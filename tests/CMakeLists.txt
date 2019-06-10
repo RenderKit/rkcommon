@@ -1,0 +1,59 @@
+## ======================================================================== ##
+## Copyright 2009-2019 Intel Corporation                                    ##
+##                                                                          ##
+## Licensed under the Apache License, Version 2.0 (the "License");          ##
+## you may not use this file except in compliance with the License.         ##
+## You may obtain a copy of the License at                                  ##
+##                                                                          ##
+##     http://www.apache.org/licenses/LICENSE-2.0                           ##
+##                                                                          ##
+## Unless required by applicable law or agreed to in writing, software      ##
+## distributed under the License is distributed on an "AS IS" BASIS,        ##
+## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. ##
+## See the License for the specific language governing permissions and      ##
+## limitations under the License.                                           ##
+## ======================================================================== ##
+
+add_executable(ospcommon_test_suite
+  catch_main.cpp
+
+  containers/test_AlignedVector.cpp
+  containers/test_TransactionalBuffer.cpp
+
+  tasking/test_async.cpp
+  tasking/test_parallel_for.cpp
+  tasking/test_parallel_foreach.cpp
+  tasking/test_schedule.cpp
+
+  utility/test_Any.cpp
+  utility/test_ArgumentList.cpp
+  utility/test_ArrayView.cpp
+  utility/test_Observers.cpp
+  utility/test_OnScopeExit.cpp
+  utility/test_Optional.cpp
+  utility/test_ParameterizedObject.cpp
+  utility/test_StringManip.cpp
+)
+
+target_link_libraries(ospcommon_test_suite PRIVATE ospcommon)
+
+add_test(NAME ArgumentList          COMMAND ospcommon_test_suite "[ArgumentList]")
+add_test(NAME ArrayView             COMMAND ospcommon_test_suite "[ArrayView]")
+add_test(NAME OnScopeExit           COMMAND ospcommon_test_suite "[OnScopeExit]")
+add_test(NAME Optional              COMMAND ospcommon_test_suite "[Optional]")
+add_test(NAME TransactionalBuffer   COMMAND ospcommon_test_suite "[TransactionalBuffer]")
+add_test(NAME StringManip           COMMAND ospcommon_test_suite "[StringManip]")
+if(NOT WIN32) # Tests which are broken on Windows with unknown fixes (for now)
+  add_test(NAME Any                 COMMAND ospcommon_test_suite "[Any]")
+  add_test(NAME AlignedVector       COMMAND ospcommon_test_suite "[AlignedVector]")
+  add_test(NAME Observers           COMMAND ospcommon_test_suite "[Observers]")
+  add_test(NAME ParameterizedObject COMMAND ospcommon_test_suite "[ParameterizedObject]")
+  add_test(NAME async               COMMAND ospcommon_test_suite "[async]")
+  add_test(NAME parallel_for        COMMAND ospcommon_test_suite "[parallel_for]")
+  add_test(NAME parallel_foreach    COMMAND ospcommon_test_suite "[parallel_foreach]")
+  add_test(NAME schedule            COMMAND ospcommon_test_suite "[schedule]")
+endif()
+
+install(TARGETS ospcommon_test_suite
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
