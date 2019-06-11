@@ -23,25 +23,37 @@ using ospcommon::utility::ArgumentList;
 static const char *test_arguments[5] = {
     "testApp", "arg1", "arg2", "arg3", "arg4"};
 
-TEST_CASE("ArgumentList correctness", "[ArgumentList]")
+SCENARIO("ArgumentList correctness", "[ArgumentList]")
 {
-  ArgumentList args(5, test_arguments);
+  GIVEN("A constructed ArgumentList from a given const char *[]")
+  {
+    ArgumentList args(5, test_arguments);
 
-  REQUIRE(!args.empty());
+    THEN("The list is initially not empty")
+    {
+      REQUIRE(!args.empty());
+    }
 
-  REQUIRE(args.size() == 4);
-  REQUIRE(args[0] != "testApp");
+    THEN("The list contains only the arguments, and not the application")
+    {
+      REQUIRE(args.size() == 4);
+      REQUIRE(args[0] != "testApp");
+    }
 
-  args.remove(0);
-  REQUIRE(args[0] == "arg2");
-  REQUIRE(args[1] == "arg3");
-  REQUIRE(args[2] == "arg4");
+    THEN("Removal of arguments from given indices mutates the list")
+    {
+      args.remove(0);
+      REQUIRE(args[0] == "arg2");
+      REQUIRE(args[1] == "arg3");
+      REQUIRE(args[2] == "arg4");
 
-  args.remove(0, 2);
-  REQUIRE(args[0] == "arg4");
+      args.remove(0, 2);
+      REQUIRE(args[0] == "arg4");
 
-  args.remove(0);
-  REQUIRE(args.empty());
+      args.remove(0);
+      REQUIRE(args.empty());
+    }
+  }
 }
 
 struct TestParser final : public ospcommon::utility::ArgumentsParser

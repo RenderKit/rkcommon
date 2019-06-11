@@ -42,58 +42,89 @@ inline void verify_value(const Optional<T> &opt, const T &value)
 
 // Tests //////////////////////////////////////////////////////////////////////
 
-TEST_CASE("Optional<> construction", "[Optional]")
+SCENARIO("Optional<> construction", "[Optional]")
 {
-  // Default construction results in "no value"
-  Optional<int> default_opt;
-  verify_no_value(default_opt);
-
-  // All types that are not Optional<> construct w/ value
-  Optional<int> value_opt(5);
-  verify_value(value_opt, 5);
-
-  SECTION("Copy construct from Optional<> without value")
+  GIVEN("A default constructed Optional<>")
   {
-    Optional<int> copy_opt(default_opt);
-    verify_no_value(copy_opt);
+    Optional<int> default_opt;
+    THEN("The Optional<> should not have a value")
+    {
+      verify_no_value(default_opt);
+    }
+
+    WHEN("Used to copy construct from an Optional<> without a value")
+    {
+      Optional<int> copy_opt(default_opt);
+      THEN("The new Optional<> should also not have a value")
+      {
+        verify_no_value(copy_opt);
+      }
+    }
+
+    WHEN("Used to move construct from Optional<> without value")
+    {
+      Optional<int> copy_opt(std::move(default_opt));
+      THEN("The new Optional<> should also not have a value")
+      {
+        verify_no_value(copy_opt);
+      }
+    }
+
+    WHEN("Assigned a value with operator=()")
+    {
+      default_opt = 5;
+      THEN("The Optional<> should take on the new value")
+      {
+        verify_value(default_opt, 5);
+      }
+    }
   }
 
-  SECTION("Copy construct from Optional<> with value")
+  GIVEN("An Optional<> constructed with a value")
   {
-    Optional<int> copy_opt(value_opt);
-    verify_value(copy_opt, 5);
-  }
+    Optional<int> value_opt(5);
 
-  SECTION("Copy construct from Optional<> with value and different type")
-  {
-    Optional<float> copy_opt(value_opt);
-    verify_value(copy_opt, 5.f);
-  }
+    THEN("The stored value should match the value passed on construction")
+    {
+      verify_value(value_opt, 5);
+    }
 
-  SECTION("Move construct from Optional<> without value")
-  {
-    Optional<int> copy_opt(std::move(default_opt));
-    verify_no_value(copy_opt);
-  }
+    WHEN("Used to copy construct from an Optional<> with a value")
+    {
+      Optional<int> copy_opt(value_opt);
+      THEN("The new Optional<> should have the same value")
+      {
+        verify_value(copy_opt, 5);
+      }
+    }
 
-  SECTION("Move construct from Optional<> with value")
-  {
-    Optional<int> copy_opt(std::move(value_opt));
-    verify_value(copy_opt, 5);
-  }
+    WHEN("Used to copy construct from Optional<> with value and different type")
+    {
+      Optional<float> copy_opt(value_opt);
+      THEN("The new Optional<> should have the right value")
+      {
+        verify_value(copy_opt, 5.f);
+      }
+    }
 
-  SECTION("Move construct from Optional<> with value and different type")
-  {
-    Optional<float> copy_opt(std::move(value_opt));
-    verify_value(copy_opt, 5.f);
-  }
-}
+    WHEN("Used to move construct from Optional<> with value")
+    {
+      Optional<int> copy_opt(std::move(value_opt));
+      THEN("The new Optional<> should have the same value")
+      {
+        verify_value(copy_opt, 5);
+      }
+    }
 
-TEST_CASE("Optional<>::operator=(T)", "[Optional]")
-{
-  Optional<int> opt;
-  opt = 5;
-  verify_value(opt, 5);
+    WHEN("Used to move construct from Optional<> with value and different type")
+    {
+      Optional<float> copy_opt(std::move(value_opt));
+      THEN("The new Optional<> should have the right value")
+      {
+        verify_value(copy_opt, 5.f);
+      }
+    }
+  }
 }
 
 TEST_CASE("Optional<>::operator=(Optional<>)", "[Optional]")
@@ -109,7 +140,7 @@ TEST_CASE("Optional<>::operator=(Optional<>)", "[Optional]")
   verify_value(movedFromOpt, 5.f);
 }
 
-TEST_CASE("Optional<>::value_or()", "[Optional]")
+SCENARIO("Optional<>::value_or()", "[Optional]")
 {
   Optional<int> opt;
 

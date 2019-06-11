@@ -20,11 +20,17 @@
 
 using ospcommon::containers::AlignedVector;
 
-TEST_CASE("verify alignment", "[AlignedVector]")
+SCENARIO("verify alignment", "[AlignedVector]")
 {
-  AlignedVector<int> aligned_vec;
+  GIVEN("An AlignedVector<> with reserved memory")
+  {
+    AlignedVector<int> aligned_vec;
 
-  aligned_vec.resize(500);
+    aligned_vec.resize(500);
 
-  REQUIRE(ospcommon::memory::isAligned(aligned_vec.data()));
+    THEN("The allocated memory should be aligned")
+    {
+      REQUIRE(ospcommon::memory::isAligned(aligned_vec.data()));
+    }
+  }
 }

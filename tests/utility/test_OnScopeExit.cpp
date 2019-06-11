@@ -20,15 +20,21 @@
 
 using ospcommon::utility::OnScopeExit;
 
-TEST_CASE("OnScopeExit correctness", "[OnScopeExit]")
+SCENARIO("OnScopeExit correctness", "[OnScopeExit]")
 {
-  int testValue = 0;
-
+  GIVEN("A value captured by an OnScopeExit lambda")
   {
-    OnScopeExit guard([&]() { testValue++; });
+    int testValue = 0;
 
-    REQUIRE(testValue == 0);  // hasn't executed yet
+    THEN("The value is only affected after OnScopeExit is out of scope")
+    {
+      {
+        OnScopeExit guard([&]() { testValue++; });
+
+        REQUIRE(testValue == 0);
+      }
+
+      REQUIRE(testValue == 1);
+    }
   }
-
-  REQUIRE(testValue == 1);  // executed exactly once?
 }

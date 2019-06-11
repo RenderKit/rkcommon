@@ -20,21 +20,33 @@
 
 using namespace ospcommon::utility;
 
-TEST_CASE("Observable/Observer interfaces", "[Observers]")
+SCENARIO("Observable/Observer interfaces", "[Observers]")
 {
-  Observable at;
+  GIVEN("A single observable and two observers")
+  {
+    Observable at;
 
-  Observer look1(at);
-  Observer look2(at);
+    Observer look1(at);
+    Observer look2(at);
 
-  REQUIRE(!look1.wasNotified());
-  REQUIRE(!look2.wasNotified());
+    THEN("Neither observer has been notified after construction")
+    {
+      REQUIRE(!look1.wasNotified());
+      REQUIRE(!look2.wasNotified());
+    }
 
-  at.notifyObservers();
+    WHEN("The observable notifies")
+    {
+      at.notifyObservers();
 
-  REQUIRE(look1.wasNotified());
-  REQUIRE(look2.wasNotified());
+      THEN("Both observers independently are notified exactly once")
+      {
+        REQUIRE(look1.wasNotified());
+        REQUIRE(look2.wasNotified());
 
-  REQUIRE(!look1.wasNotified());
-  REQUIRE(!look2.wasNotified());
+        REQUIRE(!look1.wasNotified());
+        REQUIRE(!look2.wasNotified());
+      }
+    }
+  }
 }

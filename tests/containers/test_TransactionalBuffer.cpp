@@ -22,26 +22,39 @@
 
 using ospcommon::containers::TransactionalBuffer;
 
-// Tests //////////////////////////////////////////////////////////////////////
-
-TEST_CASE("interface tests", "[TransactionalBuffer]")
+SCENARIO("interface tests", "[TransactionalBuffer]")
 {
-  TransactionalBuffer<int> tb;
+  GIVEN("A default constructed TransactionalBuffer<>")
+  {
+    TransactionalBuffer<int> tb;
 
-  REQUIRE(tb.size() == 0);
-  REQUIRE(tb.empty());
+    THEN("The buffer should be empty")
+    {
+      REQUIRE(tb.size() == 0);
+      REQUIRE(tb.empty());
+    }
 
-  tb.push_back(2);
+    WHEN("The buffer has a value pushed back on it")
+    {
+      tb.push_back(2);
 
-  REQUIRE(tb.buffer.size() == 1);
-  REQUIRE(tb.size() == 1);
-  REQUIRE(!tb.empty());
-  REQUIRE(tb.buffer[0] == 2);
+      THEN("The buffer adds it to the underlying storage")
+      {
+        REQUIRE(tb.buffer.size() == 1);
+        REQUIRE(tb.size() == 1);
+        REQUIRE(!tb.empty());
+        REQUIRE(tb.buffer[0] == 2);
+      }
 
-  auto v = tb.consume();
+      THEN("Consuming the buffer empties it")
+      {
+        auto v = tb.consume();
 
-  REQUIRE(v.size() == 1);
-  REQUIRE(v[0] == 2);
+        REQUIRE(v.size() == 1);
+        REQUIRE(v[0] == 2);
 
-  REQUIRE(tb.buffer.empty());
+        REQUIRE(tb.buffer.empty());
+      }
+    }
+  }
 }
