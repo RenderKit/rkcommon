@@ -90,8 +90,9 @@ namespace ospcommon {
 
       /*! Try to parse given string into a range; and return if
         successful. if not, return defaultvalue */
-      static range_t<T> fromString(const std::string &string,
-                                   const range_t<T> &defaultValue = empty);
+      static range_t<T> fromString(
+          const std::string &string,
+          const range_t<T> &defaultValue = ospcommon::math::empty);
 
       inline vec_t<T, 2> toVec2() const
       {
