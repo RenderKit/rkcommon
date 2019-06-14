@@ -16,9 +16,11 @@
 
 #pragma once
 
-#include "vec.h"
+#include "../math/vec.h"
 
 namespace ospcommon {
+
+  using namespace math;
 
   template <int NDIMS>
   struct multidim_index_iterator;
