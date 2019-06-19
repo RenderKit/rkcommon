@@ -284,7 +284,7 @@ namespace ospcommon {
     using AffineSpace2f      = AffineSpaceT<LinearSpace2f>;
     using AffineSpace3f      = AffineSpaceT<LinearSpace3f>;
     using AffineSpace3fa     = AffineSpaceT<LinearSpace3fa>;
-    using OrthonormalSpace3f = AffineSpaceT<Quaternion3f>;
+    using OrthonormalSpace3f = AffineSpaceT<quaternionf>;
 
     using affine2f = AffineSpace2f;
     using affine3f = AffineSpace3f;

@@ -21,7 +21,7 @@
 #include <string>
 
 #include "../memory/malloc.h"
-#include "../vec.h"
+#include "../math/vec.h"
 
 namespace ospcommon {
   namespace utility {
