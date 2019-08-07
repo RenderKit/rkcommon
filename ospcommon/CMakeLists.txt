@@ -27,9 +27,7 @@ add_library(${PROJECT_NAME}
   networking/SocketFabric.cpp
 
   os/FileName.cpp
-  os/sysinfo.cpp
   os/library.cpp
-  os/thread.cpp
 
   tasking/detail/enkiTS/TaskScheduler.cpp
   tasking/detail/tasking_system_handle.cpp

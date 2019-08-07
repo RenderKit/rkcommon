@@ -16,7 +16,6 @@
 
 #include "common.h"
 #include "os/library.h"
-#include "os/sysinfo.h"
 
 namespace ospcommon {
 

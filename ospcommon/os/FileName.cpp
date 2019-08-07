@@ -15,7 +15,6 @@
 // ======================================================================== //
 
 #include "FileName.h"
-#include "sysinfo.h"
 
 namespace ospcommon {
 #ifdef _WIN32
@@ -60,12 +59,6 @@ namespace ospcommon {
     if (home)
       return home;
     return "";
-  }
-
-  /*! returns path to executable */
-  FileName FileName::executableFolder()
-  {
-    return FileName(getExecutableFileName()).path();
   }
 
   /*! returns the path */
