@@ -65,6 +65,8 @@ target_compile_definitions(${PROJECT_NAME}
     -DOSPCOMMON_SOVERSION=0
 )
 
+set_property(TARGET ospcommon PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 ## Install library + targets ##################################################
 
 install(TARGETS ${PROJECT_NAME}
