@@ -82,7 +82,6 @@ install(TARGETS ${PROJECT_NAME}
 install(EXPORT ospcommon_Exports
   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ospcommon
   NAMESPACE ospcommon::
-  FILE ospcommonConfig.cmake
 )
 
 install(TARGETS ${name}

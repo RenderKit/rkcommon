@@ -98,78 +98,26 @@ macro(ospcommon_configure_compiler)
   endif()
 endmacro()
 
-## MPI configuration macro ##
-
-macro(ospcommon_configure_mpi)
-  if (WIN32) # FindMPI does not find Intel MPI on Windows, we need to help here
-    find_package(MPI)
-
-    # need to strip quotes, otherwise CMake treats it as relative path
-    string(REGEX REPLACE "^\"|\"$" "" MPI_CXX_INCLUDE_PATH ${MPI_CXX_INCLUDE_PATH})
-
-    if (NOT MPI_CXX_FOUND)
-      # try again, hinting the compiler wrappers
-      set(MPI_CXX_COMPILER mpicxx.bat)
-      set(MPI_C_COMPILER mpicc.bat)
-      find_package(MPI)
-
-      if (NOT MPI_CXX_LIBRARIES)
-        set(MPI_LIB_PATH ${MPI_CXX_INCLUDE_PATH}\\..\\lib)
-
-        set(MPI_LIB "MPI_LIB-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
-        find_library(MPI_LIB NAMES impi HINTS ${MPI_LIB_PATH})
-        set(MPI_C_LIB ${MPI_LIB})
-        set(MPI_C_LIBRARIES ${MPI_LIB} CACHE STRING "MPI C libraries to link against" FORCE)
-
-        set(MPI_LIB "MPI_LIB-NOTFOUND" CACHE FILEPATH "Cleared" FORCE)
-        find_library(MPI_LIB NAMES impicxx HINTS ${MPI_LIB_PATH})
-        set(MPI_CXX_LIBRARIES ${MPI_C_LIB} ${MPI_LIB} CACHE STRING "MPI CXX libraries to link against" FORCE)
-        set(MPI_LIB "MPI_LIB-NOTFOUND" CACHE INTERNAL "Scratch variable for MPI lib detection" FORCE)
-      endif()
-    endif()
-  else()
-    find_package(MPI REQUIRED)
-  endif()
-
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MPI_CXX_COMPILE_FLAGS}")
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${MPI_CXX_LINK_FLAGS}")
-
-  set(OSPCOMMON_MPI_INCLUDES ${MPI_CXX_INCLUDE_PATH})
-endmacro()
-
-## Tasking System Macros ##
+## Tasking System macros ##
 
 macro(ospcommon_configure_tasking_system)
-  # -------------------------------------------------------
-  # Setup tasking system build configuration
-  # -------------------------------------------------------
-
   set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
   set(THREADS_PREFER_PTHREAD_FLAG TRUE)
   find_package(Threads REQUIRED)
 
-  # NOTE(jda) - Notice that this implies that OSPCOMMON_CONFIGURE_COMPILER() has
-  #             been called before this macro!
-  if(OSPCOMMON_COMPILER_ICC)
-    set(CILK_STRING "Cilk")
-  endif()
-
   set(OSPCOMMON_TASKING_SYSTEM TBB CACHE STRING
-      "Per-node thread tasking system [TBB,OpenMP,Cilk,LibDispatch,Internal,Debug]")
+      "Per-node thread tasking system [TBB,OpenMP,LibDispatch,Internal,Debug]")
 
   set_property(CACHE OSPCOMMON_TASKING_SYSTEM PROPERTY
-               STRINGS TBB ${CILK_STRING} OpenMP Internal LibDispatch Debug)
-  mark_as_advanced(OSPCOMMON_TASKING_SYSTEM)
+               STRINGS TBB OpenMP Internal LibDispatch Debug)
 
   # NOTE(jda) - Make the OSPCOMMON_TASKING_SYSTEM build option case-insensitive
   string(TOUPPER ${OSPCOMMON_TASKING_SYSTEM} OSPCOMMON_TASKING_SYSTEM_ID)
 
-  set(OSPCOMMON_TASKING_TBB         FALSE)
-  set(OSPCOMMON_TASKING_CILK        FALSE)
-  set(OSPCOMMON_TASKING_OPENMP      FALSE)
-  set(OSPCOMMON_TASKING_INTERNAL    FALSE)
-  set(OSPCOMMON_TASKING_LIBDISPATCH FALSE)
-  set(OSPCOMMON_TASKING_DEBUG       FALSE)
+  set(OSPCOMMON_TASKING_TBB      FALSE)
+  set(OSPCOMMON_TASKING_OPENMP   FALSE)
+  set(OSPCOMMON_TASKING_INTERNAL FALSE)
+  set(OSPCOMMON_TASKING_DEBUG    FALSE)
 
   if(${OSPCOMMON_TASKING_SYSTEM_ID} STREQUAL "TBB")
     set(OSPCOMMON_TASKING_TBB TRUE)
@@ -180,15 +128,11 @@ macro(ospcommon_configure_tasking_system)
     unset(TBB_LIBRARY_DEBUG        CACHE)
     unset(TBB_LIBRARY_MALLOC       CACHE)
     unset(TBB_LIBRARY_MALLOC_DEBUG CACHE)
-    if(${OSPCOMMON_TASKING_SYSTEM_ID} STREQUAL "CILK")
-      set(OSPCOMMON_TASKING_CILK TRUE)
-    elseif(${OSPCOMMON_TASKING_SYSTEM_ID} STREQUAL "OPENMP")
+    if(${OSPCOMMON_TASKING_SYSTEM_ID} STREQUAL "OPENMP")
       set(OSPCOMMON_TASKING_OPENMP TRUE)
       find_package(OpenMP)
     elseif(${OSPCOMMON_TASKING_SYSTEM_ID} STREQUAL "INTERNAL")
       set(OSPCOMMON_TASKING_INTERNAL TRUE)
-    elseif(${OSPCOMMON_TASKING_SYSTEM_ID} STREQUAL "LIBDISPATCH")
-      set(OSPCOMMON_TASKING_LIBDISPATCH TRUE)
     else()
       set(OSPCOMMON_TASKING_DEBUG TRUE)
     endif()
@@ -209,20 +153,8 @@ macro(ospcommon_configure_tasking_system)
       endif()
       set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_OMP)
     endif()
-  elseif(OSPCOMMON_TASKING_CILK)
-    set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_CILK)
-    if (OSPCOMMON_COMPILER_GCC OR OSPCOMMON_COMPILER_CLANG)
-      ospcommon_warn_once(UNSAFE_USE_OF_CILK
-          "You are using Cilk with GCC or Clang...use at your own risk!")
-      set(OSPCOMMON_TASKING_OPTIONS "-fcilkplus")
-    endif()
   elseif(OSPCOMMON_TASKING_INTERNAL)
     set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_INTERNAL)
-  elseif(OSPCOMMON_TASKING_LIBDISPATCH)
-    find_package(libdispatch REQUIRED)
-    set(OSPCOMMON_TASKING_INCLUDES ${LIBDISPATCH_INCLUDE_DIRS})
-    set(OSPCOMMON_TASKING_LIBS ${OSPCOMMON_TASKING_LIBS} ${LIBDISPATCH_LIBRARIES})
-    set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_LIBDISPATCH)
   else()#Debug
     # Do nothing, will fall back to scalar code (useful for debugging)
   endif()
