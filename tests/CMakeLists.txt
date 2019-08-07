@@ -41,6 +41,8 @@ add_executable(ospcommon_test_suite
   containers/test_TransactionalBuffer.cpp
 
   tasking/test_async.cpp
+  tasking/test_AsyncLoop.cpp
+  tasking/test_AsyncTask.cpp
   tasking/test_parallel_for.cpp
   tasking/test_parallel_foreach.cpp
   tasking/test_schedule.cpp

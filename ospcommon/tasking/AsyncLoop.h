@@ -25,7 +25,7 @@
 #include "../traits/osptraits.h"
 
 #include "schedule.h"
-#include "tasking_system_handle.h"
+#include "tasking_system_init.h"
 
 namespace ospcommon {
   namespace tasking {
