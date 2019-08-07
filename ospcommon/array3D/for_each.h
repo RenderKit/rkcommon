@@ -24,6 +24,8 @@
 namespace ospcommon {
   namespace array3D {
 
+    using namespace ospcommon::math;
+
     /*! compute - in 64 bit - the number of voxels in a vec3i */
     inline size_t longProduct(const vec3i &dims)
     {
