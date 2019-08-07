@@ -18,13 +18,13 @@
 
 #include <utility>
 
-#ifdef OSPRAY_TASKING_TBB
+#ifdef OSPCOMMON_TASKING_TBB
 #  include <tbb/task.h>
-#elif defined(OSPRAY_TASKING_OMP)
+#elif defined(OSPCOMMON_TASKING_OMP)
 #  include <thread>
-#elif defined(OSPRAY_TASKING_CILK)
+#elif defined(OSPCOMMON_TASKING_CILK)
 #  include <cilk/cilk.h>
-#elif defined(OSPRAY_TASKING_INTERNAL)
+#elif defined(OSPCOMMON_TASKING_INTERNAL)
 #  include "TaskSys.h"
 #endif
 
@@ -35,7 +35,7 @@ namespace ospcommon {
       template<typename TASK_T>
       inline void schedule_impl(TASK_T fcn)
       {
-#ifdef OSPRAY_TASKING_TBB
+#ifdef OSPCOMMON_TASKING_TBB
         struct LocalTBBTask : public tbb::task
         {
           TASK_T func;
@@ -46,12 +46,12 @@ namespace ospcommon {
         auto *tbb_node =
           new(tbb::task::allocate_root())LocalTBBTask(std::move(fcn));
         tbb::task::enqueue(*tbb_node);
-#elif defined(OSPRAY_TASKING_OMP)
+#elif defined(OSPCOMMON_TASKING_OMP)
         std::thread thread(fcn);
         thread.detach();
-#elif defined(OSPRAY_TASKING_CILK)
+#elif defined(OSPCOMMON_TASKING_CILK)
         cilk_spawn fcn();
-#elif defined(OSPRAY_TASKING_INTERNAL)
+#elif defined(OSPCOMMON_TASKING_INTERNAL)
         detail::schedule_internal(std::move(fcn));
 #else// Debug --> synchronous!
         fcn();

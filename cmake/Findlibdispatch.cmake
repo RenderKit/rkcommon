@@ -43,7 +43,7 @@ FIND_LIBRARY(LIBDISPATCH_LIBRARY dispatch PATHS ${LIBDISPATCH_ROOT}/lib NO_DEFAU
 SET(LIBDISPATCH_ROOT_LAST ${LIBDISPATCH_ROOT} CACHE INTERNAL "Last value of LIBDISPATCH_ROOT to detect changes")
 
 SET(LIBDISPATCH_ERROR_MESSAGE
-  "Apple's 'libdispatch' not found. Please set LIBDISPATCH_ROOT to the installation location of libdispatch or please choose a different tasking system backend (OSPRAY_TASKING_SYSTEM).")
+  "Apple's 'libdispatch' not found. Please set LIBDISPATCH_ROOT to the installation location of libdispatch or please choose a different tasking system backend (OSPCOMMON_TASKING_SYSTEM).")
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(LIBDISPATCH

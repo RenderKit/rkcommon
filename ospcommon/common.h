@@ -16,11 +16,10 @@
 
 #pragma once
 
+// ospcommon
 #include "platform.h"
 // std
-#include <algorithm>  // std::min etc on windows
-#include <mutex>
-#include <stdexcept>
+#include <string>
 
 #ifdef _WIN32
 // ----------- windows only -----------
@@ -39,10 +38,6 @@ typedef int ssize_t;
 #include "unistd.h"
 #endif
 
-#include "math/ospmath.h"
-
-#include <stdint.h>
-
 #ifdef _WIN32
 #ifdef ospray_common_EXPORTS
 #define OSPCOMMON_INTERFACE __declspec(dllexport)
@@ -53,30 +48,9 @@ typedef int ssize_t;
 #define OSPCOMMON_INTERFACE
 #endif
 
-#ifdef NDEBUG
-#define Assert(expr)        /* nothing */
-#define Assert2(expr, expl) /* nothing */
-#define AssertError(errMsg) /* nothing */
-#else
-#define Assert(expr)                                         \
-  ((void)((expr) ? 0                                         \
-                 : ((void)ospcommon::doAssertion(            \
-                        __FILE__, __LINE__, #expr, nullptr), \
-                    0)))
-#define Assert2(expr, expl)                               \
-  ((void)((expr) ? 0                                      \
-                 : ((void)ospcommon::doAssertion(         \
-                        __FILE__, __LINE__, #expr, expl), \
-                    0)))
-#define AssertError(errMsg) doAssertion(__FILE__, __LINE__, (errMsg), nullptr)
-#endif
-
 #ifdef _WIN32
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
-#define NOTIMPLEMENTED                                        \
-  throw std::runtime_error(std::string(__PRETTY_FUNCTION__) + \
-                           ": not implemented...")
 
 #define SCOPED_LOCK(x)                  \
   std::lock_guard<std::mutex> _lock(x); \
@@ -86,20 +60,22 @@ namespace ospcommon {
 
   using byte_t = unsigned char;
 
-  OSPCOMMON_INTERFACE void doAssertion(const char *file,
-                                       int line,
-                                       const char *expr,
-                                       const char *expl);
-
   /*! remove specified num arguments from an ac/av arglist */
   OSPCOMMON_INTERFACE void removeArgs(int &ac,
                                       const char **&av,
                                       int where,
                                       int howMany);
+
   OSPCOMMON_INTERFACE void loadLibrary(const std::string &name,
                                        bool anchor = true);
+
   OSPCOMMON_INTERFACE void loadDefaultLibrary();
+
   OSPCOMMON_INTERFACE void *getSymbol(const std::string &name);
+
+  OSPCOMMON_INTERFACE std::string prettyDouble(double x);
+
+  OSPCOMMON_INTERFACE std::string prettyNumber(size_t x);
 
   // NOTE(jda) - Implement make_unique() as it didn't show up until C++14...
   template <typename T, typename... Args>

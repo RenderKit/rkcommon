@@ -26,23 +26,6 @@ namespace ospcommon {
     ac -= howMany;
   }
 
-  void doAssertion(const char *file,
-                   int line,
-                   const char *expr,
-                   const char *expl)
-  {
-    if (expl)
-      fprintf(stderr,
-              "%s:%i: Assertion failed: \"%s\":\nAdditional Info: %s\n",
-              file,
-              line,
-              expr,
-              expl);
-    else
-      fprintf(stderr, "%s:%i: Assertion failed: \"%s\".\n", file, line, expr);
-    abort();
-  }
-
   void loadLibrary(const std::string &name, bool anchor)
   {
     LibraryRepository::getInstance()->add(name, anchor);
@@ -57,5 +40,67 @@ namespace ospcommon {
   {
     return LibraryRepository::getInstance()->getSymbol(name);
   }
+
+#ifdef _WIN32
+#define osp_snprintf sprintf_s
+#else
+#define osp_snprintf snprintf
+#endif
+
+  std::string prettyDouble(double val)
+  {
+    const double absVal = abs(val);
+    char result[1000];
+
+    if (absVal >= 1e+15f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e18f, 'E');
+    else if (absVal >= 1e+15f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e15f, 'P');
+    else if (absVal >= 1e+12f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e12f, 'T');
+    else if (absVal >= 1e+09f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e09f, 'G');
+    else if (absVal >= 1e+06f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e06f, 'M');
+    else if (absVal >= 1e+03f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e03f, 'k');
+    else if (absVal <= 1e-12f)
+      osp_snprintf(result, 1000, "%.1f%c", val * 1e15f, 'f');
+    else if (absVal <= 1e-09f)
+      osp_snprintf(result, 1000, "%.1f%c", val * 1e12f, 'p');
+    else if (absVal <= 1e-06f)
+      osp_snprintf(result, 1000, "%.1f%c", val * 1e09f, 'n');
+    else if (absVal <= 1e-03f)
+      osp_snprintf(result, 1000, "%.1f%c", val * 1e06f, 'u');
+    else if (absVal <= 1e-00f)
+      osp_snprintf(result, 1000, "%.1f%c", val * 1e03f, 'm');
+    else
+      osp_snprintf(result, 1000, "%f", (float)val);
+    return result;
+  }
+
+  std::string prettyNumber(size_t s)
+  {
+    const double val = s;
+    char result[1000];
+
+    if (val >= 1e+15f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e18f, 'E');
+    else if (val >= 1e+15f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e15f, 'P');
+    else if (val >= 1e+12f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e12f, 'T');
+    else if (val >= 1e+09f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e09f, 'G');
+    else if (val >= 1e+06f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e06f, 'M');
+    else if (val >= 1e+03f)
+      osp_snprintf(result, 1000, "%.1f%c", val / 1e03f, 'k');
+    else
+      osp_snprintf(result, 1000, "%lu", s);
+    return result;
+  }
+
+#undef osp_snprintf
 
 }  // namespace ospcommon

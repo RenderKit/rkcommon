@@ -106,7 +106,7 @@ set(TBB_ROOT_LAST ${TBB_ROOT} CACHE INTERNAL "Last value of TBB_ROOT to detect c
 set(TBB_ERROR_MESSAGE
   "Threading Building Blocks (TBB) with minimum version ${TBB_VERSION_REQUIRED} not found.
 OSPRay uses TBB as default tasking system. Please make sure you have the TBB headers installed as well (the package is typically named 'libtbb-dev' or 'tbb-devel') and/or hint the location of TBB in TBB_ROOT.
-Alternatively, you can try to use OpenMP as tasking system by setting OSPRAY_TASKING_SYSTEM=OpenMP")
+Alternatively, you can try to use OpenMP as tasking system by setting OSPCOMMON_TASKING_SYSTEM=OpenMP")
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(TBB

@@ -15,13 +15,15 @@
 // ======================================================================== //
 
 #include "malloc.h"
-#if defined(TASKING_TBB)
+#if defined(OSPCOMMON_TASKING_TBB)
 #define __TBB_NO_IMPLICIT_LINKAGE 1
 #include "tbb/scalable_allocator.h"
-#endif
-
+#else
 #ifdef _WIN32
 #include <malloc.h>
+#else
+#include <xmmintrin.h>
+#endif
 #endif
 
 namespace ospcommon {
@@ -30,7 +32,7 @@ namespace ospcommon {
     void *alignedMalloc(size_t size, size_t align)
     {
       assert((align & (align - 1)) == 0);
-#if defined(TASKING_TBB)
+#if defined(OSPCOMMON_TASKING_TBB)
       return scalable_aligned_malloc(size, align);
 #else
 #ifdef _WIN32
@@ -43,7 +45,7 @@ namespace ospcommon {
 
     void alignedFree(void *ptr)
     {
-#if defined(TASKING_TBB)
+#if defined(OSPCOMMON_TASKING_TBB)
       scalable_aligned_free(ptr);
 #else
 #ifdef _WIN32

@@ -30,7 +30,7 @@ add_library(${PROJECT_NAME}
   os/library.cpp
 
   tasking/detail/enkiTS/TaskScheduler.cpp
-  tasking/detail/tasking_system_handle.cpp
+  tasking/detail/tasking_system_init.cpp
   tasking/detail/TaskSys.cpp
 
   utility/demangle.cpp
