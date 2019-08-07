@@ -18,6 +18,7 @@ add_executable(ospcommon_test_suite
   catch_main.cpp
 
   containers/test_AlignedVector.cpp
+  containers/test_FlatMap.cpp
   containers/test_TransactionalBuffer.cpp
 
   tasking/test_async.cpp
@@ -41,6 +42,7 @@ add_test(NAME ArgumentList          COMMAND ospcommon_test_suite "[ArgumentList]
 add_test(NAME ArrayView             COMMAND ospcommon_test_suite "[ArrayView]")
 add_test(NAME OnScopeExit           COMMAND ospcommon_test_suite "[OnScopeExit]")
 add_test(NAME Optional              COMMAND ospcommon_test_suite "[Optional]")
+add_test(NAME FlatMap               COMMAND ospcommon_test_suite "[FlatMap]")
 add_test(NAME TransactionalBuffer   COMMAND ospcommon_test_suite "[TransactionalBuffer]")
 add_test(NAME StringManip           COMMAND ospcommon_test_suite "[StringManip]")
 if(NOT WIN32) # Tests which are broken on Windows with unknown fixes (for now)

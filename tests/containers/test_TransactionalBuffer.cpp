@@ -22,7 +22,7 @@
 
 using ospcommon::containers::TransactionalBuffer;
 
-SCENARIO("interface tests", "[TransactionalBuffer]")
+SCENARIO("TransactionalBuffer interface tests", "[TransactionalBuffer]")
 {
   GIVEN("A default constructed TransactionalBuffer<>")
   {
