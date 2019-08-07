@@ -17,6 +17,25 @@
 add_executable(ospcommon_test_suite
   catch_main.cpp
 
+  array3D/test_Array3D.cpp
+  array3D/test_for_each.cpp
+
+  math/test_AffineSpace.cpp
+  math/test_box.cpp
+  math/test_constants.cpp
+  math/test_LinearSpace.cpp
+  math/test_ospmath.cpp
+  math/test_Quaternion.cpp
+  math/test_range.cpp
+  math/test_vec.cpp
+
+  memory/test_DeletedUniquePtr.cpp
+  memory/test_malloc.cpp
+  memory/test_RefCount.cpp
+
+  os/test_FileName.cpp
+  os/test_library.cpp
+
   containers/test_AlignedVector.cpp
   containers/test_FlatMap.cpp
   containers/test_TransactionalBuffer.cpp
@@ -26,14 +45,26 @@ add_executable(ospcommon_test_suite
   tasking/test_parallel_foreach.cpp
   tasking/test_schedule.cpp
 
+  traits/test_traits.cpp
+
   utility/test_Any.cpp
   utility/test_ArgumentList.cpp
   utility/test_ArrayView.cpp
+  utility/test_CodeTimer.cpp
+  utility/test_DataView.cpp
+  utility/test_demangle.cpp
+  utility/test_DoubleBufferedValue.cpp
+  utility/test_getEnvVar.cpp
+  utility/test_multidim_index_sequence.cpp
   utility/test_Observers.cpp
   utility/test_OnScopeExit.cpp
   utility/test_Optional.cpp
   utility/test_ParameterizedObject.cpp
+  utility/test_PseudoURL.cpp
+  utility/test_SaveImage.cpp
   utility/test_StringManip.cpp
+  utility/test_TimeStamp.cpp
+  utility/test_TransactionalValue.cpp
 )
 
 target_link_libraries(ospcommon_test_suite PRIVATE ospcommon)
