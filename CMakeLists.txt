@@ -36,6 +36,8 @@ include(clang-format)
 ospcommon_configure_build_type()
 ospcommon_configure_compiler()
 
+option(BUILD_SHARED_LIBS "Build ospcommon as a shared library" ON)
+
 enable_testing()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
