@@ -20,8 +20,8 @@
 #include <stdio.h>
 #include <string>
 
-#include "../memory/malloc.h"
 #include "../math/vec.h"
+#include "../memory/malloc.h"
 
 namespace ospcommon {
   namespace utility {
@@ -78,6 +78,7 @@ namespace ospcommon {
                          const int sizeY,
                          const T *p)
     {
+      using namespace ospcommon::math;
       static_assert(std::is_same<T, vec4f>::value ||
                         std::is_same<T, vec3fa>::value ||
                         std::is_same<T, vec3f>::value,
