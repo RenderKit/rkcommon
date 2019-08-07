@@ -17,6 +17,7 @@
 #include "FileName.h"
 
 namespace ospcommon {
+
 #ifdef _WIN32
   const char path_sep = '\\';
 #else
@@ -172,4 +173,5 @@ namespace ospcommon {
   {
     return cout << filename.filename;
   }
+
 }  // namespace ospcommon

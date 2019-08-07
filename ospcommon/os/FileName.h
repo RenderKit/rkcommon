@@ -16,9 +16,10 @@
 
 #pragma once
 
-#include "common.h"
+#include "../common.h"
 
 namespace ospcommon {
+
   /*! Convenience class for handling file names and paths. */
   class FileName
   {
@@ -98,4 +99,5 @@ namespace ospcommon {
    private:
     std::string filename;
   };
+
 }  // namespace ospcommon
