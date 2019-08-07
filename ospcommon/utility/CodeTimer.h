@@ -16,7 +16,8 @@
 
 #pragma once
 
-#include "../common.h"
+// std
+#include <chrono>
 
 namespace ospcommon {
   namespace utility {
@@ -36,34 +37,38 @@ namespace ospcommon {
       double perSecondSmoothed() const;
 
      private:
-      double lastSeconds{0.0};
       double smooth_nom{0.0};
       double smooth_den{0.0};
-      double frameStartTime{0.0};
+
+      std::chrono::time_point<std::chrono::steady_clock> frameEndTime;
+      std::chrono::time_point<std::chrono::steady_clock> frameStartTime;
     };
 
     // Inlined CodeTimer definitions //////////////////////////////////////////
 
     inline void CodeTimer::start()
     {
-      frameStartTime = ospcommon::getSysTime();
+      frameStartTime = std::chrono::steady_clock::now();
     }
 
     inline void CodeTimer::stop()
     {
-      lastSeconds = ospcommon::getSysTime() - frameStartTime;
-      smooth_nom  = smooth_nom * 0.8f + lastSeconds;
+      frameEndTime = std::chrono::steady_clock::now();
+
+      smooth_nom  = smooth_nom * 0.8f + seconds();
       smooth_den  = smooth_den * 0.8f + 1.f;
     }
 
     inline double CodeTimer::seconds() const
     {
-      return lastSeconds;
+      auto diff = frameEndTime - frameStartTime;
+      return std::chrono::duration<double>(diff).count();
     }
 
     inline double CodeTimer::milliseconds() const
     {
-      return seconds() * 1000.0;
+      auto diff = frameEndTime - frameStartTime;
+      return std::chrono::duration<double, std::milli>(diff).count();
     }
 
     inline double CodeTimer::perSecond() const
