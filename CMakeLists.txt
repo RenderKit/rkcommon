@@ -38,8 +38,7 @@ project(ospcommon VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
-include(macros)
-include(clang-format)
+include(ospcommon_macros)
 
 ospcommon_configure_build_type()
 ospcommon_configure_compiler()
@@ -80,7 +79,7 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   cmake/FindTBB.cmake
-  cmake/macros.cmake
+  cmake/ospcommon_macros.cmake
 DESTINATION
   ${CMAKE_INSTALL_LIBDIR}/cmake/ospcommon
 )

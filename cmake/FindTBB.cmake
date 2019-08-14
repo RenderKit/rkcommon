@@ -23,7 +23,8 @@ if (NOT TBB_ROOT)
   set(TBB_ROOT $ENV{TBBROOT})
 endif()
 
-# detect changed TBB_ROOT
+## Detect changed TBB_ROOT ##
+
 if (NOT TBB_ROOT STREQUAL TBB_ROOT_LAST)
   unset(TBB_INCLUDE_DIR CACHE)
   unset(TBB_LIBRARY CACHE)
@@ -114,7 +115,8 @@ find_package_handle_standard_args(TBB
   TBB_INCLUDE_DIR TBB_LIBRARY TBB_LIBRARY_MALLOC
 )
 
-# check version
+## Check version ##
+
 if (TBB_INCLUDE_DIR)
   file(READ ${TBB_INCLUDE_DIR}/tbb/tbb_stddef.h TBB_STDDEF_H)
 
@@ -131,6 +133,8 @@ if (TBB_INCLUDE_DIR)
   set(TBB_VERSION ${TBB_VERSION} CACHE STRING "TBB Version")
   mark_as_advanced(TBB_VERSION)
 endif()
+
+## Build TBB target 'ospcommon_tbb' ##
 
 if (TBB_FOUND)
   add_library(ospcommon_tbb SHARED IMPORTED)

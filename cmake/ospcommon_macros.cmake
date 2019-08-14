@@ -14,6 +14,8 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
+include(CMakeFindDependencyMacro)
+
 ## Macro for printing CMake variables ##
 macro(print var)
   message("${var} = ${${var}}")
@@ -141,11 +143,13 @@ macro(ospcommon_create_tasking_target)
   set(OSPCOMMON_TASKING_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
   if(OSPCOMMON_TASKING_TBB)
-    find_package(TBB REQUIRED)
-    list(APPEND OSPCOMMON_TASKING_LIBS ospcommon_tbb)
-    set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_TBB)
+    find_dependency(TBB)
+    if (TBB_FOUND)
+      list(APPEND OSPCOMMON_TASKING_LIBS ospcommon_tbb)
+      set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_TBB)
+    endif()
   elseif(OSPCOMMON_TASKING_OPENMP)
-    find_package(OpenMP)
+    find_dependency(OpenMP)
     if (OPENMP_FOUND)
       list(APPEND OSPCOMMON_TASKING_LIBS OpenMP::OpenMP_CXX)
       set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_OMP)
