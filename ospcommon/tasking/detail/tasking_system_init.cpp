@@ -20,8 +20,6 @@
 #if defined(OSPCOMMON_TASKING_TBB)
 #include <tbb/task_arena.h>
 #include <tbb/task_scheduler_init.h>
-#elif defined(OSPCOMMON_TASKING_CILK)
-#include <cilk/cilk_api.h>
 #elif defined(OSPCOMMON_TASKING_OMP)
 #include <omp.h>
 #elif defined(OSPCOMMON_TASKING_INTERNAL)
@@ -54,13 +52,11 @@ namespace ospcommon {
             tbb_init(numThreads)
 #endif
       {
-#if defined(OSPCOMMON_TASKING_CILK)
-        __cilkrts_set_param("nworkers", std::to_string(numThreads).c_str());
-#elif defined(OSPCOMMON_TASKING_OMP)
+#if defined(OSPCOMMON_TASKING_OMP)
         if (numThreads > 0)
           omp_set_num_threads(numThreads);
 #elif defined(OSPCOMMON_TASKING_INTERNAL)
-        detail::initTaskSystemInternal(numThreads < 0 ? -1 : numThreads);
+        detail::initTaskSystemInternal(numThreads <= 0 ? -1 : numThreads + 1);
 #endif
       }
 
@@ -72,20 +68,12 @@ namespace ospcommon {
 #else
         return tbb::task_scheduler_init::default_num_threads();
 #endif
-#elif defined(OSPCOMMON_TASKING_CILK)
-        return numThreads >= 0 ? numThreads
-                               : std::thread::hardware_concurrency();
 #elif defined(OSPCOMMON_TASKING_OMP)
-        int threads = 0;
-#pragma omp parallel
-        {
-          threads = omp_get_num_threads();
-        }
-        return threads;
+        return omp_get_max_threads();
 #elif defined(OSPCOMMON_TASKING_INTERNAL)
         return detail::numThreadsTaskSystemInternal();
 #else
-        return 0;
+        return 1;
 #endif
       }
 

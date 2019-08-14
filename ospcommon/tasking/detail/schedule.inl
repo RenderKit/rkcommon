@@ -22,8 +22,6 @@
 #  include <tbb/task.h>
 #elif defined(OSPCOMMON_TASKING_OMP)
 #  include <thread>
-#elif defined(OSPCOMMON_TASKING_CILK)
-#  include <cilk/cilk.h>
 #elif defined(OSPCOMMON_TASKING_INTERNAL)
 #  include "TaskSys.h"
 #endif
@@ -49,8 +47,6 @@ namespace ospcommon {
 #elif defined(OSPCOMMON_TASKING_OMP)
         std::thread thread(fcn);
         thread.detach();
-#elif defined(OSPCOMMON_TASKING_CILK)
-        cilk_spawn fcn();
 #elif defined(OSPCOMMON_TASKING_INTERNAL)
         detail::schedule_internal(std::move(fcn));
 #else// Debug --> synchronous!

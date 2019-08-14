@@ -20,36 +20,19 @@
 
 #ifdef OSPCOMMON_TASKING_TBB
 #  include <tbb/parallel_for.h>
-#elif defined(OSPCOMMON_TASKING_CILK)
-#  include <cilk/cilk.h>
 #elif defined(OSPCOMMON_TASKING_INTERNAL)
 #  include "TaskSys.h"
-#elif defined(OSPCOMMON_TASKING_LIBDISPATCH)
-#  include "dispatch/dispatch.h"
 #endif
 
 namespace ospcommon {
   namespace tasking {
     namespace detail {
 
-#if defined(OSPCOMMON_TASKING_LIBDISPATCH)
-      template<typename INDEX_T, typename TASK_T>
-      inline void callFcn_T(void *_task, INDEX_T taskIndex)
-      {
-        auto &task = *((TASK_T*)_task);
-        task(taskIndex);
-      }
-#endif
-
       template<typename INDEX_T, typename TASK_T>
       inline void parallel_for_impl(INDEX_T nTasks, TASK_T&& fcn)
       {
 #ifdef OSPCOMMON_TASKING_TBB
         tbb::parallel_for(INDEX_T(0), nTasks, std::forward<TASK_T>(fcn));
-#elif defined(OSPCOMMON_TASKING_CILK)
-        cilk_for (INDEX_T taskIndex = 0; taskIndex < nTasks; ++taskIndex) {
-          fcn(taskIndex);
-        }
 #elif defined(OSPCOMMON_TASKING_OMP)
 #       pragma omp parallel for schedule(dynamic)
         for (INDEX_T taskIndex = 0; taskIndex < nTasks; ++taskIndex) {
@@ -57,12 +40,6 @@ namespace ospcommon {
         }
 #elif defined(OSPCOMMON_TASKING_INTERNAL)
         detail::parallel_for_internal(nTasks, std::forward<TASK_T>(fcn));
-#elif defined(OSPCOMMON_TASKING_LIBDISPATCH)
-        dispatch_apply_f(nTasks,
-                         dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
-                                                   0),
-                         &fcn,
-                         &callFcn_T<TASK_T>);
 #else // Debug (no tasking system)
         for (INDEX_T taskIndex = 0; taskIndex < nTasks; ++taskIndex) {
           fcn(taskIndex);
