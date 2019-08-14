@@ -67,7 +67,7 @@ namespace ospcommon {
                                       int howMany);
 
   OSPCOMMON_INTERFACE void loadLibrary(const std::string &name,
-                                       bool anchor = true);
+                                       bool anchor = false);
 
   OSPCOMMON_INTERFACE void loadDefaultLibrary();
 
