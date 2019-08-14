@@ -101,15 +101,11 @@ endmacro()
 ## Tasking System macros ##
 
 macro(ospcommon_configure_tasking_system)
-  set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-  set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-  find_package(Threads REQUIRED)
-
   set(OSPCOMMON_TASKING_SYSTEM TBB CACHE STRING
-      "Per-node thread tasking system [TBB,OpenMP,LibDispatch,Internal,Debug]")
+      "Per-node thread tasking system [TBB,OpenMP,Internal,Debug]")
 
   set_property(CACHE OSPCOMMON_TASKING_SYSTEM PROPERTY
-               STRINGS TBB OpenMP Internal LibDispatch Debug)
+               STRINGS TBB OpenMP Internal Debug)
 
   # NOTE(jda) - Make the OSPCOMMON_TASKING_SYSTEM build option case-insensitive
   string(TOUPPER ${OSPCOMMON_TASKING_SYSTEM} OSPCOMMON_TASKING_SYSTEM_ID)
@@ -121,7 +117,6 @@ macro(ospcommon_configure_tasking_system)
 
   if(${OSPCOMMON_TASKING_SYSTEM_ID} STREQUAL "TBB")
     set(OSPCOMMON_TASKING_TBB TRUE)
-    find_package(TBB REQUIRED)
   else()
     unset(TBB_INCLUDE_DIR          CACHE)
     unset(TBB_LIBRARY              CACHE)
@@ -130,27 +125,29 @@ macro(ospcommon_configure_tasking_system)
     unset(TBB_LIBRARY_MALLOC_DEBUG CACHE)
     if(${OSPCOMMON_TASKING_SYSTEM_ID} STREQUAL "OPENMP")
       set(OSPCOMMON_TASKING_OPENMP TRUE)
-      find_package(OpenMP)
     elseif(${OSPCOMMON_TASKING_SYSTEM_ID} STREQUAL "INTERNAL")
       set(OSPCOMMON_TASKING_INTERNAL TRUE)
     else()
       set(OSPCOMMON_TASKING_DEBUG TRUE)
     endif()
   endif()
+endmacro()
+
+macro(ospcommon_create_tasking_target)
+  set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+  set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+  find_package(Threads REQUIRED)
 
   set(OSPCOMMON_TASKING_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
   if(OSPCOMMON_TASKING_TBB)
+    find_package(TBB REQUIRED)
+    list(APPEND OSPCOMMON_TASKING_LIBS ospcommon_tbb)
     set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_TBB)
-    set(OSPCOMMON_TASKING_INCLUDES ${TBB_INCLUDE_DIRS})
-    set(OSPCOMMON_TASKING_LIBS ${OSPCOMMON_TASKING_LIBS} ${TBB_LIBRARIES})
   elseif(OSPCOMMON_TASKING_OPENMP)
+    find_package(OpenMP)
     if (OPENMP_FOUND)
-      set(OSPCOMMON_TASKING_OPTIONS "${OpenMP_CXX_FLAGS}")
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-      if(OSPCOMMON_COMPILER_ICC) # workaround linker issue #115
-        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -liomp5")
-      endif()
+      list(APPEND OSPCOMMON_TASKING_LIBS OpenMP::OpenMP_CXX)
       set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_OMP)
     endif()
   elseif(OSPCOMMON_TASKING_INTERNAL)
@@ -158,16 +155,9 @@ macro(ospcommon_configure_tasking_system)
   else()#Debug
     # Do nothing, will fall back to scalar code (useful for debugging)
   endif()
-endmacro()
 
-macro(ospcommon_create_tasking_target)
   if (NOT TARGET ospcommon_tasking)
     add_library(ospcommon_tasking INTERFACE)
-
-    target_include_directories(ospcommon_tasking
-    INTERFACE
-      ${OSPCOMMON_TASKING_INCLUDES}
-    )
 
     target_link_libraries(ospcommon_tasking
     INTERFACE
@@ -177,11 +167,6 @@ macro(ospcommon_create_tasking_target)
     target_compile_definitions(ospcommon_tasking
     INTERFACE
       ${OSPCOMMON_TASKING_DEFINITIONS}
-    )
-
-    target_compile_options(ospcommon_tasking
-    INTERFACE
-      ${OSPCOMMON_TASKING_OPTIONS}
     )
   endif()
 endmacro()

@@ -19,7 +19,8 @@
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.9) # NOTE(jda) - want to rely on OpenMP targets
+
 if(POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW) # since 3.12
 endif()
@@ -27,13 +28,40 @@ endif()
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(GNUInstallDirs)
+
 ## Establish project ##
 
 project(ospcommon VERSION 1.0.0 LANGUAGES CXX)
 
+## Add ospcommon specific macros ##
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
+
+include(macros)
+include(clang-format)
+
+ospcommon_configure_build_type()
+ospcommon_configure_compiler()
+ospcommon_configure_tasking_system()
+ospcommon_create_tasking_target()
+
+## Build options and specific configuration ##
+
+option(BUILD_SHARED_LIBS "Build ospcommon as a shared library" ON)
+
+enable_testing()
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
+## Build library and tests ##
+
+subdirs(ospcommon tests)
+
 ## Configure CMake find_package() config files ##
 
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
@@ -51,33 +79,11 @@ write_basic_package_version_file(
 install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  cmake/FindTBB.cmake
+  cmake/macros.cmake
 DESTINATION
   ${CMAKE_INSTALL_LIBDIR}/cmake/ospcommon
 )
-
-## Add ospcommon specific macros ##
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
-
-include(macros)
-include(clang-format)
-
-ospcommon_configure_build_type()
-ospcommon_configure_compiler()
-
-## Build options and specific configuration ##
-
-option(BUILD_SHARED_LIBS "Build ospcommon as a shared library" ON)
-
-enable_testing()
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-
-## Build library and tests ##
-
-subdirs(ospcommon tests)
 
 # Must be last
 include(CPack)

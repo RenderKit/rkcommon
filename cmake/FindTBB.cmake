@@ -133,6 +133,8 @@ if (TBB_INCLUDE_DIR)
 endif()
 
 if (TBB_FOUND)
+  add_library(ospcommon_tbb SHARED IMPORTED)
+
   set(TBB_INCLUDE_DIRS ${TBB_INCLUDE_DIR})
   # NOTE(jda) - TBB found in CentOS 6/7 package manager does not have debug
   #             versions of the library...silently fall-back to using only the
@@ -145,6 +147,12 @@ if (TBB_FOUND)
         debug ${TBB_LIBRARY_DEBUG} debug ${TBB_LIBRARY_MALLOC_DEBUG}
     )
   endif()
+
+  target_include_directories(ospcommon_tbb INTERFACE ${TBB_INCLUDE_DIRS})
+  target_link_libraries(ospcommon_tbb INTERFACE ${TBB_LIBRARIES})
+  set_target_properties(ospcommon_tbb PROPERTIES
+    IMPORTED_LOCATION ${TBB_LIBRARY}
+  )
 endif()
 
 mark_as_advanced(TBB_INCLUDE_DIR)

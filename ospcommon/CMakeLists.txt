@@ -14,9 +14,6 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-ospcommon_configure_tasking_system()
-ospcommon_create_tasking_target()
-
 add_library(${PROJECT_NAME}
   common.cpp
 
@@ -43,7 +40,7 @@ add_library(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
   PUBLIC
-    $<BUILD_INTERFACE:ospcommon_tasking>
+    ospcommon_tasking
     ${CMAKE_DL_LIBS}
     $<${OSPCOMMON_PLATFORM_WIN}:ws2_32>
 )
@@ -69,7 +66,7 @@ set_property(TARGET ospcommon PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 ## Install library + targets ##################################################
 
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${PROJECT_NAME} ospcommon_tasking
   EXPORT ospcommon_Exports
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     NAMELINK_SKIP
@@ -84,7 +81,7 @@ install(EXPORT ospcommon_Exports
   NAMESPACE ospcommon::
 )
 
-install(TARGETS ${name}
+install(TARGETS ${PROJECT_NAME} ospcommon_tasking
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     NAMELINK_ONLY
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
