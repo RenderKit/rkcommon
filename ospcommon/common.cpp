@@ -16,6 +16,7 @@
 
 #include "common.h"
 #include "os/library.h"
+#include <cmath>
 
 namespace ospcommon {
 
