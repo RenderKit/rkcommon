@@ -16,10 +16,11 @@
 
 ## Global CMake options ##
 
-set(CMAKE_DISABLE_SOURCE_CHANGES ON)
-set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
-
-cmake_minimum_required(VERSION 3.9) # NOTE(jda) - want to rely on OpenMP targets
+if (OSPCOMMON_TASKING_SYSTEM STREQUAL "OpenMP")
+  cmake_minimum_required(VERSION 3.9) # NOTE(jda): rely on OpenMP targets
+else()
+  cmake_minimum_required(VERSION 3.1)
+endif()
 
 if(POLICY CMP0074)
   cmake_policy(SET CMP0074 NEW) # since 3.12
@@ -27,6 +28,10 @@ endif()
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(CMAKE_DISABLE_SOURCE_CHANGES ON)
+set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 include(GNUInstallDirs)
 
