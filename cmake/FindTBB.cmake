@@ -152,8 +152,6 @@ if (TBB_FOUND)
     )
   endif()
 
-  target_include_directories(ospcommon_tbb INTERFACE ${TBB_INCLUDE_DIRS})
-  target_link_libraries(ospcommon_tbb INTERFACE ${TBB_LIBRARIES})
   set_target_properties(ospcommon_tbb PROPERTIES
     INTERFACE_LINK_LIBRARIES "${TBB_LIBRARY};${TBB_LIBRARY_MALLOC}"
     INTERFACE_INCLUDE_DIRECTORIES "${TBB_INCLUDE_DIRS}"
