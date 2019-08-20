@@ -137,7 +137,7 @@ endif()
 ## Build TBB target 'ospcommon_tbb' ##
 
 if (TBB_FOUND)
-  add_library(ospcommon_tbb SHARED IMPORTED)
+  add_library(ospcommon_tbb INTERFACE IMPORTED)
 
   set(TBB_INCLUDE_DIRS ${TBB_INCLUDE_DIR})
   # NOTE(jda) - TBB found in CentOS 6/7 package manager does not have debug
@@ -155,7 +155,8 @@ if (TBB_FOUND)
   target_include_directories(ospcommon_tbb INTERFACE ${TBB_INCLUDE_DIRS})
   target_link_libraries(ospcommon_tbb INTERFACE ${TBB_LIBRARIES})
   set_target_properties(ospcommon_tbb PROPERTIES
-    IMPORTED_LOCATION ${TBB_LIBRARY}
+    INTERFACE_LINK_LIBRARIES "${TBB_LIBRARY};${TBB_LIBRARY_MALLOC}"
+    INTERFACE_INCLUDE_DIRECTORIES "${TBB_INCLUDE_DIRS}"
   )
 endif()
 

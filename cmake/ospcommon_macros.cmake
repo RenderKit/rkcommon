@@ -146,31 +146,25 @@ macro(ospcommon_create_tasking_target)
     find_dependency(TBB)
     if (TBB_FOUND)
       list(APPEND OSPCOMMON_TASKING_LIBS ospcommon_tbb)
-      set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_TBB)
+      set(OSPCOMMON_TASKING_DEFINITIONS OSPCOMMON_TASKING_TBB)
     endif()
   elseif(OSPCOMMON_TASKING_OPENMP)
     find_dependency(OpenMP)
     if (OPENMP_FOUND)
       list(APPEND OSPCOMMON_TASKING_LIBS OpenMP::OpenMP_CXX)
-      set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_OMP)
+      set(OSPCOMMON_TASKING_DEFINITIONS OSPCOMMON_TASKING_OMP)
     endif()
   elseif(OSPCOMMON_TASKING_INTERNAL)
-    set(OSPCOMMON_TASKING_DEFINITIONS -DOSPCOMMON_TASKING_INTERNAL)
+    set(OSPCOMMON_TASKING_DEFINITIONS OSPCOMMON_TASKING_INTERNAL)
   else()#Debug
     # Do nothing, will fall back to scalar code (useful for debugging)
   endif()
 
   if (NOT TARGET ospcommon_tasking)
-    add_library(ospcommon_tasking INTERFACE)
-
-    target_link_libraries(ospcommon_tasking
-    INTERFACE
-      ${OSPCOMMON_TASKING_LIBS}
-    )
-
-    target_compile_definitions(ospcommon_tasking
-    INTERFACE
-      ${OSPCOMMON_TASKING_DEFINITIONS}
+    add_library(ospcommon_tasking INTERFACE IMPORTED)
+    set_target_properties(ospcommon_tasking PROPERTIES
+      INTERFACE_LINK_LIBRARIES "${OSPCOMMON_TASKING_LIBS}"
+      INTERFACE_COMPILE_DEFINITIONS "${OSPCOMMON_TASKING_DEFINITIONS}"
     )
   endif()
 endmacro()

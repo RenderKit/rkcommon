@@ -66,7 +66,7 @@ set_property(TARGET ospcommon PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 ## Install library + targets ##################################################
 
-install(TARGETS ${PROJECT_NAME} ospcommon_tasking
+install(TARGETS ${PROJECT_NAME}
   EXPORT ospcommon_Exports
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     NAMELINK_SKIP
@@ -81,7 +81,7 @@ install(EXPORT ospcommon_Exports
   NAMESPACE ospcommon::
 )
 
-install(TARGETS ${PROJECT_NAME} ospcommon_tasking
+install(TARGETS ${PROJECT_NAME}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     NAMELINK_ONLY
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
