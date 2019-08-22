@@ -25,7 +25,7 @@ using ospcommon::tasking::parallel_foreach;
 
 TEST_CASE("parallel_foreach", "[parallel_foreach]")
 {
-  const size_t N_ELEMENTS = 1e8;
+  const size_t N_ELEMENTS = size_t(1e8);
 
   const int bad_value  = 0;
   const int good_value = 1;

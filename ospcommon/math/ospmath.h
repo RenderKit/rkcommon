@@ -16,9 +16,11 @@
 
 #pragma once
 
-#include <cmath>
 #include "../platform.h"
 #include "constants.h"
+// std
+#include <algorithm> // std::min()/std::max() on Windows
+#include <cmath>
 
 #ifdef _WIN32
 #include <intrin.h>

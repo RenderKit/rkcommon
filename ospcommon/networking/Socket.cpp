@@ -15,6 +15,8 @@
 // ======================================================================== //
 
 #include "Socket.h"
+// std
+#include <mutex>
 #include <string>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -23,9 +25,7 @@
 
 #ifdef _WIN32
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-//#include <winsock2.h>
-//#include <io.h>
-typedef int socklen_t;
+using socklen_t = int;
 #define SHUT_RDWR 0x2
 #else
 #include <fcntl.h>

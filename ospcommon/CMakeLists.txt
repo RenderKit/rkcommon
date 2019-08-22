@@ -60,6 +60,8 @@ target_compile_definitions(${PROJECT_NAME}
     #             would inject versioning information independent of ospcommon
     #             version.
     -DOSPCOMMON_SOVERSION=0
+  PUBLIC
+    $<WIN32:-DNOMINMAX>
 )
 
 set_property(TARGET ospcommon PROPERTY POSITION_INDEPENDENT_CODE ON)

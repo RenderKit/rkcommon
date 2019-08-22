@@ -55,7 +55,7 @@ namespace ospcommon {
       T &at(size_t offset) const;  // bounds checking
 
       operator bool() const;
-      operator T *() const;
+      explicit operator T *() const;
 
       T *data() const;
 
