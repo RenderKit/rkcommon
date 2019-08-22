@@ -53,6 +53,10 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
+if (WIN32)
+  set(EXTRA_COMPILE_DEFINITIONS -DNOMINMAX)
+endif()
+
 target_compile_definitions(${PROJECT_NAME}
   PRIVATE
     # NOTE(jda) - OSPRAY_SOVERSION fallbacks in library.cpp should be handled
@@ -61,7 +65,7 @@ target_compile_definitions(${PROJECT_NAME}
     #             version.
     -DOSPCOMMON_SOVERSION=0
   PUBLIC
-    $<WIN32:-DNOMINMAX>
+    ${EXTRA_COMPILE_DEFINITIONS}
 )
 
 set_property(TARGET ospcommon PROPERTY POSITION_INDEPENDENT_CODE ON)
