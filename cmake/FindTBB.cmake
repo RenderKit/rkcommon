@@ -89,17 +89,18 @@ else ()
       /opt/intel/tbb
   )
 
+  find_path(TBB_INCLUDE_DIR tbb/task_scheduler_init.h PATHS ${OSPCOMMON_TBB_ROOT}/include NO_DEFAULT_PATH)
+
   if (APPLE)
-    find_path(TBB_INCLUDE_DIR tbb/task_scheduler_init.h PATHS ${OSPCOMMON_TBB_ROOT}/include NO_DEFAULT_PATH)
+    set(TBB_HINTS PATHS ${OSPCOMMON_TBB_ROOT}/lib NO_DEFAULT_PATH)
   else()
-    find_path(TBB_INCLUDE_DIR tbb/task_scheduler_init.h PATHS ${OSPCOMMON_TBB_ROOT}/include NO_DEFAULT_PATH)
-    set(TBB_HINTS HINTS ${OSPCOMMON_TBB_ROOT}/lib/intel64/gcc4.7 ${OSPCOMMON_TBB_ROOT}/lib/intel64/gcc4.4 ${OSPCOMMON_TBB_ROOT}/lib ${OSPCOMMON_TBB_ROOT}/lib64 PATHS /usr/libx86_64-linux-gnu/)
+    set(TBB_HINTS HINTS ${OSPCOMMON_TBB_ROOT}/lib/intel64/gcc4.7 ${OSPCOMMON_TBB_ROOT}/lib/intel64/gcc4.4 ${OSPCOMMON_TBB_ROOT}/lib ${OSPCOMMON_TBB_ROOT}/lib64 PATHS /usr/lib/x86_64-linux-gnu/)
   endif()
 
-  find_library(TBB_LIBRARY tbb PATHS ${OSPCOMMON_TBB_ROOT}/lib NO_DEFAULT_PATH)
-  find_library(TBB_LIBRARY_DEBUG tbb_debug PATHS ${OSPCOMMON_TBB_ROOT}/lib NO_DEFAULT_PATH)
-  find_library(TBB_LIBRARY_MALLOC tbbmalloc PATHS ${OSPCOMMON_TBB_ROOT}/lib NO_DEFAULT_PATH)
-  find_library(TBB_LIBRARY_MALLOC_DEBUG tbbmalloc_debug PATHS ${OSPCOMMON_TBB_ROOT}/lib NO_DEFAULT_PATH)
+  find_library(TBB_LIBRARY tbb ${TBB_HINTS})
+  find_library(TBB_LIBRARY_DEBUG tbb_debug ${TBB_HINTS})
+  find_library(TBB_LIBRARY_MALLOC tbbmalloc ${TBB_HINTS})
+  find_library(TBB_LIBRARY_MALLOC_DEBUG tbbmalloc_debug ${TBB_HINTS})
 endif()
 
 set(OSPCOMMON_TBB_ROOT_LAST ${OSPCOMMON_TBB_ROOT} CACHE INTERNAL "Last value of OSPCOMMON_TBB_ROOT to detect changes")
