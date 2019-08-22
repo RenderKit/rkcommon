@@ -50,7 +50,11 @@ ospcommon_create_tasking_target()
 
 option(BUILD_SHARED_LIBS "Build ospcommon as a shared library" ON)
 
-enable_testing()
+include(CTest)
+
+if (BUILD_TESTING)
+  enable_testing()
+endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -58,7 +62,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 ## Build library and tests ##
 
-subdirs(ospcommon tests)
+add_subdirectory(ospcommon)
+
+if (BUILD_TESTING)
+  add_subdirectory(tests)
+endif()
 
 ## Configure CMake find_package() config files ##
 
