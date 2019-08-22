@@ -35,7 +35,7 @@ set(OSPCOMMON_TASKING_OPENMP      @OSPCOMMON_TASKING_OPENMP@)
 set(OSPCOMMON_TASKING_INTERNAL    @OSPCOMMON_TASKING_INTERNAL@)
 set(OSPCOMMON_TASKING_DEBUG       @OSPCOMMON_TASKING_DEBUG@)
 
-ospcommon_create_tasking_target()
+ospcommon_create_tasking_target(TRUE)
 
 ## Restore CMAKE_MODULE_PATH ##
 

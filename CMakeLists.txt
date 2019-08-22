@@ -44,7 +44,7 @@ include(ospcommon_macros)
 ospcommon_configure_build_type()
 ospcommon_configure_compiler()
 ospcommon_configure_tasking_system()
-ospcommon_create_tasking_target()
+ospcommon_create_tasking_target(FALSE)
 
 ## Build options and specific configuration ##
 
