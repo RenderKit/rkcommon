@@ -14,6 +14,13 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
+if (OSPCOMMON_TASKING_INTERNAL)
+  set(EXTRA_TASKING_SOURCES
+    tasking/detail/enkiTS/TaskScheduler.cpp
+    tasking/detail/TaskSys.cpp
+  )
+endif()
+
 add_library(${PROJECT_NAME}
   common.cpp
 
@@ -26,9 +33,9 @@ add_library(${PROJECT_NAME}
   os/FileName.cpp
   os/library.cpp
 
-  tasking/detail/enkiTS/TaskScheduler.cpp
   tasking/detail/tasking_system_init.cpp
-  tasking/detail/TaskSys.cpp
+
+  ${EXTRA_TASKING_SOURCES}
 
   utility/demangle.cpp
   utility/ParameterizedObject.cpp
