@@ -20,15 +20,18 @@
 #if defined(OSPCOMMON_TASKING_TBB)
 #include <tbb/task_arena.h>
 #include <tbb/task_scheduler_init.h>
+#define TBB_PREVIEW_GLOBAL_CONTROL 1
+#include <tbb/global_control.h>
 #elif defined(OSPCOMMON_TASKING_OMP)
 #include <omp.h>
 #elif defined(OSPCOMMON_TASKING_INTERNAL)
 #include "TaskSys.h"
 #endif
-
+// std
 #include <thread>
+// intrinsics
 #include <xmmintrin.h>
-
+// ospcommon
 #include "../../common.h"
 
 /* normally defined in pmmintrin.h, but we always need this */
@@ -49,7 +52,11 @@ namespace ospcommon {
           : numThreads(numThreads)
 #if defined(OSPCOMMON_TASKING_TBB)
             ,
-            tbb_init(numThreads)
+            tbb_gc(tbb::global_control::max_allowed_parallelism,
+                   (numThreads > 0)
+                       ? numThreads
+                       : tbb::task_scheduler_init::default_num_threads())
+
 #endif
       {
 #if defined(OSPCOMMON_TASKING_OMP)
@@ -63,11 +70,7 @@ namespace ospcommon {
       int num_threads()
       {
 #if defined(OSPCOMMON_TASKING_TBB)
-#if TBB_INTERFACE_VERSION >= 9100
         return tbb::this_task_arena::max_concurrency();
-#else
-        return tbb::task_scheduler_init::default_num_threads();
-#endif
 #elif defined(OSPCOMMON_TASKING_OMP)
         return omp_get_max_threads();
 #elif defined(OSPCOMMON_TASKING_INTERNAL)
@@ -79,7 +82,7 @@ namespace ospcommon {
 
       int numThreads{-1};
 #if defined(OSPCOMMON_TASKING_TBB)
-      tbb::task_scheduler_init tbb_init;
+      tbb::global_control tbb_gc;
 #endif
     };
 
@@ -90,16 +93,7 @@ namespace ospcommon {
       _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
       _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
 
-#if defined(OSPCOMMON_TASKING_TBB)
-      if (!g_tasking_handle.get())
-        g_tasking_handle = make_unique<tasking_system_handle>(numThreads);
-      else {
-        g_tasking_handle->tbb_init.terminate();
-        g_tasking_handle->tbb_init.initialize(numThreads);
-      }
-#else
       g_tasking_handle = make_unique<tasking_system_handle>(numThreads);
-#endif
     }
 
     int numTaskingThreads()

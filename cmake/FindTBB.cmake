@@ -14,7 +14,7 @@
 ## limitations under the License.                                           ##
 ## ======================================================================== ##
 
-set(TBB_VERSION_REQUIRED "3.0")
+set(TBB_VERSION_REQUIRED "4.4")
 
 if (NOT OSPCOMMON_TBB_ROOT)
   set(OSPCOMMON_TBB_ROOT $ENV{OSPCOMMON_TBB_ROOT})
