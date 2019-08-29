@@ -15,378 +15,230 @@
 // ======================================================================== //
 
 #include "Socket.h"
-// std
-#include <mutex>
 #include <string>
-
-////////////////////////////////////////////////////////////////////////////////
-/// Platforms supporting Socket interface
-////////////////////////////////////////////////////////////////////////////////
+#include <atomic>
+#include <memory>
 
 #ifdef _WIN32
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-using socklen_t = int;
-#define SHUT_RDWR 0x2
-#else
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define SHUT_RDWR SD_BOTH
+typedef int socklen_t;
+#else 
+#include <unistd.h>
 #include <fcntl.h>
-#include <netdb.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#define SOCKET int
-#define INVALID_SOCKET -1
-#define closesocket ::close
+#include <arpa/inet.h>
+#include <netdb.h> 
 #endif
 
 /*! ignore if not supported */
 #ifndef MSG_NOSIGNAL
-#define MSG_NOSIGNAL 0
+#define MSG_NOSIGNAL 0 
 #endif
 
-#define BUFFERING 1
+namespace ospcommon
+{
+  const socket_t OSP_INVALID_SOCKET = -1;
 
-namespace ospcommon {
-  __forceinline void initialize()
-  {
 #ifdef _WIN32
-    static bool initialized = false;
-    static std::mutex initMutex;
-    std::lock_guard<std::mutex> lock(initMutex);
-    WSADATA wsaData;
-    short version = MAKEWORD(1, 1);
-    if (WSAStartup(version, &wsaData) != 0)
-      THROW_RUNTIME_ERROR("Winsock initialization failed");
-    initialized = true;
-#endif
-  }
-
-  struct buffered_socket_t
-  {
-    buffered_socket_t(SOCKET fd,
-                      size_t isize = 64 * 1024,
-                      size_t osize = 64 * 1024)
-        : fd(fd),
-          ibuf(new char[isize]),
-          isize(isize),
-          istart(0),
-          iend(0),
-          obuf(new char[osize]),
-          osize(osize),
-          oend(0)
-    {
+  struct WinSockContext {
+    WinSockContext() {
+      WSADATA wsadata;
+      if (WSAStartup(MAKEWORD(2, 2), &wsadata) != 0) {
+        throw std::runtime_error("WinSock initialization failed");
+      }
     }
-
-    ~buffered_socket_t()
-    {
-      delete[] ibuf;
-      ibuf = nullptr;
-      delete[] obuf;
-      obuf = nullptr;
+    ~WinSockContext() {
+      WSACleanup();
     }
-
-    SOCKET fd;  //!< file descriptor of the socket
-    char *ibuf;
-    size_t isize;
-    size_t istart, iend;
-    char *obuf;
-    size_t osize;
-    size_t oend;
   };
+
+  static std::unique_ptr<WinSockContext> winsock = nullptr;
+
+  void initialize()
+  {
+    static std::atomic<bool> initialized = false;
+    static std::mutex initMutex;
+    if (!initialized) {
+      std::lock_guard<std::mutex> lock(initMutex);
+      if (!winsock) {
+        winsock = std::make_unique<WinSockContext>();
+      }
+      initialized = true;
+    }
+  }
+#else
+  void initialize() { }
+#endif
 
   struct AutoCloseSocket
   {
-    SOCKET sock;
-    AutoCloseSocket(SOCKET sock) : sock(sock) {}
-    ~AutoCloseSocket()
-    {
-      if (sock != INVALID_SOCKET) {
-        closesocket(sock);
+    socket_t sock;
+    AutoCloseSocket(socket_t sock) : sock(sock) {}
+    ~AutoCloseSocket () {
+      if (sock != OSP_INVALID_SOCKET) {
+        close(sock);
       }
     }
   };
 
-  socket_t connect(const char *host, unsigned short port)
+  socket_t connect(const char* host, uint16_t port) 
   {
     initialize();
 
     /*! create a new socket */
-    SOCKET sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd == INVALID_SOCKET)
-      THROW_RUNTIME_ERROR("cannot create socket");
+    socket_t sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == OSP_INVALID_SOCKET) throw std::runtime_error("cannot create socket");
     AutoCloseSocket auto_close(sockfd);
 
     /*! perform DNS lookup */
-    struct hostent *server = ::gethostbyname(host);
-    if (server == nullptr)
-      THROW_RUNTIME_ERROR("server " + std::string(host) + " not found");
+    struct hostent* server = ::gethostbyname(host);
+    if (server == nullptr) throw std::runtime_error("server "+std::string(host)+" not found");
 
     /*! perform connection */
     struct sockaddr_in serv_addr;
-    memset((char *)&serv_addr, 0, sizeof(serv_addr));
+    memset((char*)&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port   = (unsigned short)htons(port);
-    memcpy((char *)&serv_addr.sin_addr.s_addr,
-           (char *)server->h_addr,
-           server->h_length);
+    serv_addr.sin_port = (uint16_t)htons(port);
+    memcpy((char*)&serv_addr.sin_addr.s_addr, (char*)server->h_addr, server->h_length);
 
-    if (::connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-      THROW_RUNTIME_ERROR("connection to " + std::string(host) + ":" +
-                          std::to_string((long long)port) + " failed");
+    if (::connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0)
+      throw std::runtime_error("connection to "+std::string(host)+":"+std::to_string((long long)port)+" failed");
 
-      /*! enable TCP_NODELAY */
+    /*! enable TCP_NODELAY */
 #ifdef TCP_NODELAY
-    {
-      int flag = 1;
-      ::setsockopt(
-          sockfd, IPPROTO_TCP, TCP_NODELAY, (const char *)&flag, sizeof(int));
-    }
+    { int flag = 1; ::setsockopt(sockfd, IPPROTO_TCP, TCP_NODELAY, (const char*)&flag, sizeof(int)); }
 #endif
 
     /*! we do not want SIGPIPE to be thrown */
 #ifdef SO_NOSIGPIPE
-    {
-      int flag = 1;
-      setsockopt(
-          sockfd, SOL_SOCKET, SO_NOSIGPIPE, (const char *)&flag, sizeof(int));
-    }
+    { int flag = 1; setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, (const char*) &flag, sizeof(int)); }
 #endif
 
-    auto_close.sock = INVALID_SOCKET;
-    return (socket_t) new buffered_socket_t(sockfd);
+    auto_close.sock = OSP_INVALID_SOCKET;
+    return sockfd;
   }
 
-  socket_t bind(unsigned short port)
+  socket_t listen(uint16_t port)
   {
     initialize();
 
     /*! create a new socket */
-    SOCKET sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd == INVALID_SOCKET)
-      THROW_RUNTIME_ERROR("cannot create socket");
+    socket_t sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd == OSP_INVALID_SOCKET) throw std::runtime_error("cannot create socket");
     AutoCloseSocket auto_close(sockfd);
 
-    /* When the server completes, the server socket enters a time-wait state
-    during which the local address and port used by the socket are believed to
-    be in use by the OS. The wait state may last several minutes. This socket
-    option allows bind() to reuse the port immediately. */
+    /* When the server completes, the server socket enters a time-wait state during which the local
+       address and port used by the socket are believed to be in use by the OS. The wait state may
+       last several minutes. This socket option allows bind() to reuse the port immediately. */
 #ifdef SO_REUSEADDR
-    {
-      int flag = true;
-      ::setsockopt(
-          sockfd, SOL_SOCKET, SO_REUSEADDR, (const char *)&flag, sizeof(int));
-    }
+    { int flag = true; ::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char*)&flag, sizeof(int)); }
 #endif
 
     /*! bind socket to port */
     struct sockaddr_in serv_addr;
-    memset((char *)&serv_addr, 0, sizeof(serv_addr));
-    serv_addr.sin_family      = AF_INET;
-    serv_addr.sin_port        = (unsigned short)htons(port);
+    memset((char *) &serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = (uint16_t)htons(port);
     serv_addr.sin_addr.s_addr = INADDR_ANY;
 
-    if (::bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-      THROW_RUNTIME_ERROR("binding to port " + std::to_string((long long)port) +
-                          " failed");
+    if (::bind(sockfd, (struct sockaddr*) &serv_addr, sizeof(serv_addr)) < 0)
+      throw std::runtime_error("binding to port "+std::to_string((long long)port)+" failed");
 
-    /*! listen to port, up to 5 pending connections */
-    if (::listen(sockfd, 5) < 0)
-      THROW_RUNTIME_ERROR("listening on socket failed");
+    /*! listen to port, up to 32 pending connections */
+    if (::listen(sockfd, 32) < 0)
+      throw std::runtime_error("listening on socket failed");
 
-    auto_close.sock = INVALID_SOCKET;
-    return (socket_t) new buffered_socket_t(sockfd);
+    auto_close.sock = OSP_INVALID_SOCKET;
+    return sockfd;
   }
 
-  socket_t listen(socket_t hsock)
+  socket_t accept(socket_t hsock)
   {
-    SOCKET sockfd = ((buffered_socket_t *)hsock)->fd;
-
     /*! accept incoming connection */
-    struct sockaddr_in addr;
+    struct sockaddr_in addr = {};
     socklen_t len = sizeof(addr);
-    SOCKET fd     = ::accept(sockfd, (struct sockaddr *)&addr, &len);
-    if (fd == INVALID_SOCKET)
-      THROW_RUNTIME_ERROR("cannot accept connection");
+    socket_t fd = ::accept(hsock, (struct sockaddr*)&addr, &len);
+    if (fd == OSP_INVALID_SOCKET) throw std::runtime_error("cannot accept connection");
 
-      /*! enable TCP_NODELAY */
+    /*! enable TCP_NODELAY */
 #ifdef TCP_NODELAY
-    {
-      int flag = 1;
-      ::setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int));
-    }
+    { int flag = 1; ::setsockopt(fd,IPPROTO_TCP,TCP_NODELAY,(char*)&flag,sizeof(int)); }
 #endif
 
     /*! we do not want SIGPIPE to be thrown */
 #ifdef SO_NOSIGPIPE
-    {
-      int flag = 1;
-      setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&flag, sizeof(int));
-    }
+    { int flag = 1; setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (void*)&flag, sizeof(int)); }
 #endif
 
-    return (socket_t) new buffered_socket_t(fd);
+    return fd; 
   }
 
-  void read(socket_t hsock_i, void *data_i, size_t bytes)
+  void read(socket_t hsock, void* data_i, size_t bytes)
   {
-    char *data = (char *)data_i;
+    char *data = reinterpret_cast<char*>(data_i);
     while (bytes) {
-      size_t readBytes = read_some(hsock_i, data, bytes);
+      size_t readBytes = read_some(hsock, data, bytes);
       data += readBytes;
       bytes -= readBytes;
     }
   }
 
-  size_t read_some(socket_t hsock_i, void *data, const size_t bytes)
+  size_t read_some(socket_t hsock, void* data_i, const size_t bytes)
   {
-    buffered_socket_t *hsock = (buffered_socket_t *)hsock_i;
-#if BUFFERING
-    if (hsock->istart == hsock->iend) {
-      ssize_t n = ::recv(hsock->fd, hsock->ibuf, hsock->isize, MSG_NOSIGNAL);
-      if (n == 0)
-        throw Disconnect();
-      else if (n < 0)
-        THROW_RUNTIME_ERROR("error reading from socket");
-      hsock->istart = 0;
-      hsock->iend   = n;
-    }
-    size_t bsize = hsock->iend - hsock->istart;
-    if (bytes < bsize)
-      bsize = bytes;
-    memcpy(data, hsock->ibuf + hsock->istart, bsize);
-    hsock->istart += bsize;
-    return bsize;
-#else
-    ssize_t n = ::read(hsock->fd, data, bytes);
-    if (n == 0)
-      throw Disconnect();
-    else if (n < 0)
-      THROW_RUNTIME_ERROR("error reading from socket");
+    char *data = reinterpret_cast<char*>(data_i);
+    ssize_t n = ::recv(hsock, data, bytes, 0);
+    if      (n == 0) throw Disconnect();
+    else if (n  < 0) throw std::runtime_error("error reading from socket");
     return n;
-#endif
   }
 
-  void write(socket_t hsock_i, const void *data_i, size_t bytes)
+  void write(socket_t hsock, const void* data_i, size_t bytes)
   {
-#if BUFFERING
-    const char *data         = (const char *)data_i;
-    buffered_socket_t *hsock = (buffered_socket_t *)hsock_i;
+    const char *data = reinterpret_cast<const char*>(data_i);
     while (bytes) {
-      if (hsock->oend == hsock->osize)
-        flush(hsock_i);
-      size_t bsize = hsock->osize - hsock->oend;
-      if (bytes < bsize)
-        bsize = bytes;
-      memcpy(hsock->obuf + hsock->oend, data, bsize);
-      data += bsize;
-      hsock->oend += bsize;
-      bytes -= bsize;
+      ssize_t n = ::send(hsock, data, bytes, 0);
+      if (n  < 0) throw std::runtime_error("error writing to socket");
+      data += n;
+      bytes -= n;
     }
+  }
+
+  void close(socket_t hsock) {
+    ::shutdown(hsock, SHUT_RDWR);
+#ifdef _WIN32
+    ::closesocket(hsock);
 #else
-    const char *data         = (const char *)data_i;
-    buffered_socket_t *hsock = (buffered_socket_t *)hsock_i;
-    while (bytes) {
-      ssize_t n = ::write(hsock->fd, data, bytes);
-      if (n < 0)
-        THROW_RUNTIME_ERROR("error writing to socket");
-      data += n;
-      bytes -= n;
-    }
+    ::close(hsock);
 #endif
   }
 
-  void flush(socket_t hsock_i)
+  uint16_t getListenPort(socket_t socket)
   {
-#if BUFFERING
-    buffered_socket_t *hsock = (buffered_socket_t *)hsock_i;
-    char *data               = hsock->obuf;
-    size_t bytes             = hsock->oend;
-    while (bytes > 0) {
-      ssize_t n = ::send(hsock->fd, data, (int)bytes, MSG_NOSIGNAL);
-      if (n < 0)
-        THROW_RUNTIME_ERROR("error writing to socket");
-      bytes -= n;
-      data += n;
-    }
-    hsock->oend = 0;
-#endif
+    struct sockaddr_in servAddr;
+    std::memset(&servAddr, 0, sizeof(servAddr));
+    socklen_t socklen = sizeof(servAddr);
+    getsockname(socket, (struct sockaddr*)&servAddr, &socklen);
+    return ntohs(servAddr.sin_port);
   }
 
-  void close(socket_t hsock_i)
+  std::string getIP(socket_t socket)
   {
-    buffered_socket_t *hsock = (buffered_socket_t *)hsock_i;
-    ::shutdown(hsock->fd, SHUT_RDWR);
-    closesocket(hsock->fd);
-    delete hsock;
-  }
+    struct sockaddr_in servAddr;
+    std::memset(&servAddr, 0, sizeof(servAddr));
+    socklen_t socklen = sizeof(servAddr);
+    getsockname(socket, (struct sockaddr*)&servAddr, &socklen);
 
-  ////////////////////////////////////////////////////////////////////////////////
-  /// All Platforms
-  ////////////////////////////////////////////////////////////////////////////////
+    char myIP[256] = {0};
+    if (!inet_ntop(AF_INET, &servAddr.sin_addr, myIP, 255))
+      throw std::runtime_error("Failed to query my IP address");
 
-  bool read_bool(socket_t socket)
-  {
-    bool value = 0;
-    read(socket, &value, sizeof(bool));
-    return value;
+    return std::string(myIP);
   }
+}
 
-  char read_char(socket_t socket)
-  {
-    char value = 0;
-    read(socket, &value, sizeof(char));
-    return value;
-  }
-
-  int read_int(socket_t socket)
-  {
-    int value = 0;
-    read(socket, &value, sizeof(int));
-    return value;
-  }
-
-  float read_float(socket_t socket)
-  {
-    float value = 0.0f;
-    read(socket, &value, sizeof(float));
-    return value;
-  }
-
-  std::string read_string(socket_t socket)
-  {
-    int bytes = read_int(socket);
-    char *str = new char[bytes + 1];
-    read(socket, str, bytes);
-    str[bytes] = 0x00;
-    std::string s(str);
-    delete[] str;
-    return s;
-  }
-
-  void write(socket_t socket, bool value)
-  {
-    write(socket, &value, sizeof(bool));
-  }
-
-  void write(socket_t socket, char value)
-  {
-    write(socket, &value, sizeof(char));
-  }
-
-  void write(socket_t socket, int value)
-  {
-    write(socket, &value, sizeof(int));
-  }
-
-  void write(socket_t socket, float value)
-  {
-    write(socket, &value, sizeof(float));
-  }
-
-  void write(socket_t socket, const std::string &str)
-  {
-    write(socket, (int)str.size());
-    write(socket, str.c_str(), str.size());
-  }
-}  // namespace ospcommon

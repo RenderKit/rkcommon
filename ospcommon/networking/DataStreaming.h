@@ -17,8 +17,8 @@
 #pragma once
 
 #include "../common.h"
-#include "../traits/osptraits.h"
-#include "../utility/ArrayView.h"
+#include "../utility/AbstractArray.h"
+#include "../utility/OwnedArray.h"
 
 #include <vector>
 
@@ -26,7 +26,7 @@ namespace ospcommon {
   namespace networking {
 
     /*! abstraction of an object that we can serailize/write (raw) data into */
-    struct WriteStream
+    struct OSPCOMMON_INTERFACE WriteStream
     {
       virtual ~WriteStream() = default;
 
@@ -36,32 +36,54 @@ namespace ospcommon {
 
     /*! abstraction of an object that we can read (raw) data from to
       then de-serialize into work objects */
-    struct ReadStream
+    struct OSPCOMMON_INTERFACE ReadStream
     {
       virtual ~ReadStream() = default;
 
       virtual void read(void *mem, size_t size) = 0;
     };
 
-    /*! generic stream operators into/out of streams, for raw data blocks */
-    template <typename T>
-    inline WriteStream &operator<<(WriteStream &buf, const T &rh)
+    struct OSPCOMMON_INTERFACE BufferWriter : WriteStream
     {
-      buf.write((const byte_t *)&rh, sizeof(T));
+      BufferWriter();
+
+      void write(const void *mem, size_t size) override;
+
+      std::shared_ptr<utility::OwnedArray<uint8_t>> buffer;
+    };
+
+    struct OSPCOMMON_INTERFACE BufferReader : ReadStream
+    {
+      BufferReader(const std::shared_ptr<utility::AbstractArray<uint8_t>> &buf);
+
+      void read(void *mem, size_t size) override;
+
+      size_t cursor = 0;
+      const std::shared_ptr<utility::AbstractArray<uint8_t>> buffer;
+    };
+
+    /*! generic stream operators into/out of streams, for raw data blocks */
+    template<typename T>
+    inline OSPCOMMON_INTERFACE
+    WriteStream &operator<<(WriteStream &buf, const T &rh)
+    {
+      buf.write((const byte_t*)&rh, sizeof(T));
       return buf;
     }
 
-    template <typename T>
-    inline ReadStream &operator>>(ReadStream &buf, T &rh)
+    template<typename T>
+    inline OSPCOMMON_INTERFACE
+    ReadStream &operator>>(ReadStream &buf, T &rh)
     {
-      buf.read((byte_t *)&rh, sizeof(T));
+      buf.read((byte_t*)&rh, sizeof(T));
       return buf;
     }
 
     /*! @{ stream operators into/out of read/write streams, for std::vectors
      * of non-POD types*/
-    template <typename T>
-    inline WriteStream &operator<<(WriteStream &buf, const std::vector<T> &rh)
+    template<typename T>
+    inline OSPCOMMON_INTERFACE
+    WriteStream &operator<<(WriteStream &buf, const std::vector<T> &rh)
     {
       const size_t sz = rh.size();
       buf << sz;
@@ -72,8 +94,9 @@ namespace ospcommon {
       return buf;
     }
 
-    template <typename T>
-    inline ReadStream &operator>>(ReadStream &buf, std::vector<T> &rh)
+    template<typename T>
+    inline OSPCOMMON_INTERFACE
+    ReadStream &operator>>(ReadStream &buf, std::vector<T> &rh)
     {
       size_t sz;
       buf >> sz;
@@ -86,20 +109,22 @@ namespace ospcommon {
     }
     /*! @} */
 
-    /*! @{ stream operators into/out of read/write streams, for ArrayView<T> */
-    template <typename T>
-    inline WriteStream &operator<<(WriteStream &buf,
-                                   const utility::ArrayView<T> &rh)
+    /*! @{ stream operators into/out of read/write streams, for AbstractArray<T> */
+    template<typename T>
+    inline OSPCOMMON_INTERFACE
+    WriteStream &operator<<(WriteStream &buf,
+                            const utility::AbstractArray<T> &rh)
     {
       const size_t sz = rh.size();
       buf << sz;
-      buf.write((const byte_t *)rh.data(), sizeof(T) * sz);
+      buf.write((const byte_t*)rh.data(), sizeof(T)*sz);
       return buf;
     }
     /*! @} */
 
     /*! @{ serialize operations for strings */
-    inline WriteStream &operator<<(WriteStream &buf, const std::string &rh)
+    inline OSPCOMMON_INTERFACE
+    WriteStream &operator<<(WriteStream &buf, const std::string &rh)
     {
       const size_t sz = rh.size();
       buf << sz;
@@ -107,15 +132,16 @@ namespace ospcommon {
       return buf;
     }
 
-    inline ReadStream &operator>>(ReadStream &buf, std::string &rh)
+    inline OSPCOMMON_INTERFACE
+    ReadStream &operator>>(ReadStream &buf, std::string &rh)
     {
       size_t sz;
       buf >> sz;
-      rh.resize(sz);
+      rh.resize(sz + 1);
       buf.read((void *)rh.data(), sz);
       return buf;
     }
     /*! @} */
 
-  }  // namespace networking
-}  // namespace ospcommon
+  } // ::ospcommon::networking
+} // ::ospcommon

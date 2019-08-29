@@ -26,7 +26,7 @@ add_library(${PROJECT_NAME}
 
   memory/malloc.cpp
 
-  networking/BufferedDataStreaming.cpp
+  networking/DataStreaming.cpp
   networking/Socket.cpp
   networking/SocketFabric.cpp
 

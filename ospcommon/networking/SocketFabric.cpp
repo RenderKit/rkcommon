@@ -23,22 +23,19 @@ namespace ospcommon {
 
     static void closeIfExists(ospcommon::socket_t socket)
     {
-      if (socket)
+      if (socket != OSP_INVALID_SOCKET)
         ospcommon::close(socket);
     }
 
     // SocketFabric definitions ///////////////////////////////////////////////
 
     SocketFabric::SocketFabric(const std::string &hostname, const uint16_t port)
-        : socket(ospcommon::connect(hostname.c_str(), port)),
-          buffer(64 * 1024, 0)
-    {
-    }
+      : socket(ospcommon::connect(hostname.c_str(), port))
+    {}
 
     SocketFabric::SocketFabric(ospcommon::socket_t socket)
-        : socket(socket), buffer(64 * 1024, 0)
-    {
-    }
+      : socket(socket)
+    {}
 
     SocketFabric::~SocketFabric()
     {
@@ -46,45 +43,37 @@ namespace ospcommon {
     }
 
     SocketFabric::SocketFabric(SocketFabric &&other)
-        : socket(other.socket), buffer(64 * 1024, 0)
+      : socket(other.socket)
     {
       // Note: the buffered socket destructor does not call shutdown
-      other.socket = nullptr;
+      other.socket = OSP_INVALID_SOCKET;
     }
 
-    SocketFabric &SocketFabric::operator=(SocketFabric &&other)
+    SocketFabric& SocketFabric::operator=(SocketFabric &&other)
     {
       closeIfExists(socket);
 
-      socket       = other.socket;
-      other.socket = nullptr;
+      socket = other.socket;
+      other.socket = OSP_INVALID_SOCKET;
 
       return *this;
     }
 
-    void SocketFabric::send(const void *mem, size_t s)
+    void SocketFabric::send(std::shared_ptr<utility::ArrayView<uint8_t>> &buf)
     {
-      // A bit annoying, because the ospcommon::Socket wrapper does its
-      // own internal buffering, however a Fabric is unbuffered and is
-      // made buffered by using the buffered data streams
-      ospcommon::write(socket, mem, s);
-      ospcommon::flush(socket);
+      ospcommon::write(socket, buf->data(), buf->size());
     }
 
-    size_t SocketFabric::read(void *&mem)
+    void SocketFabric::recv(utility::ArrayView<uint8_t> &buf)
     {
-      const size_t s =
-          ospcommon::read_some(socket, buffer.data(), buffer.size());
-      mem = buffer.data();
-      return s;
+      ospcommon::read(socket, buf.data(), buf.size());
     }
 
     // SocketListener definitions /////////////////////////////////////////////
 
     SocketListener::SocketListener(const uint16_t port)
-        : socket(ospcommon::bind(port))
-    {
-    }
+      : socket(ospcommon::listen(port))
+    {}
 
     SocketListener::~SocketListener()
     {
@@ -93,7 +82,8 @@ namespace ospcommon {
 
     SocketFabric SocketListener::accept()
     {
-      return SocketFabric(ospcommon::listen(socket));
+      return SocketFabric(ospcommon::accept(socket));
     }
-  }  // namespace networking
-}  // namespace ospcommon
+  }
+}
+

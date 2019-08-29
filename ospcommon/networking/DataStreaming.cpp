@@ -14,39 +14,39 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#pragma once
-
-#include <memory>
-#include <cstdlib>
-#include "../utility/AbstractArray.h"
 #include "../common.h"
+#include "DataStreaming.h"
+
+#include <vector>
 
 namespace ospcommon {
   namespace networking {
 
-    /*! abstraction for a physical fabric that can transmit data -
-      sockets, mpi, etc */
-    struct OSPCOMMON_INTERFACE Fabric
+    BufferWriter::BufferWriter()
+      : buffer(std::make_shared<utility::OwnedArray<uint8_t>>())
+    {}
+
+    void BufferWriter::write(const void *mem, size_t size)
     {
-      virtual ~Fabric() = default;
+      const size_t bsize = buffer->size();
+      buffer->resize(buffer->size() + size, 0);
+      std::memcpy(buffer->begin() + bsize, mem, size);
+    }
 
-      // Broadcast the data to all clients on the other end of the fabric
-      // TODO: only makes sense to call on the root rank, so maybe a separate
-      // "send" fabric ?
-      virtual void sendBcast(std::shared_ptr<utility::AbstractArray<uint8_t>> buf) = 0;
+    BufferReader::BufferReader(
+        const std::shared_ptr<utility::AbstractArray<uint8_t>> &buf)
+      : buffer(buf)
+    {
+    }
 
-      // Receive a broadcast of data from the fabric sender
-      // TODO: only makes sense to call on the receivers, so maybe a separate
-      // "recv" fabric ?
-      virtual void recvBcast(utility::AbstractArray<uint8_t> &buf) = 0;
+    void BufferReader::read(void *mem, size_t size)
+    {
+      if (cursor + size > buffer->size())
+        throw std::runtime_error("Attempt to read past end of BufferReader!");
 
-      // Send data to a specific rank in the fabric (callable on any rank)
-      virtual void send(std::shared_ptr<utility::AbstractArray<uint8_t>> buf, int rank) = 0;
-
-      // Receive data from a specific rank on the fabric (callable on any rank)
-      virtual void recv(utility::AbstractArray<uint8_t> &buf, int rank) = 0;
-    };
-
+      std::memcpy(mem, buffer->begin() + cursor, size);
+      cursor += size;
+    }
   }
 }
 

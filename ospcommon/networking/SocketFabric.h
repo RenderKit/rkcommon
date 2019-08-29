@@ -16,45 +16,44 @@
 
 #pragma once
 
-#include <cstdint>
+#include <memory>
 #include <cstdlib>
+#include <cstdint>
 #include <string>
 #include <vector>
-#include "Fabric.h"
+#include "utility/ArrayView.h"
 #include "Socket.h"
+#include "Fabric.h"
 
 namespace ospcommon {
   namespace networking {
 
-    /*! A fabrich which sends and receives over a TCP socket connection */
-    struct OSPCOMMON_INTERFACE SocketFabric : public Fabric
+    // TODO: Potentially remove this.
+
+    /*! A fabric which sends and receives over a TCP socket connection */
+    struct OSPCOMMON_INTERFACE SocketFabric
     {
       /*! Connecting to another socket on the host on the desired port */
       SocketFabric(const std::string &hostname, const uint16_t port);
-      ~SocketFabric() override;
+      ~SocketFabric();
       SocketFabric(SocketFabric &&other);
-      SocketFabric &operator=(SocketFabric &&other);
+      SocketFabric& operator=(SocketFabric &&other);
 
-      SocketFabric(const SocketFabric &) = delete;
-      SocketFabric &operator=(const SocketFabric &) = delete;
+      SocketFabric(const SocketFabric&) = delete;
+      SocketFabric& operator=(const SocketFabric&) = delete;
 
-      /*! send exact number of bytes - the fabric can do that through
-        multiple smaller messages, but all bytes have to be
-        delivered */
-      void send(const void *mem, size_t s) override;
+      void send(std::shared_ptr<utility::ArrayView<uint8_t>> &buf);
 
-      /*! receive some block of data - whatever the sender has sent -
-        and give us size and pointer to this data */
-      size_t read(void *&mem) override;
+      void recv(utility::ArrayView<uint8_t> &buf);
 
-     private:
+    private:
+
       explicit SocketFabric(ospcommon::socket_t socket);
       friend struct SocketListener;
 
       // Data //
 
       ospcommon::socket_t socket;
-      std::vector<char> buffer;
     };
 
     /*! An abstraction for listening on a socket for connections,
@@ -66,14 +65,16 @@ namespace ospcommon {
       SocketListener(const uint16_t port);
       ~SocketListener();
 
-      SocketListener(const SocketListener &) = delete;
-      SocketListener &operator=(const SocketListener &) = delete;
+      SocketListener(const SocketListener&) = delete;
+      SocketListener& operator=(const SocketListener&) = delete;
 
       SocketFabric accept();
 
-     private:
+    private:
+
       ospcommon::socket_t socket;
     };
 
-  }  // namespace networking
-}  // namespace ospcommon
+  } // ::ospcommon::networking
+} // ::ospcommon
+

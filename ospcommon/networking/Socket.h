@@ -21,80 +21,50 @@
 
 #include "../common.h"
 
-namespace ospcommon {
+namespace ospcommon
+{
   /*! type for a socket */
-  using socket_t = struct opaque_socket_t *;
+  using socket_t = uint32_t;
+  OSPCOMMON_INTERFACE extern const socket_t OSP_INVALID_SOCKET;
 
   /*! exception thrown when other side disconnects */
   struct Disconnect : public std::exception
   {
 #ifdef _WIN32
-    virtual const char *what() const override
+    virtual const char* what() const override
 #else
-    virtual const char *what() const noexcept override
+    virtual const char* what() const noexcept override
 #endif
-    {
-      return "network disconnect";
-    }
+    { return "network disconnect"; }
   };
 
-  /*! creates a socket bound to a port */
-  OSPCOMMON_INTERFACE socket_t bind(unsigned short port);
+  /*! creates a socket bound to a port and listens for incoming connections */
+  OSPCOMMON_INTERFACE socket_t listen(uint16_t port);
 
-  /*! listens for an incoming connection and accepts that connection */
-  OSPCOMMON_INTERFACE socket_t listen(socket_t sockfd);
+  /*! wait for and accept an incoing connection on the socket */
+  OSPCOMMON_INTERFACE socket_t accept(socket_t sockfd);
 
   /*! initiates a connection */
-  OSPCOMMON_INTERFACE socket_t connect(const char *host, unsigned short port);
+  OSPCOMMON_INTERFACE socket_t connect(const char* host, uint16_t port);
 
   /*! read data from the socket */
-  OSPCOMMON_INTERFACE void read(socket_t socket, void *data, size_t bytes);
+  OSPCOMMON_INTERFACE void read(socket_t socket, void* data, size_t bytes);
 
   /*! read the available data on the socket, up to 'bytes' bytes.
       Returns the number of bytes read. */
-  OSPCOMMON_INTERFACE size_t read_some(socket_t socket,
-                                       void *data,
+  OSPCOMMON_INTERFACE size_t read_some(socket_t socket, void* data,
                                        const size_t bytes);
 
   /*! write data to the socket */
-  OSPCOMMON_INTERFACE void write(socket_t socket,
-                                 const void *data,
-                                 size_t bytes);
-
-  /*! flushes the write buffer */
-  OSPCOMMON_INTERFACE void flush(socket_t socket);
+  OSPCOMMON_INTERFACE void write(socket_t socket, const void* data, size_t bytes);
 
   /*! close a socket */
   OSPCOMMON_INTERFACE void close(socket_t socket);
 
-  /*! reads a bool from the socket */
-  OSPCOMMON_INTERFACE bool read_bool(socket_t socket);
+  /*! get the port that the socket is listening on */
+  OSPCOMMON_INTERFACE uint16_t getListenPort(socket_t socket);
 
-  /*! reads a character from the socket */
-  OSPCOMMON_INTERFACE char read_char(socket_t socket);
+  /*! get the IP of this host which is visible through the socket connection */
+  OSPCOMMON_INTERFACE std::string getIP(socket_t socket);
 
-  /*! reads an integer from the socket */
-  OSPCOMMON_INTERFACE int read_int(socket_t socket);
-
-  /*! reads a float from the socket */
-  OSPCOMMON_INTERFACE float read_float(socket_t socket);
-
-  /*! reads a string from the socket */
-  OSPCOMMON_INTERFACE std::string read_string(socket_t socket);
-
-  /*! writes a bool to the socket */
-  OSPCOMMON_INTERFACE void write(socket_t socket, bool value);
-
-  /*! writes a character to the socket */
-  OSPCOMMON_INTERFACE void write(socket_t socket, char value);
-
-  /*! writes an integer to the socket */
-  OSPCOMMON_INTERFACE void write(socket_t socket, int value);
-
-  /*! writes a float to the socket */
-  OSPCOMMON_INTERFACE void write(socket_t socket, float value);
-
-  /*! writes a string to the socket */
-  OSPCOMMON_INTERFACE void write(socket_t socket, const std::string &str);
-
-}  // namespace ospcommon
+}// ::ospcommon

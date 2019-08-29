@@ -52,10 +52,6 @@ typedef int ssize_t;
 #define __PRETTY_FUNCTION__ __FUNCSIG__
 #endif
 
-#define SCOPED_LOCK(x)                  \
-  std::lock_guard<std::mutex> _lock(x); \
-  (void)_lock;
-
 namespace ospcommon {
 
   using byte_t = unsigned char;

@@ -25,120 +25,117 @@
 namespace ospcommon {
   namespace utility {
 
-    /*  'ArrayView<T>' implements an array interface on a pointer to data which
-     *  is *NOT* owned by ArrayView. If you want ArrayView to own data, then
-     *  instead use std::array<T> or std::vector<T>.
+    /*  'OwnedArray<T>' implements an array interface on a pointer to
+     *  data which is owned by the OwnedArray.
      */
     template <typename T>
-    struct ArrayView : public AbstractArray<T>
+    struct OwnedArray : public AbstractArray<T>
     {
-      ArrayView()  = default;
-      ~ArrayView() = default;
+      OwnedArray() = default;
 
       template <size_t SIZE>
-      ArrayView(std::array<T, SIZE> &init);
+      OwnedArray(std::array<T, SIZE> &init);
 
-      ArrayView(std::vector<T> &init);
+      OwnedArray(std::vector<T> &init);
 
-      explicit ArrayView(T *data, size_t size);
+      explicit OwnedArray(T *data, size_t size);
+
+      template <size_t SIZE>
+      OwnedArray& operator=(std::array<T, SIZE> &rhs);
+
+      OwnedArray& operator=(std::vector<T> &rhs);
 
       void reset() override;
       void reset(T *data, size_t size) override;
 
-      template <size_t SIZE>
-      ArrayView &operator=(std::array<T, SIZE> &rhs);
-
-      ArrayView &operator=(std::vector<T> &rhs);
+      void resize(size_t size, const T &val);
 
       size_t size() const override;
 
       const T *cbegin() const override;
       const T *cend() const override;
 
-     private:
-      T *ptr{nullptr};
-      size_t numItems{0};
+    protected:
+      std::vector<T> dataBuf;
     };
 
-    // Inlined ArrayView definitions //////////////////////////////////////////
+    // Inlined OwnedArray definitions //////////////////////////////////////////
 
     template <typename T>
-    inline ArrayView<T>::ArrayView(T *_data, size_t _size)
-        : ptr(_data), numItems(_size)
-    {
-    }
-
-    template <typename T>
-    template <size_t SIZE>
-    inline ArrayView<T>::ArrayView(std::array<T, SIZE> &init)
-        : ptr(init.data()), numItems(init.size())
-    {
-    }
-
-    template <typename T>
-    inline ArrayView<T>::ArrayView(std::vector<T> &init)
-        : ptr(init.data()), numItems(init.size())
-    {
-    }
-
-    template <typename T>
-    inline void ArrayView<T>::reset()
-    {
-      ptr      = nullptr;
-      numItems = 0;
-    }
-
-    template <typename T>
-    inline void ArrayView<T>::reset(T *_data, size_t _size)
-    {
-      ptr      = _data;
-      numItems = _size;
-    }
+    inline OwnedArray<T>::OwnedArray(T *_data, size_t _size)
+      : dataBuf(_data, _data + _size)
+    {}
 
     template <typename T>
     template <size_t SIZE>
-    inline ArrayView<T> &ArrayView<T>::operator=(std::array<T, SIZE> &rhs)
-    {
-      ptr      = rhs.data();
-      numItems = rhs.size();
+    inline OwnedArray<T>::OwnedArray(std::array<T, SIZE> &init)
+      : dataBuf(init.begin(), init.end())
+    {}
 
+    template <typename T>
+    inline OwnedArray<T>::OwnedArray(std::vector<T> &init)
+      : dataBuf(init)
+    {}
+
+    template <typename T>
+    template <size_t SIZE>
+    inline OwnedArray<T>&
+    OwnedArray<T>::operator=(std::array<T, SIZE> &rhs)
+    {
+      dataBuf = std::vector<T>(rhs.begin(), rhs.end());
       return *this;
     }
 
     template <typename T>
-    inline ArrayView<T> &ArrayView<T>::operator=(std::vector<T> &rhs)
+    inline OwnedArray<T>& OwnedArray<T>::operator=(std::vector<T> &rhs)
     {
-      ptr      = rhs.data();
-      numItems = rhs.size();
-
+      dataBuf = std::vector<T>(rhs.begin(), rhs.end());
       return *this;
     }
 
     template <typename T>
-    size_t ArrayView<T>::size() const
+    inline void OwnedArray<T>::reset()
     {
-      return numItems;
+      dataBuf.clear();
     }
 
     template <typename T>
-    const T *ArrayView<T>::cbegin() const
+    inline void OwnedArray<T>::reset(T *_data, size_t _size)
     {
-      return ptr;
+      dataBuf = std::vector<T>(_data, _data + _size);
     }
 
     template <typename T>
-    const T *ArrayView<T>::cend() const
+    inline void OwnedArray<T>::resize(size_t size, const T &val)
     {
-      return ptr + size();
+      dataBuf.resize(size, val);
     }
-
-    // ArrayView utility functions ////////////////////////////////////////////
 
     template <typename T>
-    inline ArrayView<T> make_ArrayView(T *data, size_t size)
+    size_t OwnedArray<T>::size() const
     {
-      return ArrayView<T>(data, size);
+      return dataBuf.size();
     }
 
-  }  // namespace utility
-}  // namespace ospcommon
+    template <typename T>
+    const T *OwnedArray<T>::cbegin() const
+    {
+      if (size() > 0) {
+        return &dataBuf[0];
+      }
+      return nullptr;
+    }
+
+    template <typename T>
+    const T *OwnedArray<T>::cend() const
+    {
+      if (size() > 0) {
+        return &dataBuf.back();
+      }
+      return nullptr;
+    }
+
+  } // ::ospcommon::utility
+} // ::ospcommon
+
+
