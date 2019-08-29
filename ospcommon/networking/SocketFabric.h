@@ -16,14 +16,14 @@
 
 #pragma once
 
-#include <memory>
-#include <cstdlib>
 #include <cstdint>
+#include <cstdlib>
+#include <memory>
 #include <string>
 #include <vector>
-#include "utility/ArrayView.h"
-#include "Socket.h"
 #include "Fabric.h"
+#include "Socket.h"
+#include "utility/ArrayView.h"
 
 namespace ospcommon {
   namespace networking {
@@ -37,17 +37,16 @@ namespace ospcommon {
       SocketFabric(const std::string &hostname, const uint16_t port);
       ~SocketFabric();
       SocketFabric(SocketFabric &&other);
-      SocketFabric& operator=(SocketFabric &&other);
+      SocketFabric &operator=(SocketFabric &&other);
 
-      SocketFabric(const SocketFabric&) = delete;
-      SocketFabric& operator=(const SocketFabric&) = delete;
+      SocketFabric(const SocketFabric &) = delete;
+      SocketFabric &operator=(const SocketFabric &) = delete;
 
       void send(std::shared_ptr<utility::ArrayView<uint8_t>> &buf);
 
       void recv(utility::ArrayView<uint8_t> &buf);
 
-    private:
-
+     private:
       explicit SocketFabric(ospcommon::socket_t socket);
       friend struct SocketListener;
 
@@ -65,16 +64,15 @@ namespace ospcommon {
       SocketListener(const uint16_t port);
       ~SocketListener();
 
-      SocketListener(const SocketListener&) = delete;
-      SocketListener& operator=(const SocketListener&) = delete;
+      SocketListener(const SocketListener &) = delete;
+      SocketListener &operator=(const SocketListener &) = delete;
 
       SocketFabric accept();
 
-    private:
-
+     private:
       ospcommon::socket_t socket;
     };
 
-  } // ::ospcommon::networking
-} // ::ospcommon
+  }  // namespace networking
+}  // namespace ospcommon
 

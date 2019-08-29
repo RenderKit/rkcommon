@@ -14,8 +14,8 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
-#include "../common.h"
 #include "DataStreaming.h"
+#include "../common.h"
 
 #include <vector>
 
@@ -23,8 +23,9 @@ namespace ospcommon {
   namespace networking {
 
     BufferWriter::BufferWriter()
-      : buffer(std::make_shared<utility::OwnedArray<uint8_t>>())
-    {}
+        : buffer(std::make_shared<utility::OwnedArray<uint8_t>>())
+    {
+    }
 
     void BufferWriter::write(const void *mem, size_t size)
     {
@@ -35,7 +36,7 @@ namespace ospcommon {
 
     BufferReader::BufferReader(
         const std::shared_ptr<utility::AbstractArray<uint8_t>> &buf)
-      : buffer(buf)
+        : buffer(buf)
     {
     }
 
@@ -47,6 +48,6 @@ namespace ospcommon {
       std::memcpy(mem, buffer->begin() + cursor, size);
       cursor += size;
     }
-  }
-}
+  }  // namespace networking
+}  // namespace ospcommon
 

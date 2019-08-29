@@ -41,9 +41,9 @@ namespace ospcommon {
       explicit OwnedArray(T *data, size_t size);
 
       template <size_t SIZE>
-      OwnedArray& operator=(std::array<T, SIZE> &rhs);
+      OwnedArray &operator=(std::array<T, SIZE> &rhs);
 
-      OwnedArray& operator=(std::vector<T> &rhs);
+      OwnedArray &operator=(std::vector<T> &rhs);
 
       void reset() override;
       void reset(T *data, size_t size) override;
@@ -55,7 +55,7 @@ namespace ospcommon {
       const T *cbegin() const override;
       const T *cend() const override;
 
-    protected:
+     protected:
       std::vector<T> dataBuf;
     };
 
@@ -63,31 +63,32 @@ namespace ospcommon {
 
     template <typename T>
     inline OwnedArray<T>::OwnedArray(T *_data, size_t _size)
-      : dataBuf(_data, _data + _size)
-    {}
+        : dataBuf(_data, _data + _size)
+    {
+    }
 
     template <typename T>
     template <size_t SIZE>
     inline OwnedArray<T>::OwnedArray(std::array<T, SIZE> &init)
-      : dataBuf(init.begin(), init.end())
-    {}
+        : dataBuf(init.begin(), init.end())
+    {
+    }
 
     template <typename T>
-    inline OwnedArray<T>::OwnedArray(std::vector<T> &init)
-      : dataBuf(init)
-    {}
+    inline OwnedArray<T>::OwnedArray(std::vector<T> &init) : dataBuf(init)
+    {
+    }
 
     template <typename T>
     template <size_t SIZE>
-    inline OwnedArray<T>&
-    OwnedArray<T>::operator=(std::array<T, SIZE> &rhs)
+    inline OwnedArray<T> &OwnedArray<T>::operator=(std::array<T, SIZE> &rhs)
     {
       dataBuf = std::vector<T>(rhs.begin(), rhs.end());
       return *this;
     }
 
     template <typename T>
-    inline OwnedArray<T>& OwnedArray<T>::operator=(std::vector<T> &rhs)
+    inline OwnedArray<T> &OwnedArray<T>::operator=(std::vector<T> &rhs)
     {
       dataBuf = std::vector<T>(rhs.begin(), rhs.end());
       return *this;
@@ -135,7 +136,6 @@ namespace ospcommon {
       return nullptr;
     }
 
-  } // ::ospcommon::utility
-} // ::ospcommon
-
+  }  // namespace utility
+}  // namespace ospcommon
 

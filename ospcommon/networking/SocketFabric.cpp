@@ -30,30 +30,28 @@ namespace ospcommon {
     // SocketFabric definitions ///////////////////////////////////////////////
 
     SocketFabric::SocketFabric(const std::string &hostname, const uint16_t port)
-      : socket(ospcommon::connect(hostname.c_str(), port))
-    {}
+        : socket(ospcommon::connect(hostname.c_str(), port))
+    {
+    }
 
-    SocketFabric::SocketFabric(ospcommon::socket_t socket)
-      : socket(socket)
-    {}
+    SocketFabric::SocketFabric(ospcommon::socket_t socket) : socket(socket) {}
 
     SocketFabric::~SocketFabric()
     {
       closeIfExists(socket);
     }
 
-    SocketFabric::SocketFabric(SocketFabric &&other)
-      : socket(other.socket)
+    SocketFabric::SocketFabric(SocketFabric &&other) : socket(other.socket)
     {
       // Note: the buffered socket destructor does not call shutdown
       other.socket = OSP_INVALID_SOCKET;
     }
 
-    SocketFabric& SocketFabric::operator=(SocketFabric &&other)
+    SocketFabric &SocketFabric::operator=(SocketFabric &&other)
     {
       closeIfExists(socket);
 
-      socket = other.socket;
+      socket       = other.socket;
       other.socket = OSP_INVALID_SOCKET;
 
       return *this;
@@ -72,8 +70,9 @@ namespace ospcommon {
     // SocketListener definitions /////////////////////////////////////////////
 
     SocketListener::SocketListener(const uint16_t port)
-      : socket(ospcommon::listen(port))
-    {}
+        : socket(ospcommon::listen(port))
+    {
+    }
 
     SocketListener::~SocketListener()
     {
@@ -84,6 +83,6 @@ namespace ospcommon {
     {
       return SocketFabric(ospcommon::accept(socket));
     }
-  }
-}
+  }  // namespace networking
+}  // namespace ospcommon
 

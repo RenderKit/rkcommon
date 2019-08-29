@@ -18,8 +18,8 @@
 
 #include "../common.h"
 
-#include <stdexcept>
 #include <array>
+#include <stdexcept>
 #include <vector>
 
 namespace ospcommon {
@@ -31,10 +31,10 @@ namespace ospcommon {
     template <typename T>
     struct AbstractArray
     {
-      AbstractArray()  = default;
+      AbstractArray()          = default;
       virtual ~AbstractArray() = default;
 
-      virtual void reset() = 0;
+      virtual void reset()                     = 0;
       virtual void reset(T *data, size_t size) = 0;
 
       virtual size_t size() const = 0;
@@ -52,16 +52,16 @@ namespace ospcommon {
       virtual T *end() const;
 
       virtual const T *cbegin() const = 0;
-      virtual const T *cend() const = 0;
+      virtual const T *cend() const   = 0;
     };
 
-    template<typename T>
+    template <typename T>
     T &AbstractArray<T>::operator[](size_t offset) const
     {
       return *(begin() + offset);
     }
 
-    template<typename T>
+    template <typename T>
     T &AbstractArray<T>::at(size_t offset) const
     {
       if (offset >= size())
@@ -70,34 +70,34 @@ namespace ospcommon {
       return *(begin() + offset);
     }
 
-    template<typename T>
+    template <typename T>
     AbstractArray<T>::operator bool() const
     {
       return size() != 0;
     }
 
-    template<typename T>
+    template <typename T>
     AbstractArray<T>::operator T *() const
     {
       return begin();
     }
 
-    template<typename T>
+    template <typename T>
     T *AbstractArray<T>::data() const
     {
       return begin();
     }
 
-    template<typename T>
+    template <typename T>
     T *AbstractArray<T>::begin() const
     {
-      return const_cast<T*>(cbegin());
+      return const_cast<T *>(cbegin());
     }
 
-    template<typename T>
+    template <typename T>
     T *AbstractArray<T>::end() const
     {
-      return const_cast<T*>(cend());
+      return const_cast<T *>(cend());
     }
 
   }  // namespace utility

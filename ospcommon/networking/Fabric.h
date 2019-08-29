@@ -16,10 +16,10 @@
 
 #pragma once
 
-#include <memory>
 #include <cstdlib>
-#include "../utility/AbstractArray.h"
+#include <memory>
 #include "../common.h"
+#include "../utility/AbstractArray.h"
 
 namespace ospcommon {
   namespace networking {
@@ -33,7 +33,8 @@ namespace ospcommon {
       // Broadcast the data to all clients on the other end of the fabric
       // TODO: only makes sense to call on the root rank, so maybe a separate
       // "send" fabric ?
-      virtual void sendBcast(std::shared_ptr<utility::AbstractArray<uint8_t>> buf) = 0;
+      virtual void sendBcast(
+          std::shared_ptr<utility::AbstractArray<uint8_t>> buf) = 0;
 
       // Receive a broadcast of data from the fabric sender
       // TODO: only makes sense to call on the receivers, so maybe a separate
@@ -41,12 +42,13 @@ namespace ospcommon {
       virtual void recvBcast(utility::AbstractArray<uint8_t> &buf) = 0;
 
       // Send data to a specific rank in the fabric (callable on any rank)
-      virtual void send(std::shared_ptr<utility::AbstractArray<uint8_t>> buf, int rank) = 0;
+      virtual void send(std::shared_ptr<utility::AbstractArray<uint8_t>> buf,
+                        int rank) = 0;
 
       // Receive data from a specific rank on the fabric (callable on any rank)
       virtual void recv(utility::AbstractArray<uint8_t> &buf, int rank) = 0;
     };
 
-  }
-}
+  }  // namespace networking
+}  // namespace ospcommon
 
