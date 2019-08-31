@@ -19,7 +19,7 @@
 #include "../platform.h"
 #include "constants.h"
 // std
-#include <algorithm> // std::min()/std::max() on Windows
+#include <algorithm>  // std::min()/std::max() on Windows
 #include <cmath>
 
 #ifdef _WIN32
@@ -68,6 +68,11 @@ namespace ospcommon {
       const __m128 r = _mm_rcp_ps(a);
       return _mm_cvtss_f32(
           _mm_mul_ps(r, _mm_sub_ps(_mm_set_ss(2.0f), _mm_mul_ps(r, a))));
+    }
+
+    __forceinline float rcp_safe(float f)
+    {
+      return rcp((abs(f) < 1e-8f) ? 1e-8f : f);
     }
 
     __forceinline float rsqrt(const float x)

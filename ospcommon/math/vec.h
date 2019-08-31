@@ -407,6 +407,7 @@ namespace ospcommon {
 
     // clang-format off
     unary_functor(rcp)
+    unary_functor(rcp_safe)
     unary_functor(abs)
     unary_functor(sin)
     unary_functor(cos)
