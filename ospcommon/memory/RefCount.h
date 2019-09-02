@@ -63,18 +63,18 @@ namespace ospcommon {
         return *this;
       }
 
-      virtual void refInc()
+      virtual void refInc() const
       {
         refCounter++;
       }
-      virtual void refDec()
+      virtual void refDec() const
       {
         if ((--refCounter) == 0)
           delete this;
       }
 
      private:
-      atomic_t refCounter;
+      mutable atomic_t refCounter;
     };
 
     /////////////////////////////////////////////////////////////////////////////
