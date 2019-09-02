@@ -145,6 +145,11 @@ namespace ospcommon {
         return x * y;
       }
 
+      inline size_t long_product() const
+      {
+        return size_t(x) * size_t(y);
+      }
+
       // conversion constructor to other types to enable static_cast
       template <typename OT>
       explicit inline operator vec_t<OT, 2>()
@@ -214,6 +219,11 @@ namespace ospcommon {
         return x * y * z;
       }
 
+      inline size_t long_product() const
+      {
+        return size_t(x) * size_t(y) * size_t(z);
+      }
+
       // conversion constructor to other types to enable static_cast
       template <typename OT>
       explicit inline operator vec_t<OT, 3>()
@@ -279,6 +289,11 @@ namespace ospcommon {
       inline scalar_t product() const
       {
         return x * y * z;
+      }
+
+      inline size_t long_product() const
+      {
+        return size_t(x) * size_t(y) * size_t(z);
       }
 
       inline operator vec_t<T, 3>() const
@@ -363,6 +378,11 @@ namespace ospcommon {
       inline scalar_t product() const
       {
         return x * y * z * w;
+      }
+
+      inline size_t long_product() const
+      {
+        return size_t(x) * size_t(y) * size_t(z) * size_t(w);
       }
 
       // conversion constructor to other types to enable static_cast
