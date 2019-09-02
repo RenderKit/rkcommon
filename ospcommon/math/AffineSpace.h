@@ -71,6 +71,16 @@ namespace ospcommon {
       {
       }
 
+      inline operator L*()
+      {
+        return static_cast<L*>(l);
+      }
+
+      inline operator const L*() const
+      {
+        return static_cast<const L*>(l);
+      }
+
       /////////////////////////////////////////////////////////////////////////
       // Constants
       /////////////////////////////////////////////////////////////////////////

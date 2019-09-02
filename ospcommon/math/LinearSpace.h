@@ -148,6 +148,16 @@ namespace ospcommon {
         return LinearSpace2(mirror * m.vx, m.vy);
       }
 
+      inline operator Scalar*()
+      {
+        return static_cast<Scalar*>(vx);
+      }
+
+      inline operator const Scalar*() const
+      {
+        return static_cast<const Scalar*>(vx);
+      }
+
      public:
       /*! the column vectors of the matrix */
       Vector vx, vy;
@@ -400,6 +410,16 @@ namespace ospcommon {
                             u.x * u.z * (1 - c) - u.y * s,
                             u.y * u.z * (1 - c) + u.x * s,
                             u.z * u.z + (1 - u.z * u.z) * c);
+      }
+
+      inline operator Scalar*()
+      {
+        return static_cast<Scalar*>(vx);
+      }
+
+      inline operator const Scalar*() const
+      {
+        return static_cast<const Scalar*>(vx);
       }
 
      public:

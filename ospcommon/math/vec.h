@@ -124,6 +124,16 @@ namespace ospcommon {
         return (&x)[idx];
       }
 
+      inline operator T*()
+      {
+        return &x;
+      }
+
+      inline operator const T*() const
+      {
+        return &x;
+      }
+
       /*! return result of reduce_add() across all components */
       inline scalar_t sum() const
       {
@@ -182,6 +192,16 @@ namespace ospcommon {
         return (&x)[axis];
       }
 
+      inline operator T*()
+      {
+        return &x;
+      }
+
+      inline operator const T*() const
+      {
+        return &x;
+      }
+
       /*! return result of reduce_add() across all components */
       inline scalar_t sum() const
       {
@@ -238,6 +258,16 @@ namespace ospcommon {
       {
         assert(axis < 3);
         return (&x)[axis];
+      }
+
+      inline operator T*()
+      {
+        return &x;
+      }
+
+      inline operator const T*() const
+      {
+        return &x;
       }
 
       /*! return result of reduce_add() across all components */
@@ -312,6 +342,16 @@ namespace ospcommon {
       {
         assert(idx < 4);
         return (&x)[idx];
+      }
+
+      inline operator T*()
+      {
+        return &x;
+      }
+
+      inline operator const T*() const
+      {
+        return &x;
       }
 
       /*! return result of reduce_add() across all components */

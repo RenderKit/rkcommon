@@ -109,6 +109,16 @@ namespace ospcommon {
         return !anyLessThan(vec, lower) && !anyLessThan(upper, vec);
       }
 
+      inline operator T*()
+      {
+        return static_cast<T*>(lower);
+      }
+
+      inline operator const T*() const
+      {
+        return static_cast<const T*>(lower);
+      }
+
       T lower, upper;
     };
 
