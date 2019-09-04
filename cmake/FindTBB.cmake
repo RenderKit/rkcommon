@@ -137,7 +137,7 @@ endif()
 
 ## Build TBB target 'ospcommon_tbb' ##
 
-if (TBB_FOUND)
+if (TBB_FOUND AND NOT TARGET ospcommon_tbb)
   add_library(ospcommon_tbb INTERFACE IMPORTED)
   set_target_properties(ospcommon_tbb PROPERTIES
     INTERFACE_LINK_LIBRARIES "${TBB_LIBRARY};${TBB_LIBRARY_MALLOC}"
