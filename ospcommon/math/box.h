@@ -113,13 +113,17 @@ namespace ospcommon {
     }
 
     template <typename T, int N>
-    inline range1f intersectRayBox(const vec_t<T, N> &org,
-                                   const vec_t<T, N> &dir,
-                                   const box_t<T, N> &box)
+    inline range_t<T> intersectRayBox(
+        const vec_t<T, N> &org,
+        const vec_t<T, N> &dir,
+        const box_t<T, N> &box,
+        const range_t<T> &tRange = range_t<T>(0, inf))
     {
       const auto mins = (box.lower - org) * rcp_safe(dir);
       const auto maxs = (box.upper - org) * rcp_safe(dir);
-      return range1f(reduce_max(min(mins, maxs)), reduce_min(max(mins, maxs)));
+      return range_t<T>(
+          reduce_max(vec_t<T, N + 1>(min(mins, maxs), tRange.lower)),
+          reduce_min(vec_t<T, N + 1>(max(mins, maxs), tRange.upper)));
     }
 
     // -------------------------------------------------------
