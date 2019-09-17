@@ -56,6 +56,16 @@ if (BUILD_TESTING)
   enable_testing()
 endif()
 
+if (WIN32)
+  option(INSTALL_DEPS "Install ospcommon DLL dependencies" ON)
+else()
+  set(INSTALL_DEPS OFF)
+endif()
+
+if (INSTALL_DEPS)
+  include(ospcommon_redist_deps)
+endif()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
