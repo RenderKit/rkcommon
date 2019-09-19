@@ -60,7 +60,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 if (WIN32)
-  set(EXTRA_COMPILE_DEFINITIONS -DNOMINMAX)
+  set(EXTRA_COMPILE_DEFINITIONS -DNOMINMAX -DWIN32_LEAN_AND_MEAN)
 endif()
 
 target_compile_definitions(${PROJECT_NAME}
