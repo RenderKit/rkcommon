@@ -28,7 +28,6 @@ add_library(${PROJECT_NAME}
 
   networking/DataStreaming.cpp
   networking/Socket.cpp
-  networking/SocketFabric.cpp
 
   os/FileName.cpp
   os/library.cpp
