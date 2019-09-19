@@ -31,38 +31,49 @@ namespace ospcommon {
     template <typename T>
     struct AbstractArray
     {
-      AbstractArray()          = default;
       virtual ~AbstractArray() = default;
 
-      virtual void reset()                     = 0;
-      virtual void reset(T *data, size_t size) = 0;
+      size_t size() const;
 
-      virtual size_t size() const = 0;
-
-      virtual T &operator[](size_t offset) const;
+      T &operator[](size_t offset) const;
       // with bounds checking
-      virtual T &at(size_t offset) const;
+      T &at(size_t offset) const;
 
-      virtual operator bool() const;
-      virtual explicit operator T *() const;
+      operator bool() const;
+      explicit operator T *() const;
 
-      virtual T *data() const;
+      T *data() const;
 
-      virtual T *begin() const;
-      virtual T *end() const;
+      T *begin() const;
+      T *end() const;
 
-      virtual const T *cbegin() const = 0;
-      virtual const T *cend() const   = 0;
+      const T *cbegin() const;
+      const T *cend() const;
+
+     protected:
+      // Can only be constructed by child classes
+      AbstractArray() = default;
+
+      T *ptr{nullptr};
+      size_t numItems{0};
     };
 
+    // Inlined definitions ////////////////////////////////////////////////////
+
     template <typename T>
-    T &AbstractArray<T>::operator[](size_t offset) const
+    inline size_t AbstractArray<T>::size() const
+    {
+      return numItems;
+    }
+
+    template <typename T>
+    inline T &AbstractArray<T>::operator[](size_t offset) const
     {
       return *(begin() + offset);
     }
 
     template <typename T>
-    T &AbstractArray<T>::at(size_t offset) const
+    inline T &AbstractArray<T>::at(size_t offset) const
     {
       if (offset >= size())
         throw std::runtime_error("ArrayView<T>: out of bounds access!");
@@ -71,35 +82,46 @@ namespace ospcommon {
     }
 
     template <typename T>
-    AbstractArray<T>::operator bool() const
+    inline AbstractArray<T>::operator bool() const
     {
       return size() != 0;
     }
 
     template <typename T>
-    AbstractArray<T>::operator T *() const
+    inline AbstractArray<T>::operator T *() const
     {
       return begin();
     }
 
     template <typename T>
-    T *AbstractArray<T>::data() const
+    inline T *AbstractArray<T>::data() const
     {
       return begin();
     }
 
     template <typename T>
-    T *AbstractArray<T>::begin() const
+    inline T *AbstractArray<T>::begin() const
     {
-      return const_cast<T *>(cbegin());
+      return ptr;
     }
 
     template <typename T>
-    T *AbstractArray<T>::end() const
+    inline T *AbstractArray<T>::end() const
     {
-      return const_cast<T *>(cend());
+      return ptr + size();
+    }
+
+    template <typename T>
+    inline const T *AbstractArray<T>::cbegin() const
+    {
+      return begin();
+    }
+
+    template <typename T>
+    inline const T *AbstractArray<T>::cend() const
+    {
+      return end();
     }
 
   }  // namespace utility
 }  // namespace ospcommon
-

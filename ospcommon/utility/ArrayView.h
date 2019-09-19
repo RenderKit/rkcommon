@@ -32,8 +32,8 @@ namespace ospcommon {
     template <typename T>
     struct ArrayView : public AbstractArray<T>
     {
-      ArrayView()  = default;
-      ~ArrayView() = default;
+      ArrayView()           = default;
+      ~ArrayView() override = default;
 
       template <size_t SIZE>
       ArrayView(std::array<T, SIZE> &init);
@@ -42,94 +42,71 @@ namespace ospcommon {
 
       explicit ArrayView(T *data, size_t size);
 
-      void reset() override;
-      void reset(T *data, size_t size) override;
+      void reset();
+      void reset(T *data, size_t size);
 
       template <size_t SIZE>
       ArrayView &operator=(std::array<T, SIZE> &rhs);
 
       ArrayView &operator=(std::vector<T> &rhs);
 
-      size_t size() const override;
-
-      const T *cbegin() const override;
-      const T *cend() const override;
-
      private:
-      T *ptr{nullptr};
-      size_t numItems{0};
+      void setPtr(T *data, size_t size);
     };
 
     // Inlined ArrayView definitions //////////////////////////////////////////
 
     template <typename T>
     inline ArrayView<T>::ArrayView(T *_data, size_t _size)
-        : ptr(_data), numItems(_size)
     {
+      setPtr(_data, _size);
     }
 
     template <typename T>
     template <size_t SIZE>
     inline ArrayView<T>::ArrayView(std::array<T, SIZE> &init)
-        : ptr(init.data()), numItems(init.size())
     {
+      setPtr(init.data(), init.size());
     }
 
     template <typename T>
     inline ArrayView<T>::ArrayView(std::vector<T> &init)
-        : ptr(init.data()), numItems(init.size())
     {
+      setPtr(init.data(), init.size());
     }
 
     template <typename T>
     inline void ArrayView<T>::reset()
     {
-      ptr      = nullptr;
-      numItems = 0;
+      setPtr(nullptr, 0);
     }
 
     template <typename T>
     inline void ArrayView<T>::reset(T *_data, size_t _size)
     {
-      ptr      = _data;
-      numItems = _size;
+      setPtr(_data, _size);
     }
 
     template <typename T>
     template <size_t SIZE>
     inline ArrayView<T> &ArrayView<T>::operator=(std::array<T, SIZE> &rhs)
     {
-      ptr      = rhs.data();
-      numItems = rhs.size();
-
+      setPtr(rhs.data(), rhs.size());
       return *this;
     }
 
     template <typename T>
     inline ArrayView<T> &ArrayView<T>::operator=(std::vector<T> &rhs)
     {
-      ptr      = rhs.data();
-      numItems = rhs.size();
-
+      setPtr(rhs.data(), rhs.size());
       return *this;
     }
 
     template <typename T>
-    size_t ArrayView<T>::size() const
+    inline void ArrayView<T>::setPtr(T *data, size_t size)
     {
-      return numItems;
-    }
-
-    template <typename T>
-    const T *ArrayView<T>::cbegin() const
-    {
-      return ptr;
-    }
-
-    template <typename T>
-    const T *ArrayView<T>::cend() const
-    {
-      return ptr + size();
+      this->ptr      = data;
+      this->numItems = size;
     }
 
     // ArrayView utility functions ////////////////////////////////////////////

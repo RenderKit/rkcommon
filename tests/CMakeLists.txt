@@ -49,6 +49,7 @@ add_executable(ospcommon_test_suite
 
   traits/test_traits.cpp
 
+  utility/test_AbstractArray.cpp
   utility/test_Any.cpp
   utility/test_ArgumentList.cpp
   utility/test_ArrayView.cpp
@@ -61,6 +62,7 @@ add_executable(ospcommon_test_suite
   utility/test_Observers.cpp
   utility/test_OnScopeExit.cpp
   utility/test_Optional.cpp
+  utility/test_OwnedArray.cpp
   utility/test_ParameterizedObject.cpp
   utility/test_PseudoURL.cpp
   utility/test_SaveImage.cpp

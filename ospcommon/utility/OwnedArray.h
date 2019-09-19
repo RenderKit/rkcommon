@@ -31,7 +31,8 @@ namespace ospcommon {
     template <typename T>
     struct OwnedArray : public AbstractArray<T>
     {
-      OwnedArray() = default;
+      OwnedArray()           = default;
+      ~OwnedArray() override = default;
 
       template <size_t SIZE>
       OwnedArray(std::array<T, SIZE> &init);
@@ -45,26 +46,24 @@ namespace ospcommon {
 
       OwnedArray &operator=(std::vector<T> &rhs);
 
-      void reset() override;
-      void reset(T *data, size_t size) override;
+      void reset();
+      void reset(T *_data, size_t _size);
 
       void resize(size_t size, const T &val);
 
-      size_t size() const override;
+     private:
+      void setPtr();
 
-      const T *cbegin() const override;
-      const T *cend() const override;
-
-     protected:
       std::vector<T> dataBuf;
     };
 
-    // Inlined OwnedArray definitions //////////////////////////////////////////
+    // Inlined OwnedArray definitions /////////////////////////////////////////
 
     template <typename T>
     inline OwnedArray<T>::OwnedArray(T *_data, size_t _size)
         : dataBuf(_data, _data + _size)
     {
+      setPtr();
     }
 
     template <typename T>
@@ -72,11 +71,13 @@ namespace ospcommon {
     inline OwnedArray<T>::OwnedArray(std::array<T, SIZE> &init)
         : dataBuf(init.begin(), init.end())
     {
+      setPtr();
     }
 
     template <typename T>
     inline OwnedArray<T>::OwnedArray(std::vector<T> &init) : dataBuf(init)
     {
+      setPtr();
     }
 
     template <typename T>
@@ -84,6 +85,7 @@ namespace ospcommon {
     inline OwnedArray<T> &OwnedArray<T>::operator=(std::array<T, SIZE> &rhs)
     {
       dataBuf = std::vector<T>(rhs.begin(), rhs.end());
+      setPtr();
       return *this;
     }
 
@@ -91,6 +93,7 @@ namespace ospcommon {
     inline OwnedArray<T> &OwnedArray<T>::operator=(std::vector<T> &rhs)
     {
       dataBuf = std::vector<T>(rhs.begin(), rhs.end());
+      setPtr();
       return *this;
     }
 
@@ -98,44 +101,29 @@ namespace ospcommon {
     inline void OwnedArray<T>::reset()
     {
       dataBuf.clear();
+      dataBuf.shrink_to_fit();
     }
 
     template <typename T>
     inline void OwnedArray<T>::reset(T *_data, size_t _size)
     {
       dataBuf = std::vector<T>(_data, _data + _size);
+      setPtr();
     }
 
     template <typename T>
     inline void OwnedArray<T>::resize(size_t size, const T &val)
     {
       dataBuf.resize(size, val);
+      setPtr();
     }
 
     template <typename T>
-    size_t OwnedArray<T>::size() const
+    inline void OwnedArray<T>::setPtr()
     {
-      return dataBuf.size();
-    }
-
-    template <typename T>
-    const T *OwnedArray<T>::cbegin() const
-    {
-      if (size() > 0) {
-        return &dataBuf[0];
-      }
-      return nullptr;
-    }
-
-    template <typename T>
-    const T *OwnedArray<T>::cend() const
-    {
-      if (size() > 0) {
-        return &dataBuf.back();
-      }
-      return nullptr;
+      this->ptr      = dataBuf.data();
+      this->numItems = dataBuf.size();
     }
 
   }  // namespace utility
 }  // namespace ospcommon
-
