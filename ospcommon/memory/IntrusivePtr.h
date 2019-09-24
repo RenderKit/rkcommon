@@ -34,6 +34,7 @@ namespace ospcommon {
 
       void refInc() const;
       void refDec() const;
+      long long useCount() const;
 
      private:
       mutable std::atomic<long long> refCounter{1};
@@ -50,6 +51,11 @@ namespace ospcommon {
     {
       if ((--refCounter) == 0)
         delete this;
+    }
+
+    inline long long RefCountedObject::useCount() const
+    {
+      return refCounter.load();
     }
 
     ///////////////////////////////////////////////////////////////////////////
