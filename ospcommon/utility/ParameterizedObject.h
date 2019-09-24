@@ -47,6 +47,8 @@ namespace ospcommon {
 
         /*! name under which this parameter is registered */
         std::string name;
+
+        bool query = false;
       };
 
       /*! \brief check if a given parameter is available */
@@ -110,6 +112,7 @@ namespace ospcommon {
       Param *param = findParam(name);
       if (!param)
         return valIfNotFound;
+      param->query = true;
       if (!param->data.is<T>())
         return valIfNotFound;
       return param->data.get<T>();
