@@ -64,6 +64,12 @@ namespace ospcommon {
 
       void removeParam(const std::string &name);
 
+      void resetAllParamQueryStatus()
+      {
+        for (auto p = params_begin(); p != params_end(); ++p)
+          (*p)->query = false;
+      }
+
      protected:
       /*! \brief find a given parameter, or add it if not exists (and so
        *         specified) */
