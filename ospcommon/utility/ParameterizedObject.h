@@ -38,14 +38,9 @@ namespace ospcommon {
         ~Param() = default;
 
         template <typename T>
-        void set(const T &v)
-        {
-          data = v;
-        }
+        void set(const T &v);
 
         utility::Any data;
-
-        /*! name under which this parameter is registered */
         std::string name;
 
         bool query = false;
@@ -64,26 +59,13 @@ namespace ospcommon {
 
       void removeParam(const std::string &name);
 
-      void resetAllParamQueryStatus()
-      {
-        for (auto p = params_begin(); p != params_end(); ++p)
-          (*p)->query = false;
-      }
+      void resetAllParamQueryStatus();
 
      protected:
-      /*! \brief find a given parameter, or add it if not exists (and so
-       *         specified) */
       Param *findParam(const std::string &name, bool addIfNotExist = false);
 
-      /*! enumerate parameters */
-      std::vector<std::shared_ptr<Param>>::iterator params_begin()
-      {
-        return paramList.begin();
-      }
-      std::vector<std::shared_ptr<Param>>::iterator params_end()
-      {
-        return paramList.end();
-      }
+      std::vector<std::shared_ptr<Param>>::iterator params_begin();
+      std::vector<std::shared_ptr<Param>>::iterator params_end();
 
      private:
       // Data members //
@@ -96,8 +78,13 @@ namespace ospcommon {
       std::vector<std::shared_ptr<Param>> paramList;
     };
 
-    // Inlined ParameterizedObject definitions
-    // //////////////////////////////////
+    // Inlined ParameterizedObject definitions ////////////////////////////////
+
+    template <typename T>
+    inline void ParameterizedObject::Param::set(const T &v)
+    {
+      data = v;
+    }
 
     inline bool ParameterizedObject::hasParam(const std::string &name)
     {
@@ -122,6 +109,24 @@ namespace ospcommon {
       if (!param->data.is<T>())
         return valIfNotFound;
       return param->data.get<T>();
+    }
+
+    inline void ParameterizedObject::resetAllParamQueryStatus()
+    {
+      for (auto p = params_begin(); p != params_end(); ++p)
+        (*p)->query = false;
+    }
+
+    inline std::vector<std::shared_ptr<ParameterizedObject::Param>>::iterator
+    ParameterizedObject::params_begin()
+    {
+      return paramList.begin();
+    }
+
+    inline std::vector<std::shared_ptr<ParameterizedObject::Param>>::iterator
+    ParameterizedObject::params_end()
+    {
+      return paramList.end();
     }
 
   }  // namespace utility
