@@ -64,7 +64,7 @@ namespace ospcommon {
 
     /*! generic stream operators into/out of streams, for raw data blocks */
     template <typename T>
-    inline OSPCOMMON_INTERFACE WriteStream &operator<<(WriteStream &buf,
+    inline WriteStream &operator<<(WriteStream &buf,
                                                        const T &rh)
     {
       buf.write((const byte_t *)&rh, sizeof(T));
@@ -72,7 +72,7 @@ namespace ospcommon {
     }
 
     template <typename T>
-    inline OSPCOMMON_INTERFACE ReadStream &operator>>(ReadStream &buf, T &rh)
+    inline ReadStream &operator>>(ReadStream &buf, T &rh)
     {
       buf.read((byte_t *)&rh, sizeof(T));
       return buf;
@@ -81,7 +81,7 @@ namespace ospcommon {
     /*! @{ stream operators into/out of read/write streams, for std::vectors
      * of non-POD types*/
     template <typename T>
-    inline OSPCOMMON_INTERFACE WriteStream &operator<<(WriteStream &buf,
+    inline WriteStream &operator<<(WriteStream &buf,
                                                        const std::vector<T> &rh)
     {
       const size_t sz = rh.size();
@@ -94,7 +94,7 @@ namespace ospcommon {
     }
 
     template <typename T>
-    inline OSPCOMMON_INTERFACE ReadStream &operator>>(ReadStream &buf,
+    inline ReadStream &operator>>(ReadStream &buf,
                                                       std::vector<T> &rh)
     {
       size_t sz;
@@ -111,7 +111,7 @@ namespace ospcommon {
     /*! @{ stream operators into/out of read/write streams, for AbstractArray<T>
      */
     template <typename T>
-    inline OSPCOMMON_INTERFACE WriteStream &operator<<(
+    inline WriteStream &operator<<(
         WriteStream &buf, const utility::AbstractArray<T> &rh)
     {
       const size_t sz = rh.size();
@@ -122,7 +122,7 @@ namespace ospcommon {
     /*! @} */
 
     /*! @{ serialize operations for strings */
-    inline OSPCOMMON_INTERFACE WriteStream &operator<<(WriteStream &buf,
+    inline WriteStream &operator<<(WriteStream &buf,
                                                        const std::string &rh)
     {
       const size_t sz = rh.size();
@@ -131,7 +131,7 @@ namespace ospcommon {
       return buf;
     }
 
-    inline OSPCOMMON_INTERFACE ReadStream &operator>>(ReadStream &buf,
+    inline ReadStream &operator>>(ReadStream &buf,
                                                       std::string &rh)
     {
       size_t sz;
