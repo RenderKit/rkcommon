@@ -105,9 +105,9 @@ namespace ospcommon {
       Param *param = findParam(name);
       if (!param)
         return valIfNotFound;
-      param->query = true;
       if (!param->data.is<T>())
         return valIfNotFound;
+      param->query = true;
       return param->data.get<T>();
     }
 
