@@ -150,12 +150,12 @@ namespace ospcommon {
 
       inline operator Scalar*()
       {
-        return static_cast<Scalar*>(vx);
+        return static_cast<Scalar*>(&vx);
       }
 
       inline operator const Scalar*() const
       {
-        return static_cast<const Scalar*>(vx);
+        return static_cast<const Scalar*>(&vx);
       }
 
      public:
@@ -414,12 +414,12 @@ namespace ospcommon {
 
       inline operator Scalar*()
       {
-        return static_cast<Scalar*>(vx);
+        return static_cast<Scalar*>(&vx);
       }
 
       inline operator const Scalar*() const
       {
-        return static_cast<const Scalar*>(vx);
+        return static_cast<const Scalar*>(&vx);
       }
 
      public:

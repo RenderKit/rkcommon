@@ -111,12 +111,12 @@ namespace ospcommon {
 
       inline operator T*()
       {
-        return static_cast<T*>(lower);
+        return static_cast<T*>(&lower);
       }
 
       inline operator const T*() const
       {
-        return static_cast<const T*>(lower);
+        return static_cast<const T*>(&lower);
       }
 
       T lower, upper;
