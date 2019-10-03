@@ -64,21 +64,27 @@ namespace ospcommon {
 
       // Storage mutation //
 
+      void erase(const KEY &key);
+
       void clear();
       void reserve(size_t size);
 
       // Iterators //
 
       iterator_t begin();
+      citerator_t begin() const;
       citerator_t cbegin() const;
 
       iterator_t end();
+      citerator_t end() const;
       citerator_t cend() const;
 
       riterator_t rbegin();
+      criterator_t rbegin() const;
       criterator_t crbegin() const;
 
       riterator_t rend();
+      criterator_t rend() const;
       criterator_t crend() const;
 
      private:
@@ -169,6 +175,17 @@ namespace ospcommon {
     }
 
     template <typename KEY, typename VALUE>
+    inline void FlatMap<KEY, VALUE>::erase(const KEY &key)
+    {
+      auto itr = std::stable_partition(
+          values.begin(), values.end(), [&](const item_t &i) {
+            return i.first != key;
+          });
+
+      values.resize(std::distance(values.begin(), itr));
+    }
+
+    template <typename KEY, typename VALUE>
     inline void FlatMap<KEY, VALUE>::clear()
     {
       values.clear();
@@ -180,10 +197,19 @@ namespace ospcommon {
       return values.reserve(size);
     }
 
+    // Iterators //
+
     template <typename KEY, typename VALUE>
     inline typename FlatMap<KEY, VALUE>::iterator_t FlatMap<KEY, VALUE>::begin()
     {
       return values.begin();
+    }
+
+    template <typename KEY, typename VALUE>
+    inline typename FlatMap<KEY, VALUE>::citerator_t
+    FlatMap<KEY, VALUE>::begin() const
+    {
+      return cbegin();
     }
 
     template <typename KEY, typename VALUE>
@@ -197,6 +223,13 @@ namespace ospcommon {
     inline typename FlatMap<KEY, VALUE>::iterator_t FlatMap<KEY, VALUE>::end()
     {
       return values.end();
+    }
+
+    template <typename KEY, typename VALUE>
+    inline typename FlatMap<KEY, VALUE>::citerator_t FlatMap<KEY, VALUE>::end()
+        const
+    {
+      return cend();
     }
 
     template <typename KEY, typename VALUE>
@@ -215,6 +248,13 @@ namespace ospcommon {
 
     template <typename KEY, typename VALUE>
     inline typename FlatMap<KEY, VALUE>::criterator_t
+    FlatMap<KEY, VALUE>::rbegin() const
+    {
+      return crbegin();
+    }
+
+    template <typename KEY, typename VALUE>
+    inline typename FlatMap<KEY, VALUE>::criterator_t
     FlatMap<KEY, VALUE>::crbegin() const
     {
       return values.crbegin();
@@ -228,10 +268,19 @@ namespace ospcommon {
 
     template <typename KEY, typename VALUE>
     inline typename FlatMap<KEY, VALUE>::criterator_t
+    FlatMap<KEY, VALUE>::rend() const
+    {
+      return crend();
+    }
+
+    template <typename KEY, typename VALUE>
+    inline typename FlatMap<KEY, VALUE>::criterator_t
     FlatMap<KEY, VALUE>::crend() const
     {
       return values.crend();
     }
+
+    // Helper functions //
 
     template <typename KEY, typename VALUE>
     inline typename FlatMap<KEY, VALUE>::iterator_t FlatMap<KEY, VALUE>::lookup(
