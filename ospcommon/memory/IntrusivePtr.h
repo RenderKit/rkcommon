@@ -1,4 +1,4 @@
-// Copyright 2009-2019 Intel Corporation
+// Copyright 2009-2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -16,8 +16,10 @@ namespace ospcommon {
       RefCountedObject()          = default;
       virtual ~RefCountedObject() = default;
 
-      RefCountedObject(const RefCountedObject &) = default;
-      RefCountedObject &operator=(const RefCountedObject &) = default;
+      RefCountedObject(const RefCountedObject &) = delete;
+      RefCountedObject &operator=(const RefCountedObject &) = delete;
+      RefCountedObject(RefCountedObject &&) = delete;
+      RefCountedObject &operator=(RefCountedObject &&) = delete;
 
       void refInc() const;
       void refDec() const;
