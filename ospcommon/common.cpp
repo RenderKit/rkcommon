@@ -50,7 +50,7 @@ namespace ospcommon {
 
   std::string prettyDouble(double val)
   {
-    const double absVal = abs(val);
+    const double absVal = std::abs(val);
     char result[1000];
 
     if (absVal >= 1e+15f)
