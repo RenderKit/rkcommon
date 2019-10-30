@@ -88,10 +88,12 @@ namespace ospcommon {
 
     static std::unique_ptr<tasking_system_handle> g_tasking_handle;
 
-    void initTaskingSystem(int numThreads)
+    void initTaskingSystem(int numThreads, bool flushDenormals)
     {
-      _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-      _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+      if (flushDenormals) {
+        _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+        _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+      }
 
       g_tasking_handle = make_unique<tasking_system_handle>(numThreads);
     }

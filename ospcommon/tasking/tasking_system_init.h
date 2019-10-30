@@ -21,7 +21,8 @@
 namespace ospcommon {
   namespace tasking {
 
-    void OSPCOMMON_INTERFACE initTaskingSystem(int numThreads = -1);
+    void OSPCOMMON_INTERFACE initTaskingSystem(int numThreads      = -1,
+                                               bool flushDenormals = false);
 
     int OSPCOMMON_INTERFACE numTaskingThreads();
 
