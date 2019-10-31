@@ -65,6 +65,7 @@ add_executable(ospcommon_test_suite
   utility/test_OwnedArray.cpp
   utility/test_ParameterizedObject.cpp
   utility/test_PseudoURL.cpp
+  utility/test_random.cpp  
   utility/test_SaveImage.cpp
   utility/test_StringManip.cpp
   utility/test_TimeStamp.cpp
@@ -80,6 +81,7 @@ add_test(NAME Optional              COMMAND ospcommon_test_suite "[Optional]")
 add_test(NAME FlatMap               COMMAND ospcommon_test_suite "[FlatMap]")
 add_test(NAME TransactionalBuffer   COMMAND ospcommon_test_suite "[TransactionalBuffer]")
 add_test(NAME StringManip           COMMAND ospcommon_test_suite "[StringManip]")
+add_test(NAME random                COMMAND ospcommon_test_suite "[random]")
 if(NOT WIN32) # Tests which are broken on Windows with unknown fixes (for now)
   add_test(NAME Any                 COMMAND ospcommon_test_suite "[Any]")
   add_test(NAME AlignedVector       COMMAND ospcommon_test_suite "[AlignedVector]")
