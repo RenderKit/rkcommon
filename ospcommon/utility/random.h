@@ -23,10 +23,13 @@
 namespace ospcommon {
   namespace utility {
 
-    class float_distribution
+    class pcg32_biased_float_distribution
     {
      public:
-      float_distribution(int seed, int sequence, float lower, float upper);
+      pcg32_biased_float_distribution(int seed,
+                                      int sequence,
+                                      float lower,
+                                      float upper);
       float operator()();
 
      private:
@@ -34,22 +37,21 @@ namespace ospcommon {
       float lower, upper, diff;
     };
 
-    // Inlined float_distribution definitions
-    // ////////////////////////////////////////////////
+    // Inlined pcg32_biased_float_distribution definitions ///////////////////
 
-    inline float_distribution::float_distribution(int seed,
-                                                  int sequence,
-                                                  float lower,
-                                                  float upper)
+    inline pcg32_biased_float_distribution::pcg32_biased_float_distribution(
+        int seed, int sequence, float lower, float upper)
         : lower(lower), upper(upper)
     {
       diff = upper - lower;
       rng.seed(seed, sequence);
     }
 
-    inline float float_distribution::operator()()
+    inline float pcg32_biased_float_distribution::operator()()
     {
-      return ldexp(rng(), -32) * diff + lower;
+      const unsigned scaleBits = 0x2F800000;  // 2^(-32)
+      const float scale        = *(float *)&scaleBits;
+      return (scale * rng()) * diff + lower;
     }
 
   }  // namespace utility

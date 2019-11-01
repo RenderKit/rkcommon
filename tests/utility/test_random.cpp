@@ -18,7 +18,7 @@
 #include "../catch.hpp"
 #include "ospcommon/utility/random.h"
 
-using ospcommon::utility::float_distribution;
+using ospcommon::utility::pcg32_biased_float_distribution;
 
 TEST_CASE("random", "[random]")
 {
@@ -29,7 +29,7 @@ TEST_CASE("random", "[random]")
   for (int iter = 0; iter < 1000; iter++) {
     float lower = dist(e1);
     float upper = dist(e1);
-    float_distribution osp_dist(iter, iter, lower, upper);
+    pcg32_biased_float_distribution osp_dist(iter, iter, lower, upper);
 
     INFO("seed = " << iter << " lower = " << lower << " upper = " << upper);
     if (lower > upper)
