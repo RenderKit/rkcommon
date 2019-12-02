@@ -75,7 +75,8 @@ namespace ospcommon {
       IntrusivePtr() = default;
       ~IntrusivePtr();
 
-      IntrusivePtr(const IntrusivePtr &input);
+      template <typename O>
+      IntrusivePtr(const IntrusivePtr<O> &input);
       IntrusivePtr(T *const input);
 
       IntrusivePtr &operator=(const IntrusivePtr &input);
@@ -100,7 +101,8 @@ namespace ospcommon {
     }
 
     template <typename T>
-    inline IntrusivePtr<T>::IntrusivePtr(const IntrusivePtr &input)
+    template <typename O>
+    inline IntrusivePtr<T>::IntrusivePtr(const IntrusivePtr<O> &input)
         : ptr(input.ptr)
     {
       if (ptr)
