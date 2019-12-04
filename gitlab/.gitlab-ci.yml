@@ -69,7 +69,7 @@ build-windows-msvc15:
     - gitlab\build.ps1 "Visual Studio 15 2017 Win64" "v141"
   tags:
     - msvc15
-    - win7
+    - win
   artifacts:
     paths:
       - build
@@ -117,4 +117,4 @@ test-functional-windows-msvc15:
     - build-windows-msvc15
   tags:
     - msvc15
-    - win7
+    - win
