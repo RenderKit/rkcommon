@@ -66,7 +66,7 @@ namespace ospcommon {
     class IntrusivePtr
     {
       static_assert(std::is_base_of<RefCountedObject, T>::value,
-                    "IntrusivePtr<T> can onyl be used with objects derived "
+                    "IntrusivePtr<T> can only be used with objects derived "
                     "from RefCountedObject");
 
      public:
@@ -75,11 +75,15 @@ namespace ospcommon {
       IntrusivePtr() = default;
       ~IntrusivePtr();
 
+      IntrusivePtr(const IntrusivePtr &input);
+      IntrusivePtr(IntrusivePtr &&input);
+
       template <typename O>
       IntrusivePtr(const IntrusivePtr<O> &input);
       IntrusivePtr(T *const input);
 
       IntrusivePtr &operator=(const IntrusivePtr &input);
+      IntrusivePtr &operator=(IntrusivePtr &&input);
       IntrusivePtr &operator=(T *input);
 
       operator bool() const;
@@ -98,6 +102,21 @@ namespace ospcommon {
     {
       if (ptr)
         ptr->refDec();
+    }
+
+    template <typename T>
+    inline IntrusivePtr<T>::IntrusivePtr(const IntrusivePtr<T> &input)
+        : ptr(input.ptr)
+    {
+      if (ptr)
+        ptr->refInc();
+    }
+
+    template <typename T>
+    inline IntrusivePtr<T>::IntrusivePtr(IntrusivePtr<T> &&input)
+        : ptr(input.ptr)
+    {
+      input.ptr = nullptr;
     }
 
     template <typename T>
@@ -125,6 +144,14 @@ namespace ospcommon {
       if (ptr)
         ptr->refDec();
       ptr = input.ptr;
+      return *this;
+    }
+
+    template <typename T>
+    inline IntrusivePtr<T> &IntrusivePtr<T>::operator=(IntrusivePtr &&input)
+    {
+      ptr       = input.ptr;
+      input.ptr = nullptr;
       return *this;
     }
 
