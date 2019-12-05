@@ -104,7 +104,7 @@ namespace ospcommon {
 #else
     std::string fullName = libLocation + "lib" + file + ".so";
 #endif
-    lib                  = dlopen(fullName.c_str(), RTLD_NOW | RTLD_GLOBAL);
+    lib                  = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
     if (lib == nullptr) {
       errorMsg = dlerror();  // remember original error
       // retry with SOVERSION in case symlinks are missing
@@ -114,7 +114,7 @@ namespace ospcommon {
 #else
       fullName += "." + soversion;
 #endif
-      lib      = dlopen(fullName.c_str(), RTLD_NOW | RTLD_GLOBAL);
+      lib      = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
     }
 #endif
 
