@@ -48,8 +48,9 @@ namespace ospcommon {
 
     ~LibraryRepository();
 
-    /* add a library to the repo */
+    // add/remove a library to/from the repo
     void add(const std::string &name, bool anchor = false);
+    void remove(const std::string &name);
 
     /* returns address of a symbol from any library in the repo */
     void *getSymbol(const std::string &sym) const;

@@ -32,6 +32,11 @@ namespace ospcommon {
     LibraryRepository::getInstance()->add(name, anchor);
   }
 
+  void unloadLibrary(const std::string &name)
+  {
+    LibraryRepository::getInstance()->remove(name);
+  }
+
   void loadDefaultLibrary()
   {
     LibraryRepository::getInstance()->addDefaultLibrary();

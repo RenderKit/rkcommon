@@ -178,6 +178,15 @@ namespace ospcommon {
     repo[name] = new Library(name, anchor);
   }
 
+  void LibraryRepository::remove(const std::string &name)
+  {
+    if (!libraryExists(name))
+      return;
+
+    delete repo[name];
+    repo.erase(name);
+  }
+
   void *LibraryRepository::getSymbol(const std::string &name) const
   {
     void *sym = nullptr;
