@@ -19,6 +19,8 @@
 #include <utility>
 
 #ifdef OSPCOMMON_TASKING_TBB
+#  define __TBB_NO_IMPLICIT_LINKAGE 1
+#  define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
 #  include <tbb/task.h>
 #elif defined(OSPCOMMON_TASKING_OMP)
 #  include <thread>

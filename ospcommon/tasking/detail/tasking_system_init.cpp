@@ -18,6 +18,8 @@
 
 // tasking system internals
 #if defined(OSPCOMMON_TASKING_TBB)
+#define __TBB_NO_IMPLICIT_LINKAGE 1
+#define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
 #include <tbb/task_arena.h>
 #include <tbb/task_scheduler_init.h>
 #define TBB_PREVIEW_GLOBAL_CONTROL 1
