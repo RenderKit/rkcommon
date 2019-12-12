@@ -181,6 +181,11 @@ namespace ospcommon {
       vec_t(scalar_t x, scalar_t y, scalar_t z) : x(x), y(y), z(z) {}
 
       template <typename OT, bool OA>
+      vec_t(const vec_t<OT, 2, OA> &o, scalar_t z) : x(o.x), y(o.y), z(z)
+      {
+      }
+
+      template <typename OT, bool OA>
       vec_t(const vec_t<OT, 3, OA> &o) : x(o.x), y(o.y), z(o.z)
       {
       }
@@ -255,6 +260,11 @@ namespace ospcommon {
       vec_t(scalar_t x, scalar_t y, scalar_t z) : x(x), y(y), z(z) {}
 
       template <typename OT, bool OA>
+      vec_t(const vec_t<OT, 2, OA> &o, scalar_t z) : x(o.x), y(o.y), z(z)
+      {
+      }
+
+      template <typename OT, bool OA>
       vec_t(const vec_t<OT, 3, OA> &o) : x(o.x), y(o.y), z(o.z)
       {
       }
@@ -324,21 +334,20 @@ namespace ospcommon {
 
       vec_t(scalar_t s) : x(s), y(s), z(s), w(s) {}
 
-#if 0
-    template <typename OT,
-              typename = traits::is_valid_vec_constructor_type_t<T, OT>>
-    vec_t(const OT &s) : x(s), y(s), z(s), w(s)
-    {
-    }
-#endif
-
       vec_t(scalar_t x, scalar_t y, scalar_t z, scalar_t w)
           : x(x), y(y), z(z), w(w)
       {
       }
 
-      template <typename OT, typename WT>
-      vec_t(const vec_t<OT, 3> &o, const WT w) : x(o.x), y(o.y), z(o.z), w(w)
+      template <typename OT, bool OA>
+      vec_t(const vec_t<OT, 2, OA> &o1, const vec_t<OT, 2, OA> &o2)
+          : x(o1.x), y(o1.y), z(o2.x), w(o2.y)
+      {
+      }
+
+      template <typename OT, bool OA>
+      vec_t(const vec_t<OT, 3, OA> &o, scalar_t w)
+          : x(o.x), y(o.y), z(o.z), w(w)
       {
       }
 
