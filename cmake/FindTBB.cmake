@@ -95,6 +95,7 @@ else ()
     set(TBB_HINTS PATHS ${OSPCOMMON_TBB_ROOT}/lib NO_DEFAULT_PATH)
   else()
     file(GLOB TBB_GCC_LIB_HINTS ${OSPCOMMON_TBB_ROOT}/lib/intel64/gcc*)
+    list(REVERSE TBB_GCC_LIB_HINTS)
     set(TBB_HINTS
       HINTS
         ${TBB_GCC_LIB_HINTS}
