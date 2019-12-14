@@ -1,0 +1,120 @@
+variables:
+  GIT_DEPTH: "15"
+
+stages:
+  - build
+  - test
+
+## Job Templates ##
+
+.job_template: &base_build_job
+  stage: build
+  script:
+    - gitlab/build.sh -G Ninja
+  artifacts:
+    paths:
+    - build
+
+.job_template: &build_job_docker
+  <<: *base_build_job
+  tags:
+    - docker
+
+.job_template: &base_functional_test_job
+  type: test
+  script:
+    - ./build/ospcommon_test_suite
+
+.job_template: &test_functional_job_docker
+  <<: *base_functional_test_job
+  tags:
+    - docker
+
+## Build Jobs ##
+
+build-centos7:
+  <<: *build_job_docker
+  image: ospray/docker-images:centos7
+  script:
+  - gitlab/build.sh
+
+build-ubuntu18.04:
+  <<: *build_job_docker
+  image: ospray/docker-images:ubuntu18.04
+
+build-arch:
+  <<: *build_job_docker
+  image: ospray/docker-images:arch
+
+build-arch-clang:
+  <<: *build_job_docker
+  image: ospray/docker-images:arch
+  script:
+    - export CC=clang
+    - export CXX=clang++
+    - gitlab/build.sh -G Ninja
+
+build-macOS:
+  <<: *base_build_job
+  stage: build
+  script:
+    - gitlab/build.sh
+  tags:
+    - osx
+    - clang
+
+build-windows-msvc15:
+  stage: build
+  script:
+    - gitlab\build.ps1 "Visual Studio 15 2017 Win64" "v141"
+  tags:
+    - msvc15
+    - win
+  artifacts:
+    paths:
+      - build
+    expire_in: 3 day
+
+## Functional Test Jobs ##
+
+test-functional-centos7:
+  <<: *test_functional_job_docker
+  image: ospray/docker-images:centos7
+  dependencies:
+    - build-centos7
+
+test-functional-ubuntu18.04:
+  <<: *test_functional_job_docker
+  image: ospray/docker-images:ubuntu18.04
+  dependencies:
+    - build-ubuntu18.04
+
+test-functional-arch:
+  <<: *test_functional_job_docker
+  image: ospray/docker-images:arch
+  dependencies:
+    - build-arch
+
+test-functional-arch-clang:
+  <<: *test_functional_job_docker
+  image: ospray/docker-images:arch
+  dependencies:
+    - build-arch-clang
+
+test-functional-macOS:
+  <<: *base_functional_test_job
+  dependencies:
+    - build-macOS
+  tags:
+    - osx
+    - clang
+
+test-functional-windows-msvc15:
+  <<: *base_functional_test_job
+  script:
+    - gitlab\run_tests.ps1
+  dependencies:
+    - build-windows-msvc15
+  tags:
+    - msvc15
+    - win

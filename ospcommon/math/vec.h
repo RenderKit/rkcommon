@@ -93,66 +93,66 @@ namespace ospcommon {
       using scalar_t = T;
       using Scalar   = T;
 
-      inline vec_t() = default;
+      vec_t() = default;
 
-      inline vec_t(const scalar_t *v) : x(v[0]), y(v[1]) {}
+      vec_t(const scalar_t *v) : x(v[0]), y(v[1]) {}
 
-      inline vec_t(scalar_t s) : x(s), y(s) {}
+      vec_t(scalar_t s) : x(s), y(s) {}
 
       template <typename OT,
                 typename = traits::is_valid_vec_constructor_type_t<T, OT>>
-      inline vec_t(const OT &s) : x(s), y(s)
+      vec_t(const OT &s) : x(s), y(s)
       {
       }
 
-      inline vec_t(scalar_t x, scalar_t y) : x(x), y(y) {}
+      vec_t(scalar_t x, scalar_t y) : x(x), y(y) {}
 
       template <typename OT, bool OA>
-      inline vec_t(const vec_t<OT, 2, OA> &o) : x(o.x), y(o.y)
+      vec_t(const vec_t<OT, 2, OA> &o) : x(o.x), y(o.y)
       {
       }
 
-      inline const T &operator[](const size_t idx) const
-      {
-        assert(idx < 2);
-        return (&x)[idx];
-      }
-
-      inline T &operator[](const size_t idx)
+      const T &operator[](const size_t idx) const
       {
         assert(idx < 2);
         return (&x)[idx];
       }
 
-      inline operator T*()
+      T &operator[](const size_t idx)
+      {
+        assert(idx < 2);
+        return (&x)[idx];
+      }
+
+      operator T *()
       {
         return &x;
       }
 
-      inline operator const T*() const
+      operator const T *() const
       {
         return &x;
       }
 
       /*! return result of reduce_add() across all components */
-      inline scalar_t sum() const
+      scalar_t sum() const
       {
         return x + y;
       }
       /*! return result of reduce_mul() across all components */
-      inline scalar_t product() const
+      scalar_t product() const
       {
         return x * y;
       }
 
-      inline size_t long_product() const
+      size_t long_product() const
       {
         return size_t(x) * size_t(y);
       }
 
       // conversion constructor to other types to enable static_cast
       template <typename OT>
-      explicit inline operator vec_t<OT, 2>()
+      explicit operator vec_t<OT, 2>()
       {
         return vec_t<OT, 2>(*this);
       }
@@ -166,67 +166,72 @@ namespace ospcommon {
       using scalar_t = T;
       using Scalar   = T;
 
-      inline vec_t() = default;
+      vec_t() = default;
 
-      inline vec_t(const scalar_t *v) : x(v[0]), y(v[1]), z(v[2]) {}
+      vec_t(const scalar_t *v) : x(v[0]), y(v[1]), z(v[2]) {}
 
-      inline vec_t(scalar_t s) : x(s), y(s), z(s) {}
+      vec_t(scalar_t s) : x(s), y(s), z(s) {}
 
       template <typename OT,
                 typename = traits::is_valid_vec_constructor_type_t<T, OT>>
-      inline vec_t(const OT &s) : x(s), y(s), z(s)
+      vec_t(const OT &s) : x(s), y(s), z(s)
       {
       }
 
-      inline vec_t(scalar_t x, scalar_t y, scalar_t z) : x(x), y(y), z(z) {}
+      vec_t(scalar_t x, scalar_t y, scalar_t z) : x(x), y(y), z(z) {}
 
       template <typename OT, bool OA>
-      inline vec_t(const vec_t<OT, 3, OA> &o) : x(o.x), y(o.y), z(o.z)
+      vec_t(const vec_t<OT, 2, OA> &o, scalar_t z) : x(o.x), y(o.y), z(z)
       {
       }
 
-      inline const T &operator[](const size_t axis) const
+      template <typename OT, bool OA>
+      vec_t(const vec_t<OT, 3, OA> &o) : x(o.x), y(o.y), z(o.z)
+      {
+      }
+
+      const T &operator[](const size_t axis) const
       {
         assert(axis < 3);
         return (&x)[axis];
       }
 
-      inline T &operator[](const size_t axis)
+      T &operator[](const size_t axis)
       {
         assert(axis < 3);
         return (&x)[axis];
       }
 
-      inline operator T*()
+      operator T *()
       {
         return &x;
       }
 
-      inline operator const T*() const
+      operator const T *() const
       {
         return &x;
       }
 
       /*! return result of reduce_add() across all components */
-      inline scalar_t sum() const
+      scalar_t sum() const
       {
         return x + y + z;
       }
 
       /*! return result of reduce_mul() across all components */
-      inline scalar_t product() const
+      scalar_t product() const
       {
         return x * y * z;
       }
 
-      inline size_t long_product() const
+      size_t long_product() const
       {
         return size_t(x) * size_t(y) * size_t(z);
       }
 
       // conversion constructor to other types to enable static_cast
       template <typename OT>
-      explicit inline operator vec_t<OT, 3>()
+      explicit operator vec_t<OT, 3>()
       {
         return vec_t<OT, 3>(*this);
       }
@@ -240,70 +245,75 @@ namespace ospcommon {
       using scalar_t = T;
       using Scalar   = T;
 
-      inline vec_t() = default;
+      vec_t() = default;
 
-      inline vec_t(const scalar_t *v) : x(v[0]), y(v[1]), z(v[2]) {}
+      vec_t(const scalar_t *v) : x(v[0]), y(v[1]), z(v[2]) {}
 
-      inline vec_t(scalar_t s) : x(s), y(s), z(s) {}
+      vec_t(scalar_t s) : x(s), y(s), z(s) {}
 
       template <typename OT,
                 typename = traits::is_valid_vec_constructor_type_t<T, OT>>
-      inline vec_t(const OT &s) : x(s), y(s), z(s)
+      vec_t(const OT &s) : x(s), y(s), z(s)
       {
       }
 
-      inline vec_t(scalar_t x, scalar_t y, scalar_t z) : x(x), y(y), z(z) {}
+      vec_t(scalar_t x, scalar_t y, scalar_t z) : x(x), y(y), z(z) {}
 
       template <typename OT, bool OA>
-      inline vec_t(const vec_t<OT, 3, OA> &o) : x(o.x), y(o.y), z(o.z)
+      vec_t(const vec_t<OT, 2, OA> &o, scalar_t z) : x(o.x), y(o.y), z(z)
       {
       }
 
-      inline const T &operator[](const size_t axis) const
+      template <typename OT, bool OA>
+      vec_t(const vec_t<OT, 3, OA> &o) : x(o.x), y(o.y), z(o.z)
+      {
+      }
+
+      const T &operator[](const size_t axis) const
       {
         assert(axis < 3);
         return (&x)[axis];
       }
-      inline T &operator[](const size_t axis)
+      T &operator[](const size_t axis)
       {
         assert(axis < 3);
         return (&x)[axis];
       }
 
-      inline operator T*()
+      operator T *()
       {
         return &x;
       }
 
-      inline operator const T*() const
+      operator const T *() const
       {
         return &x;
       }
 
       /*! return result of reduce_add() across all components */
-      inline scalar_t sum() const
+      scalar_t sum() const
       {
         return x + y + z;
       }
       /*! return result of reduce_mul() across all components */
-      inline scalar_t product() const
+      scalar_t product() const
       {
         return x * y * z;
       }
 
-      inline size_t long_product() const
+      size_t long_product() const
       {
         return size_t(x) * size_t(y) * size_t(z);
       }
 
-      inline operator vec_t<T, 3>() const
+      operator vec_t<T, 3>() const
       {
         return vec_t<T, 3>(x, y, z);
       }
 
       // conversion constructor to other types to enable static_cast
       template <typename OT>
-      explicit inline operator vec_t<OT, 3, true>()
+      explicit operator vec_t<OT, 3, true>()
       {
         return vec_t<OT, 3, true>(*this);
       }
@@ -318,76 +328,74 @@ namespace ospcommon {
       using scalar_t = T;
       using Scalar   = T;
 
-      inline vec_t() = default;
+      vec_t() = default;
 
-      inline vec_t(const scalar_t *v) : x(v[0]), y(v[1]), z(v[2]), w(v[3]) {}
+      vec_t(const scalar_t *v) : x(v[0]), y(v[1]), z(v[2]), w(v[3]) {}
 
-      inline vec_t(scalar_t s) : x(s), y(s), z(s), w(s) {}
+      vec_t(scalar_t s) : x(s), y(s), z(s), w(s) {}
 
-#if 0
-    template <typename OT,
-              typename = traits::is_valid_vec_constructor_type_t<T, OT>>
-    inline vec_t(const OT &s) : x(s), y(s), z(s), w(s)
-    {
-    }
-#endif
-
-      inline vec_t(scalar_t x, scalar_t y, scalar_t z, scalar_t w)
+      vec_t(scalar_t x, scalar_t y, scalar_t z, scalar_t w)
           : x(x), y(y), z(z), w(w)
       {
       }
 
-      template <typename OT, typename WT>
-      inline vec_t(const vec_t<OT, 3> &o, const WT w)
+      template <typename OT, bool OA>
+      vec_t(const vec_t<OT, 2, OA> &o1, const vec_t<OT, 2, OA> &o2)
+          : x(o1.x), y(o1.y), z(o2.x), w(o2.y)
+      {
+      }
+
+      template <typename OT, bool OA>
+      vec_t(const vec_t<OT, 3, OA> &o, scalar_t w)
           : x(o.x), y(o.y), z(o.z), w(w)
       {
       }
 
       template <typename OT, bool OA>
-      inline vec_t(const vec_t<OT, 4, OA> &o) : x(o.x), y(o.y), z(o.z), w(o.w)
+      vec_t(const vec_t<OT, 4, OA> &o) : x(o.x), y(o.y), z(o.z), w(o.w)
       {
       }
 
-      inline const T &operator[](const size_t idx) const
+      const T &operator[](const size_t idx) const
       {
         assert(idx < 4);
         return (&x)[idx];
       }
-      inline T &operator[](const size_t idx)
+      T &operator[](const size_t idx)
       {
         assert(idx < 4);
         return (&x)[idx];
       }
 
-      inline operator T*()
+      operator T *()
       {
         return &x;
       }
 
-      inline operator const T*() const
+      operator const T *() const
       {
         return &x;
       }
 
       /*! return result of reduce_add() across all components */
-      inline scalar_t sum() const
+      scalar_t sum() const
       {
         return x + y + z + w;
       }
       /*! return result of reduce_mul() across all components */
-      inline scalar_t product() const
+      scalar_t product() const
       {
         return x * y * z * w;
       }
 
-      inline size_t long_product() const
+      size_t long_product() const
       {
         return size_t(x) * size_t(y) * size_t(z) * size_t(w);
       }
 
       // conversion constructor to other types to enable static_cast
       template <typename OT>
-      explicit inline operator vec_t<OT, 4>()
+      explicit operator vec_t<OT, 4>()
       {
         return vec_t<OT, 4>(*this);
       }

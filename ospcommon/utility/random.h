@@ -14,55 +14,45 @@
 // limitations under the License.                                           //
 // ======================================================================== //
 
+#pragma once
+
+#include <cmath>
 #include "../common.h"
-// std
-#include <map>
-#include <memory>
-#include <string>
+#include "detail/pcg_random.hpp"
 
 namespace ospcommon {
+  namespace utility {
 
-  class OSPCOMMON_INTERFACE Library
-  {
-   public:
-    /* opens a shared library */
-    Library(const std::string &name, bool anchor = false);
-    ~Library();
+    class pcg32_biased_float_distribution
+    {
+     public:
+      pcg32_biased_float_distribution(int seed,
+                                      int sequence,
+                                      float lower,
+                                      float upper);
+      float operator()();
 
-    /* returns address of a symbol from the library */
-    void *getSymbol(const std::string &sym) const;
+     private:
+      pcg32 rng;
+      float lower, upper, diff;
+    };
 
-   private:
-    Library(void *const lib);
-    std::string libraryName;
-    void *lib;
-    bool freeLibOnDelete{true};
-    friend class LibraryRepository;
-  };
+    // Inlined pcg32_biased_float_distribution definitions ///////////////////
 
-  class OSPCOMMON_INTERFACE LibraryRepository
-  {
-   public:
-    static LibraryRepository *getInstance();
-    static void cleanupInstance();
+    inline pcg32_biased_float_distribution::pcg32_biased_float_distribution(
+        int seed, int sequence, float lower, float upper)
+        : lower(lower), upper(upper)
+    {
+      diff = upper - lower;
+      rng.seed(seed, sequence);
+    }
 
-    ~LibraryRepository();
+    inline float pcg32_biased_float_distribution::operator()()
+    {
+      const unsigned scaleBits = 0x2F800000;  // 2^(-32)
+      const float scale        = *(float *)&scaleBits;
+      return (scale * rng()) * diff + lower;
+    }
 
-    // add/remove a library to/from the repo
-    void add(const std::string &name, bool anchor = false);
-    void remove(const std::string &name);
-
-    /* returns address of a symbol from any library in the repo */
-    void *getSymbol(const std::string &sym) const;
-
-    /* add the default library to the repo */
-    void addDefaultLibrary();
-
-    bool libraryExists(const std::string &name) const;
-
-   private:
-    static std::unique_ptr<LibraryRepository> instance;
-    LibraryRepository() = default;
-    std::map<std::string, Library *> repo;
-  };
+  }  // namespace utility
 }  // namespace ospcommon

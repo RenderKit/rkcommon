@@ -65,6 +65,8 @@ namespace ospcommon {
   OSPCOMMON_INTERFACE void loadLibrary(const std::string &name,
                                        bool anchor = false);
 
+  OSPCOMMON_INTERFACE void unloadLibrary(const std::string &name);
+
   OSPCOMMON_INTERFACE void loadDefaultLibrary();
 
   OSPCOMMON_INTERFACE void *getSymbol(const std::string &name);

@@ -94,7 +94,16 @@ else ()
   if (APPLE)
     set(TBB_HINTS PATHS ${OSPCOMMON_TBB_ROOT}/lib NO_DEFAULT_PATH)
   else()
-    set(TBB_HINTS HINTS ${OSPCOMMON_TBB_ROOT}/lib/intel64/gcc4.7 ${OSPCOMMON_TBB_ROOT}/lib/intel64/gcc4.4 ${OSPCOMMON_TBB_ROOT}/lib ${OSPCOMMON_TBB_ROOT}/lib64 PATHS /usr/lib/x86_64-linux-gnu/)
+    file(GLOB TBB_GCC_LIB_HINTS ${OSPCOMMON_TBB_ROOT}/lib/intel64/gcc*)
+    list(REVERSE TBB_GCC_LIB_HINTS)
+    set(TBB_HINTS
+      HINTS
+        ${TBB_GCC_LIB_HINTS}
+        ${OSPCOMMON_TBB_ROOT}/lib
+        ${OSPCOMMON_TBB_ROOT}/lib64
+      PATHS
+        /usr/lib/x86_64-linux-gnu/
+      )
   endif()
 
   find_library(TBB_LIBRARY tbb ${TBB_HINTS})

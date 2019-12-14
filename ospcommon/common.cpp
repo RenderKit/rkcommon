@@ -32,6 +32,11 @@ namespace ospcommon {
     LibraryRepository::getInstance()->add(name, anchor);
   }
 
+  void unloadLibrary(const std::string &name)
+  {
+    LibraryRepository::getInstance()->remove(name);
+  }
+
   void loadDefaultLibrary()
   {
     LibraryRepository::getInstance()->addDefaultLibrary();
@@ -50,7 +55,7 @@ namespace ospcommon {
 
   std::string prettyDouble(double val)
   {
-    const double absVal = abs(val);
+    const double absVal = std::abs(val);
     char result[1000];
 
     if (absVal >= 1e+15f)

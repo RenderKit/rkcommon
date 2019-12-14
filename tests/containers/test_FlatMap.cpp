@@ -123,6 +123,15 @@ SCENARIO("FlatMap interface tests", "[FlatMap]")
         fm.clear();
         REQUIRE(fm.values.size() == 0);
       }
+
+      THEN("Erasing a value mutates the elements correctly")
+      {
+        fm.erase("first");
+        REQUIRE(!fm.contains("first"));
+        REQUIRE(fm.size() == 1);
+        REQUIRE(fm.at_index(0) == std::make_pair(std::string("second"), 2));
+      }
+
     }
   }
 }

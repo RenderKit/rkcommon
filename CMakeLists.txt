@@ -33,7 +33,7 @@ include(GNUInstallDirs)
 
 ## Establish project ##
 
-project(ospcommon VERSION 1.0.1 LANGUAGES CXX)
+project(ospcommon VERSION 1.1.0 LANGUAGES CXX)
 
 ## Add ospcommon specific macros ##
 

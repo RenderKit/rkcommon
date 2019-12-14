@@ -17,6 +17,7 @@
 #include "malloc.h"
 #if defined(OSPCOMMON_TASKING_TBB)
 #define __TBB_NO_IMPLICIT_LINKAGE 1
+#define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
 #include "tbb/scalable_allocator.h"
 #else
 #ifdef _WIN32
