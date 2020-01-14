@@ -101,33 +101,33 @@ namespace ospcommon {
   }
 
   template <>
-  inline size_t index_sequence_2D::flatten(const vec2ul &coords) const
+  inline size_t index_sequence_2D::flatten(const vec_t<size_t, 2> &coords) const
   {
     return coords.x + dims.x * coords.y;
   }
 
   template <>
-  inline size_t index_sequence_3D::flatten(const vec3ul &coords) const
+  inline size_t index_sequence_3D::flatten(const vec_t<size_t, 3> &coords) const
   {
     return coords.x + dims.x * (coords.y + dims.y * coords.z);
   }
 
   template <>
-  inline vec2ul index_sequence_2D::reshape(size_t i) const
+  inline vec_t<size_t, 2> index_sequence_2D::reshape(size_t i) const
   {
     size_t y = i / dims.x;
     size_t x = i % dims.x;
-    return vec2ul(x, y);
+    return vec_t<size_t, 2>(x, y);
   }
 
   template <>
-  inline vec3ul index_sequence_3D::reshape(size_t i) const
+  inline vec_t<size_t, 3> index_sequence_3D::reshape(size_t i) const
   {
     size_t z = i / (dims.x * dims.y);
     i -= (z * dims.x * dims.y);
     size_t y = i / dims.x;
     size_t x = i % dims.x;
-    return vec3ul(x, y, z);
+    return vec_t<size_t, 3>(x, y, z);
   }
 
   template <int NDIMS>
