@@ -46,7 +46,7 @@ namespace ospcommon {
     multidim_index_iterator<NDIMS> end() const;
 
    private:
-    vec_t<size_t, NDIMS> dims{0};
+    vec_t<int, NDIMS> dims{0};
   };
 
   using index_sequence_2D = multidim_index_sequence<2>;
@@ -75,8 +75,8 @@ namespace ospcommon {
     multidim_index_iterator &operator+(const multidim_index_iterator &other);
     multidim_index_iterator &operator-(const multidim_index_iterator &other);
 
-    multidim_index_iterator &operator+(int other);
-    multidim_index_iterator &operator-(int other);
+    multidim_index_iterator &operator+(size_t other);
+    multidim_index_iterator &operator-(size_t other);
 
     bool operator==(const multidim_index_iterator &other) const;
     bool operator!=(const multidim_index_iterator &other) const;
@@ -139,7 +139,7 @@ namespace ospcommon {
   template <int NDIMS>
   inline size_t multidim_index_sequence<NDIMS>::total_indices() const
   {
-    return dims.product();
+    return dims.long_product();
   }
 
   template <int NDIMS>
@@ -210,7 +210,7 @@ namespace ospcommon {
 
   template <int NDIMS>
   inline multidim_index_iterator<NDIMS>
-      &multidim_index_iterator<NDIMS>::operator+(int offset)
+      &multidim_index_iterator<NDIMS>::operator+(size_t offset)
   {
     current_index += offset;
     return *this;
@@ -218,7 +218,7 @@ namespace ospcommon {
 
   template <int NDIMS>
   inline multidim_index_iterator<NDIMS>
-      &multidim_index_iterator<NDIMS>::operator-(int offset)
+      &multidim_index_iterator<NDIMS>::operator-(size_t offset)
   {
     current_index -= offset;
     return *this;
