@@ -32,13 +32,13 @@ namespace ospcommon {
                   "ospcommon::multidim_index_sequence is currently limited to"
                   " only 2 or 3 dimensions. (NDIMS == 2 || NDIMS == 3)");
 
-    multidim_index_sequence(const vec_t<int, NDIMS> &_dims);
+    multidim_index_sequence(const vec_t<size_t, NDIMS> &_dims);
 
-    size_t flatten(const vec_t<int, NDIMS> &coords) const;
+    size_t flatten(const vec_t<size_t, NDIMS> &coords) const;
 
-    vec_t<int, NDIMS> reshape(size_t i) const;
+    vec_t<size_t, NDIMS> reshape(size_t i) const;
 
-    vec_t<int, NDIMS> dimensions() const;
+    vec_t<size_t, NDIMS> dimensions() const;
 
     size_t total_indices() const;
 
@@ -55,8 +55,8 @@ namespace ospcommon {
   template <int NDIMS>
   struct multidim_index_iterator
   {
-    multidim_index_iterator(const vec_t<int, NDIMS> &_dims) : dims(_dims) {}
-    multidim_index_iterator(const vec_t<int, NDIMS> &_dims, size_t start)
+    multidim_index_iterator(const vec_t<size_t, NDIMS> &_dims) : dims(_dims) {}
+    multidim_index_iterator(const vec_t<size_t, NDIMS> &_dims, size_t start)
         : multidim_index_iterator(_dims)
     {
       current_index = start;
@@ -64,7 +64,7 @@ namespace ospcommon {
 
     // Traditional iterator interface methods //
 
-    vec_t<int, NDIMS> operator*() const;
+    vec_t<size_t, NDIMS> operator*() const;
 
     multidim_index_iterator operator++();
     multidim_index_iterator &operator++(int);
@@ -75,8 +75,8 @@ namespace ospcommon {
     multidim_index_iterator &operator+(const multidim_index_iterator &other);
     multidim_index_iterator &operator-(const multidim_index_iterator &other);
 
-    multidim_index_iterator &operator+(int other);
-    multidim_index_iterator &operator-(int other);
+    multidim_index_iterator &operator+(size_t other);
+    multidim_index_iterator &operator-(size_t other);
 
     bool operator==(const multidim_index_iterator &other) const;
     bool operator!=(const multidim_index_iterator &other) const;
@@ -95,43 +95,43 @@ namespace ospcommon {
 
   template <int NDIMS>
   inline multidim_index_sequence<NDIMS>::multidim_index_sequence(
-      const vec_t<int, NDIMS> &_dims)
+      const vec_t<size_t, NDIMS> &_dims)
       : dims(_dims)
   {
   }
 
   template <>
-  inline size_t index_sequence_2D::flatten(const vec2i &coords) const
+  inline size_t index_sequence_2D::flatten(const vec_t<size_t, 2> &coords) const
   {
     return coords.x + dims.x * coords.y;
   }
 
   template <>
-  inline size_t index_sequence_3D::flatten(const vec3i &coords) const
+  inline size_t index_sequence_3D::flatten(const vec_t<size_t, 3> &coords) const
   {
     return coords.x + dims.x * (coords.y + dims.y * coords.z);
   }
 
   template <>
-  inline vec2i index_sequence_2D::reshape(size_t i) const
+  inline vec_t<size_t, 2> index_sequence_2D::reshape(size_t i) const
   {
     size_t y = i / dims.x;
     size_t x = i % dims.x;
-    return vec2i(x, y);
+    return vec_t<size_t, 2>(x, y);
   }
 
   template <>
-  inline vec3i index_sequence_3D::reshape(size_t i) const
+  inline vec_t<size_t, 3> index_sequence_3D::reshape(size_t i) const
   {
     size_t z = i / (dims.x * dims.y);
     i -= (z * dims.x * dims.y);
     size_t y = i / dims.x;
     size_t x = i % dims.x;
-    return vec3i(x, y, z);
+    return vec_t<size_t, 3>(x, y, z);
   }
 
   template <int NDIMS>
-  inline vec_t<int, NDIMS> multidim_index_sequence<NDIMS>::dimensions() const
+  inline vec_t<size_t, NDIMS> multidim_index_sequence<NDIMS>::dimensions() const
   {
     return dims;
   }
@@ -139,7 +139,7 @@ namespace ospcommon {
   template <int NDIMS>
   inline size_t multidim_index_sequence<NDIMS>::total_indices() const
   {
-    return dims.product();
+    return dims.long_product();
   }
 
   template <int NDIMS>
@@ -157,14 +157,14 @@ namespace ospcommon {
   // Inlined multidim_index_iterator definitions //////////////////////////////
 
   template <int NDIMS>
-  inline vec_t<int, NDIMS> multidim_index_iterator<NDIMS>::operator*() const
+  inline vec_t<size_t, NDIMS> multidim_index_iterator<NDIMS>::operator*() const
   {
     return dims.reshape(current_index);
   }
 
   template <int NDIMS>
-  inline multidim_index_iterator<NDIMS> multidim_index_iterator<NDIMS>::
-  operator++()
+  inline multidim_index_iterator<NDIMS>
+  multidim_index_iterator<NDIMS>::operator++()
   {
     return multidim_index_iterator<NDIMS>(dims.dimensions(), ++current_index);
   }
@@ -178,8 +178,8 @@ namespace ospcommon {
   }
 
   template <int NDIMS>
-  inline multidim_index_iterator<NDIMS> multidim_index_iterator<NDIMS>::
-  operator--()
+  inline multidim_index_iterator<NDIMS>
+  multidim_index_iterator<NDIMS>::operator--()
   {
     return multidim_index_iterator<NDIMS>(dims.dimensions(), --current_index);
   }
@@ -193,16 +193,18 @@ namespace ospcommon {
   }
 
   template <int NDIMS>
-  inline multidim_index_iterator<NDIMS> &multidim_index_iterator<NDIMS>::
-  operator+(const multidim_index_iterator &other)
+  inline multidim_index_iterator<NDIMS>
+      &multidim_index_iterator<NDIMS>::operator+(
+          const multidim_index_iterator &other)
   {
     current_index += other.current_index;
     return *this;
   }
 
   template <int NDIMS>
-  inline multidim_index_iterator<NDIMS> &multidim_index_iterator<NDIMS>::
-  operator-(const multidim_index_iterator &other)
+  inline multidim_index_iterator<NDIMS>
+      &multidim_index_iterator<NDIMS>::operator-(
+          const multidim_index_iterator &other)
   {
     current_index -= other.current_index;
     return *this;
@@ -210,7 +212,7 @@ namespace ospcommon {
 
   template <int NDIMS>
   inline multidim_index_iterator<NDIMS>
-      &multidim_index_iterator<NDIMS>::operator+(int offset)
+      &multidim_index_iterator<NDIMS>::operator+(size_t offset)
   {
     current_index += offset;
     return *this;
@@ -218,7 +220,7 @@ namespace ospcommon {
 
   template <int NDIMS>
   inline multidim_index_iterator<NDIMS>
-      &multidim_index_iterator<NDIMS>::operator-(int offset)
+      &multidim_index_iterator<NDIMS>::operator-(size_t offset)
   {
     current_index -= offset;
     return *this;
