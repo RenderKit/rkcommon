@@ -1,5 +1,5 @@
 ## ======================================================================== ##
-## Copyright 2009-2019 Intel Corporation                                    ##
+## Copyright 2009-2020 Intel Corporation                                    ##
 ##                                                                          ##
 ## Licensed under the Apache License, Version 2.0 (the "License");          ##
 ## you may not use this file except in compliance with the License.         ##
@@ -33,7 +33,7 @@ include(GNUInstallDirs)
 
 ## Establish project ##
 
-project(ospcommon VERSION 1.2.0 LANGUAGES CXX)
+project(ospcommon VERSION 1.3.0 LANGUAGES CXX)
 
 ## Add ospcommon specific macros ##
 
