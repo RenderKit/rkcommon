@@ -37,6 +37,8 @@ namespace ospcommon {
       virtual void sendBcast(
           std::shared_ptr<utility::AbstractArray<uint8_t>> buf) = 0;
 
+      virtual void flushBcastSends() = 0;
+
       // Receive a broadcast of data from the fabric sender
       // TODO: only makes sense to call on the receivers, so maybe a separate
       // "recv" fabric ?
