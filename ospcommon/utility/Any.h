@@ -1,5 +1,5 @@
 // ======================================================================== //
-// Copyright 2009-2019 Intel Corporation                                    //
+// Copyright 2009-2020 Intel Corporation                                    //
 //                                                                          //
 // Licensed under the Apache License, Version 2.0 (the "License");          //
 // you may not use this file except in compliance with the License.         //
@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include <string.h>
 #include <iostream>
 #include <sstream>
 
@@ -196,8 +197,8 @@ namespace ospcommon {
     template <typename T>
     inline bool Any::is() const
     {
-      return valid() &&
-             (typeid(T).hash_code() == currentValue->valueTypeID().hash_code());
+      return valid() && (strcmp(typeid(T).name(),
+                                currentValue->valueTypeID().name()) == 0);
     }
 
     inline bool Any::valid() const
