@@ -60,7 +60,7 @@ target_compile_definitions(${PROJECT_NAME}
     #             in the Library object's interface directly, where libospcommon
     #             would inject versioning information independent of ospcommon
     #             version.
-    -DOSPCOMMON_SOVERSION=0
+    -DOSPRAY_SOVERSION=2
   PUBLIC
     ${EXTRA_COMPILE_DEFINITIONS}
 )
