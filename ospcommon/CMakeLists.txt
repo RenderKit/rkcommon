@@ -1,4 +1,4 @@
-## Copyright 2009-2019 Intel Corporation
+## Copyright 2009-2020 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 if (OSPCOMMON_TASKING_INTERNAL)
@@ -9,6 +9,8 @@ if (OSPCOMMON_TASKING_INTERNAL)
 endif()
 
 add_library(${PROJECT_NAME}
+  ${RKCOMMON_RESOURCE}
+
   common.cpp
 
   memory/malloc.cpp
@@ -42,6 +44,7 @@ target_link_libraries(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/..>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
   PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}

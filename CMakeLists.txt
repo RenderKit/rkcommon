@@ -22,6 +22,13 @@ include(GNUInstallDirs)
 
 project(ospcommon VERSION 1.3.0 LANGUAGES CXX)
 
+configure_file(
+  ${CMAKE_SOURCE_DIR}/ospcommon/version.h.in
+  ${CMAKE_BINARY_DIR}/ospcommon/version.h
+  @ONLY
+)
+set(RKCOMMON_RESOURCE ${CMAKE_SOURCE_DIR}/ospcommon/rkcommon.rc)
+
 ## Add ospcommon specific macros ##
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)

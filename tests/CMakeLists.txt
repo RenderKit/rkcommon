@@ -1,7 +1,9 @@
-## Copyright 2009-2019 Intel Corporation
+## Copyright 2009-2020 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 add_executable(ospcommon_test_suite
+  ${RKCOMMON_RESOURCE}
+
   catch_main.cpp
 
   array3D/test_Array3D.cpp
