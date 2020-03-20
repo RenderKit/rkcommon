@@ -69,6 +69,9 @@ set_property(TARGET ospcommon PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 ## Install library + targets ##################################################
 
+set_target_properties(${PROJECT_NAME}
+    PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
+
 install(TARGETS ${PROJECT_NAME}
   EXPORT ospcommon_Exports
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
