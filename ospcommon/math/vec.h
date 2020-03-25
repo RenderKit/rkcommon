@@ -1,18 +1,5 @@
-// ======================================================================== //
-// Copyright 2009-2019 Intel Corporation                                    //
-//                                                                          //
-// Licensed under the Apache License, Version 2.0 (the "License");          //
-// you may not use this file except in compliance with the License.         //
-// You may obtain a copy of the License at                                  //
-//                                                                          //
-//     http://www.apache.org/licenses/LICENSE-2.0                           //
-//                                                                          //
-// Unless required by applicable law or agreed to in writing, software      //
-// distributed under the License is distributed on an "AS IS" BASIS,        //
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. //
-// See the License for the specific language governing permissions and      //
-// limitations under the License.                                           //
-// ======================================================================== //
+// Copyright 2009-2020 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
 
 #pragma once
 
@@ -949,6 +936,8 @@ namespace ospcommon {
     // -------------------------------------------------------
     typedef vec_t<uint8_t, 2> vec2uc;
     typedef vec_t<int8_t, 2> vec2c;
+    typedef vec_t<uint16_t, 2> vec2us;
+    typedef vec_t<int16_t, 2> vec2s;
     typedef vec_t<uint32_t, 2> vec2ui;
     typedef vec_t<int32_t, 2> vec2i;
     typedef vec_t<uint64_t, 2> vec2ul;
@@ -961,6 +950,8 @@ namespace ospcommon {
     // -------------------------------------------------------
     typedef vec_t<uint8_t, 3> vec3uc;
     typedef vec_t<int8_t, 3> vec3c;
+    typedef vec_t<uint16_t, 3> vec3us;
+    typedef vec_t<int16_t, 3> vec3s;
     typedef vec_t<uint32_t, 3> vec3ui;
     typedef vec_t<int32_t, 3> vec3i;
     typedef vec_t<uint64_t, 3> vec3ul;
@@ -976,6 +967,8 @@ namespace ospcommon {
     // -------------------------------------------------------
     typedef vec_t<uint8_t, 4> vec4uc;
     typedef vec_t<int8_t, 4> vec4c;
+    typedef vec_t<uint16_t, 4> vec4us;
+    typedef vec_t<int16_t, 4> vec4s;
     typedef vec_t<uint32_t, 4> vec4ui;
     typedef vec_t<int32_t, 4> vec4i;
     typedef vec_t<uint64_t, 4> vec4ul;
