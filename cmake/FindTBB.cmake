@@ -1,4 +1,4 @@
-## Copyright 2009-2019 Intel Corporation
+## Copyright 2009-2020 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 set(TBB_VERSION_REQUIRED "4.4")
@@ -93,10 +93,13 @@ else ()
       )
   endif()
 
-  find_library(TBB_LIBRARY tbb ${TBB_HINTS})
-  find_library(TBB_LIBRARY_DEBUG tbb_debug ${TBB_HINTS})
-  find_library(TBB_LIBRARY_MALLOC tbbmalloc ${TBB_HINTS})
-  find_library(TBB_LIBRARY_MALLOC_DEBUG tbbmalloc_debug ${TBB_HINTS})
+  # prefer libtbbX.so.2 to allow installing TBB as dependency
+  find_library(TBB_LIBRARY NAMES libtbb.so.2 tbb ${TBB_HINTS})
+  find_library(TBB_LIBRARY_DEBUG NAMES libtbb_debug.so.2 tbb_debug ${TBB_HINTS})
+  find_library(TBB_LIBRARY_MALLOC
+      NAMES libtbbmalloc.so.2 tbbmalloc ${TBB_HINTS})
+  find_library(TBB_LIBRARY_MALLOC_DEBUG
+      NAMES libtbbmalloc_debug.so.2 tbbmalloc_debug ${TBB_HINTS})
 endif()
 
 set(OSPCOMMON_TBB_ROOT_LAST ${OSPCOMMON_TBB_ROOT} CACHE INTERNAL "Last value of OSPCOMMON_TBB_ROOT to detect changes")

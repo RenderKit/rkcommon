@@ -20,7 +20,7 @@ include(GNUInstallDirs)
 
 ## Establish project ##
 
-project(ospcommon VERSION 1.3.0 LANGUAGES CXX)
+project(ospcommon VERSION 1.3.1 LANGUAGES CXX)
 
 configure_file(
   ${CMAKE_SOURCE_DIR}/ospcommon/version.h.in
