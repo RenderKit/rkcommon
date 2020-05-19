@@ -3,9 +3,9 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/utility/ArgumentList.h"
+#include "rkcommon/utility/ArgumentList.h"
 
-using ospcommon::utility::ArgumentList;
+using rkcommon::utility::ArgumentList;
 
 static const char *test_arguments[5] = {
     "testApp", "arg1", "arg2", "arg3", "arg4"};
@@ -43,7 +43,7 @@ SCENARIO("ArgumentList correctness", "[ArgumentList]")
   }
 }
 
-struct TestParser final : public ospcommon::utility::ArgumentsParser
+struct TestParser final : public rkcommon::utility::ArgumentsParser
 {
   int tryConsume(ArgumentList &argList, int argID) override
   {

@@ -3,9 +3,9 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/utility/Optional.h"
+#include "rkcommon/utility/Optional.h"
 
-using ospcommon::utility::Optional;
+using rkcommon::utility::Optional;
 
 // Helper functions ///////////////////////////////////////////////////////////
 
@@ -207,6 +207,6 @@ TEST_CASE("logical operators", "[Optional]")
 TEST_CASE("make_optional<>()", "[Optional]")
 {
   Optional<int> opt1(5);
-  auto opt2 = ospcommon::utility::make_optional<int>(5);
+  auto opt2 = rkcommon::utility::make_optional<int>(5);
   REQUIRE(opt1 == opt2);
 }

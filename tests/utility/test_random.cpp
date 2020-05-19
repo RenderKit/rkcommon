@@ -3,9 +3,9 @@
 
 #include <random>
 #include "../catch.hpp"
-#include "ospcommon/utility/random.h"
+#include "rkcommon/utility/random.h"
 
-using ospcommon::utility::pcg32_biased_float_distribution;
+using rkcommon::utility::pcg32_biased_float_distribution;
 
 TEST_CASE("random", "[random]")
 {

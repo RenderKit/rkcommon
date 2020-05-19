@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // only test compliation, no functional tests (yet)
-#include "ospcommon/array3D/Array3D.h"
+#include "rkcommon/array3D/Array3D.h"

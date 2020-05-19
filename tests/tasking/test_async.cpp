@@ -3,9 +3,9 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/tasking/async.h"
+#include "rkcommon/tasking/async.h"
 
-using ospcommon::tasking::async;
+using rkcommon::tasking::async;
 
 TEST_CASE("async", "[async]")
 {

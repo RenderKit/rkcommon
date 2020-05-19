@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // only test compliation, no functional tests (yet)
-#include "ospcommon/os/library.h"
+#include "rkcommon/os/library.h"

@@ -3,11 +3,11 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/utility/ArrayView.h"
+#include "rkcommon/utility/ArrayView.h"
 
 #include <numeric>
 
-using ospcommon::utility::ArrayView;
+using rkcommon::utility::ArrayView;
 
 // Helper functions ///////////////////////////////////////////////////////////
 

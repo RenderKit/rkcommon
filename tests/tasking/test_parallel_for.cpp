@@ -3,12 +3,12 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/tasking/parallel_for.h"
+#include "rkcommon/tasking/parallel_for.h"
 
 #include <algorithm>
 #include <vector>
 
-using ospcommon::tasking::parallel_for;
+using rkcommon::tasking::parallel_for;
 
 TEST_CASE("parallel_for", "[parallel_for]")
 {

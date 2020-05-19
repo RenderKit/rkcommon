@@ -19,6 +19,6 @@ echo "Running tests"
 
 $env:Path += ";.\build\Release"
 
-.\build\Release\ospcommon_test_suite.exe
+.\build\Release\rkcommon_test_suite.exe
 
 exit $LASTEXITCODE

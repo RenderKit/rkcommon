@@ -22,7 +22,7 @@ cmake --version
 cmake -L `
 -G $args[0] `
 -T $args[1] `
--D OSPCOMMON_TASKING_SYSTEM=INTERNAL `
+-D RKCOMMON_TASKING_SYSTEM=INTERNAL `
 ..
 
 cmake --build . --config Release --target ALL_BUILD

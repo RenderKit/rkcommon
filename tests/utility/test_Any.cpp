@@ -3,12 +3,12 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/math/box.h"
-#include "ospcommon/math/vec.h"
-#include "ospcommon/utility/Any.h"
+#include "rkcommon/math/box.h"
+#include "rkcommon/math/vec.h"
+#include "rkcommon/utility/Any.h"
 
-using namespace ospcommon::utility;
-using namespace ospcommon::math;
+using namespace rkcommon::utility;
+using namespace rkcommon::math;
 
 // Helper types ///////////////////////////////////////////////////////////////
 

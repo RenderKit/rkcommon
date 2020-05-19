@@ -23,7 +23,7 @@ stages:
 .job_template: &base_functional_test_job
   type: test
   script:
-    - ./build/ospcommon_test_suite
+    - ./build/rkcommon_test_suite
 
 .job_template: &test_functional_job_docker
   <<: *base_functional_test_job

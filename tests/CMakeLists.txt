@@ -1,7 +1,7 @@
 ## Copyright 2009-2020 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
-add_executable(ospcommon_test_suite
+add_executable(rkcommon_test_suite
   ${RKCOMMON_RESOURCE}
 
   catch_main.cpp
@@ -13,7 +13,7 @@ add_executable(ospcommon_test_suite
   math/test_box.cpp
   math/test_constants.cpp
   math/test_LinearSpace.cpp
-  math/test_ospmath.cpp
+  math/test_rkmath.cpp
   math/test_Quaternion.cpp
   math/test_range.cpp
   math/test_vec.cpp
@@ -54,34 +54,34 @@ add_executable(ospcommon_test_suite
   utility/test_OwnedArray.cpp
   utility/test_ParameterizedObject.cpp
   utility/test_PseudoURL.cpp
-  utility/test_random.cpp  
+  utility/test_random.cpp
   utility/test_SaveImage.cpp
   utility/test_StringManip.cpp
   utility/test_TimeStamp.cpp
   utility/test_TransactionalValue.cpp
 )
 
-target_link_libraries(ospcommon_test_suite PRIVATE ospcommon)
+target_link_libraries(rkcommon_test_suite PRIVATE rkcommon)
 
-add_test(NAME ArgumentList          COMMAND ospcommon_test_suite "[ArgumentList]")
-add_test(NAME ArrayView             COMMAND ospcommon_test_suite "[ArrayView]")
-add_test(NAME OnScopeExit           COMMAND ospcommon_test_suite "[OnScopeExit]")
-add_test(NAME Optional              COMMAND ospcommon_test_suite "[Optional]")
-add_test(NAME FlatMap               COMMAND ospcommon_test_suite "[FlatMap]")
-add_test(NAME TransactionalBuffer   COMMAND ospcommon_test_suite "[TransactionalBuffer]")
-add_test(NAME StringManip           COMMAND ospcommon_test_suite "[StringManip]")
-add_test(NAME random                COMMAND ospcommon_test_suite "[random]")
+add_test(NAME ArgumentList          COMMAND rkcommon_test_suite "[ArgumentList]")
+add_test(NAME ArrayView             COMMAND rkcommon_test_suite "[ArrayView]")
+add_test(NAME OnScopeExit           COMMAND rkcommon_test_suite "[OnScopeExit]")
+add_test(NAME Optional              COMMAND rkcommon_test_suite "[Optional]")
+add_test(NAME FlatMap               COMMAND rkcommon_test_suite "[FlatMap]")
+add_test(NAME TransactionalBuffer   COMMAND rkcommon_test_suite "[TransactionalBuffer]")
+add_test(NAME StringManip           COMMAND rkcommon_test_suite "[StringManip]")
+add_test(NAME random                COMMAND rkcommon_test_suite "[random]")
 if(NOT WIN32) # Tests which are broken on Windows with unknown fixes (for now)
-  add_test(NAME Any                 COMMAND ospcommon_test_suite "[Any]")
-  add_test(NAME AlignedVector       COMMAND ospcommon_test_suite "[AlignedVector]")
-  add_test(NAME Observers           COMMAND ospcommon_test_suite "[Observers]")
-  add_test(NAME ParameterizedObject COMMAND ospcommon_test_suite "[ParameterizedObject]")
-  add_test(NAME async               COMMAND ospcommon_test_suite "[async]")
-  add_test(NAME parallel_for        COMMAND ospcommon_test_suite "[parallel_for]")
-  add_test(NAME parallel_foreach    COMMAND ospcommon_test_suite "[parallel_foreach]")
-  add_test(NAME schedule            COMMAND ospcommon_test_suite "[schedule]")
+  add_test(NAME Any                 COMMAND rkcommon_test_suite "[Any]")
+  add_test(NAME AlignedVector       COMMAND rkcommon_test_suite "[AlignedVector]")
+  add_test(NAME Observers           COMMAND rkcommon_test_suite "[Observers]")
+  add_test(NAME ParameterizedObject COMMAND rkcommon_test_suite "[ParameterizedObject]")
+  add_test(NAME async               COMMAND rkcommon_test_suite "[async]")
+  add_test(NAME parallel_for        COMMAND rkcommon_test_suite "[parallel_for]")
+  add_test(NAME parallel_foreach    COMMAND rkcommon_test_suite "[parallel_foreach]")
+  add_test(NAME schedule            COMMAND rkcommon_test_suite "[schedule]")
 endif()
 
-install(TARGETS ospcommon_test_suite
+install(TARGETS rkcommon_test_suite
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )

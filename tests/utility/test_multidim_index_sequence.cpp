@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // only test compliation, no functional tests (yet)
-#include "ospcommon/utility/multidim_index_sequence.h"
+#include "rkcommon/utility/multidim_index_sequence.h"

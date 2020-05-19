@@ -3,9 +3,9 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/utility/OnScopeExit.h"
+#include "rkcommon/utility/OnScopeExit.h"
 
-using ospcommon::utility::OnScopeExit;
+using rkcommon::utility::OnScopeExit;
 
 SCENARIO("OnScopeExit correctness", "[OnScopeExit]")
 {
