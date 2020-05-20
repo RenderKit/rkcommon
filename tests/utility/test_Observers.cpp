@@ -3,9 +3,9 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/utility/Observer.h"
+#include "rkcommon/utility/Observer.h"
 
-using namespace ospcommon::utility;
+using namespace rkcommon::utility;
 
 SCENARIO("Observable/Observer interfaces", "[Observers]")
 {

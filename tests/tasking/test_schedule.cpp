@@ -3,11 +3,11 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/tasking/schedule.h"
+#include "rkcommon/tasking/schedule.h"
 
 #include <atomic>
 
-using ospcommon::tasking::schedule;
+using rkcommon::tasking::schedule;
 
 TEST_CASE("schedule", "[schedule]")
 {

@@ -4,10 +4,10 @@
 #include "../catch.hpp"
 
 #define private public
-#include "ospcommon/containers/TransactionalBuffer.h"
+#include "rkcommon/containers/TransactionalBuffer.h"
 #undef private
 
-using ospcommon::containers::TransactionalBuffer;
+using rkcommon::containers::TransactionalBuffer;
 
 SCENARIO("TransactionalBuffer interface tests", "[TransactionalBuffer]")
 {

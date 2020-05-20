@@ -3,7 +3,7 @@
 
 ## Global CMake options ##
 
-if (OSPCOMMON_TASKING_SYSTEM STREQUAL "OpenMP")
+if (RKCOMMON_TASKING_SYSTEM STREQUAL "OpenMP")
   cmake_minimum_required(VERSION 3.9) # NOTE(jda): rely on OpenMP targets
 else()
   cmake_minimum_required(VERSION 3.1)
@@ -20,29 +20,29 @@ include(GNUInstallDirs)
 
 ## Establish project ##
 
-project(ospcommon VERSION 1.3.1 LANGUAGES CXX)
+project(rkcommon VERSION 1.4.0 LANGUAGES CXX)
 
 configure_file(
-  ${CMAKE_SOURCE_DIR}/ospcommon/version.h.in
-  ${CMAKE_BINARY_DIR}/ospcommon/version.h
+  ${CMAKE_SOURCE_DIR}/rkcommon/version.h.in
+  ${CMAKE_BINARY_DIR}/rkcommon/version.h
   @ONLY
 )
-set(RKCOMMON_RESOURCE ${CMAKE_SOURCE_DIR}/ospcommon/rkcommon.rc)
+set(RKCOMMON_RESOURCE ${CMAKE_SOURCE_DIR}/rkcommon/rkcommon.rc)
 
-## Add ospcommon specific macros ##
+## Add rkcommon specific macros ##
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 
-include(ospcommon_macros)
+include(rkcommon_macros)
 
-ospcommon_configure_build_type()
-ospcommon_configure_compiler()
-ospcommon_configure_tasking_system()
-ospcommon_create_tasking_target(FALSE)
+rkcommon_configure_build_type()
+rkcommon_configure_compiler()
+rkcommon_configure_tasking_system()
+rkcommon_create_tasking_target(FALSE)
 
 ## Build options and specific configuration ##
 
-option(BUILD_SHARED_LIBS "Build ospcommon as a shared library" ON)
+option(BUILD_SHARED_LIBS "Build rkcommon as a shared library" ON)
 
 include(CTest)
 
@@ -51,13 +51,13 @@ if (BUILD_TESTING)
 endif()
 
 if (WIN32)
-  option(INSTALL_DEPS "Install ospcommon DLL dependencies" ON)
+  option(INSTALL_DEPS "Install rkcommon DLL dependencies" ON)
 else()
   set(INSTALL_DEPS OFF)
 endif()
 
 if (INSTALL_DEPS)
-  include(ospcommon_redist_deps)
+  include(rkcommon_redist_deps)
 endif()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
@@ -66,7 +66,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 
 ## Build library and tests ##
 
-add_subdirectory(ospcommon)
+add_subdirectory(rkcommon)
 
 if (BUILD_TESTING)
   add_subdirectory(tests)
@@ -80,7 +80,7 @@ configure_package_config_file(
   "${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
   "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
 INSTALL_DESTINATION
-  ${CMAKE_INSTALL_LIBDIR}/cmake/ospcommon-${PROJECT_VERSION}
+  ${CMAKE_INSTALL_LIBDIR}/cmake/rkcommon-${PROJECT_VERSION}
 )
 
 write_basic_package_version_file(
@@ -93,9 +93,9 @@ install(FILES
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
   ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   cmake/FindTBB.cmake
-  cmake/ospcommon_macros.cmake
+  cmake/rkcommon_macros.cmake
 DESTINATION
-  ${CMAKE_INSTALL_LIBDIR}/cmake/ospcommon-${PROJECT_VERSION}
+  ${CMAKE_INSTALL_LIBDIR}/cmake/rkcommon-${PROJECT_VERSION}
 )
 
 # Must be last

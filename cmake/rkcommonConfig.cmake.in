@@ -1,0 +1,33 @@
+## Copyright 2009-2019 Intel Corporation
+## SPDX-License-Identifier: Apache-2.0
+
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@_Exports.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/rkcommon_macros.cmake")
+
+check_required_components("@PROJECT_NAME@")
+
+## Stash incoming CMAKE_MODULE_PATH ##
+
+set(RKCOMMON_CALLERS_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
+
+## Create rkcommon tasking target ##
+
+set(RKCOMMON_TASKING_SYSTEM      @RKCOMMON_TASKING_SYSTEM@)
+
+set(RKCOMMON_TASKING_TBB         @RKCOMMON_TASKING_TBB@)
+set(RKCOMMON_TASKING_OPENMP      @RKCOMMON_TASKING_OPENMP@)
+set(RKCOMMON_TASKING_INTERNAL    @RKCOMMON_TASKING_INTERNAL@)
+set(RKCOMMON_TASKING_DEBUG       @RKCOMMON_TASKING_DEBUG@)
+
+rkcommon_create_tasking_target(TRUE)
+
+## Restore CMAKE_MODULE_PATH ##
+
+set(CMAKE_MODULE_PATH ${RKCOMMON_CALLERS_CMAKE_MODULE_PATH})
+
+## Standard signal that the package was found ##
+
+set(RKCOMMON_FOUND TRUE)

@@ -4,12 +4,12 @@
 #include "../catch.hpp"
 
 #define private public
-#include "ospcommon/containers/FlatMap.h"
+#include "rkcommon/containers/FlatMap.h"
 #undef private
 
 #include <string>
 
-using ospcommon::containers::FlatMap;
+using rkcommon::containers::FlatMap;
 
 SCENARIO("FlatMap interface tests", "[FlatMap]")
 {

@@ -3,9 +3,9 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/containers/AlignedVector.h"
+#include "rkcommon/containers/AlignedVector.h"
 
-using ospcommon::containers::AlignedVector;
+using rkcommon::containers::AlignedVector;
 
 SCENARIO("verify alignment", "[AlignedVector]")
 {
@@ -17,7 +17,7 @@ SCENARIO("verify alignment", "[AlignedVector]")
 
     THEN("The allocated memory should be aligned")
     {
-      REQUIRE(ospcommon::memory::isAligned(aligned_vec.data()));
+      REQUIRE(rkcommon::memory::isAligned(aligned_vec.data()));
     }
   }
 }

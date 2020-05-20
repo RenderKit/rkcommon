@@ -20,6 +20,6 @@ cd build
 
 cmake --version
 
-cmake -DOSPCOMMON_TASKING_SYSTEM=INTERNAL ..
+cmake -DRKCOMMON_TASKING_SYSTEM=INTERNAL ..
 
 cmake --build .

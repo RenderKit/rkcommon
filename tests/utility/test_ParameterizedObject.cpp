@@ -3,9 +3,9 @@
 
 #include "../catch.hpp"
 
-#include "ospcommon/utility/ParameterizedObject.h"
+#include "rkcommon/utility/ParameterizedObject.h"
 
-using ospcommon::utility::ParameterizedObject;
+using rkcommon::utility::ParameterizedObject;
 
 SCENARIO("ParameterizedObject interface", "[ParameterizedObject]")
 {

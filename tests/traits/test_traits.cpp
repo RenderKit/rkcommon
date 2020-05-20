@@ -2,4 +2,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // only test compliation, no functional tests
-#include "ospcommon/traits/osptraits.h"
+#include "rkcommon/traits/rktraits.h"
