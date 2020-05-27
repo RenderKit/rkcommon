@@ -1,4 +1,4 @@
-## Copyright 2009-2019 Intel Corporation
+## Copyright 2009-2020 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 include(CMakeFindDependencyMacro)
@@ -130,7 +130,7 @@ macro(rkcommon_create_tasking_target FROM_INSTALL)
   set(RKCOMMON_TASKING_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
   if(RKCOMMON_TASKING_TBB)
-    if (FROM_INSTALL)
+    if (${FROM_INSTALL})
       find_dependency(TBB)
     else()
       if(POLICY CMP0074)
