@@ -130,17 +130,17 @@ macro(rkcommon_create_tasking_target FROM_INSTALL)
   set(RKCOMMON_TASKING_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
   if(RKCOMMON_TASKING_TBB)
+    if(POLICY CMP0074)
+      # Our FindTBB script uses TBB_ROOT, which is the NEW behaviour for
+      # CMP0074.
+      cmake_policy(SET CMP0074 NEW)
+    endif()
     if (NOT RKCOMMON_TBB_ROOT STREQUAL "")
       set(TBB_ROOT ${RKCOMMON_TBB_ROOT})
     endif()
     if (${FROM_INSTALL})
-      find_dependency(TBB)
+      find_dependency(TBB 4.4 REQUIRED tbb tbbmalloc)
     else()
-      if(POLICY CMP0074)
-        # Our FindTBB script uses TBB_ROOT, which is the NEW behaviour for
-        # CMP0074.
-        cmake_policy(SET CMP0074 NEW)
-      endif()
       find_package(TBB 4.4 REQUIRED tbb tbbmalloc)
     endif()
 
