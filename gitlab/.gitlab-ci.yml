@@ -1,9 +1,13 @@
 variables:
   GIT_DEPTH: "15"
+  KW_PROJECT_NAME: rkcommon
+  ErrorActionPreference: STOP
 
 stages:
   - build
   - test
+  - build-kw
+  - test-kw
 
 ## Job Templates ##
 
@@ -17,8 +21,7 @@ stages:
 
 .job_template: &build_job_docker
   <<: *base_build_job
-  tags:
-    - docker
+  tags: [docker]
 
 .job_template: &base_functional_test_job
   type: test
@@ -27,28 +30,31 @@ stages:
 
 .job_template: &test_functional_job_docker
   <<: *base_functional_test_job
-  tags:
-    - docker
+  tags: [docker]
 
 ## Build Jobs ##
 
 build-centos7:
   <<: *build_job_docker
-  image: ospray/docker-images:centos7
+  image: $DOCKER_REGISTRY/ospray/docker-images:centos7
   script:
   - gitlab/build.sh
 
 build-ubuntu18.04:
   <<: *build_job_docker
-  image: ospray/docker-images:ubuntu18.04
+  image: $DOCKER_REGISTRY/ospray/docker-images:ubuntu18.04
+
+build-ubuntu20.04:
+  <<: *build_job_docker
+  image: $DOCKER_REGISTRY/ospray/docker-images:ubuntu20.04
 
 build-arch:
   <<: *build_job_docker
-  image: ospray/docker-images:arch
+  image: $DOCKER_REGISTRY/ospray/docker-images:arch
 
 build-arch-clang:
   <<: *build_job_docker
-  image: ospray/docker-images:arch
+  image: $DOCKER_REGISTRY/ospray/docker-images:arch
   script:
     - export CC=clang
     - export CXX=clang++
@@ -77,44 +83,65 @@ build-windows-msvc15:
 
 ## Functional Test Jobs ##
 
-test-functional-centos7:
+test-centos7:
   <<: *test_functional_job_docker
-  image: ospray/docker-images:centos7
-  dependencies:
-    - build-centos7
+  image: $DOCKER_REGISTRY/ospray/docker-images:centos7
+  dependencies: [build-centos7]
 
-test-functional-ubuntu18.04:
+test-ubuntu18.04:
   <<: *test_functional_job_docker
-  image: ospray/docker-images:ubuntu18.04
-  dependencies:
-    - build-ubuntu18.04
+  image: $DOCKER_REGISTRY/ospray/docker-images:ubuntu18.04
+  dependencies: [build-ubuntu18.04]
 
-test-functional-arch:
+test-ubuntu20.04:
   <<: *test_functional_job_docker
-  image: ospray/docker-images:arch
-  dependencies:
-    - build-arch
+  image: $DOCKER_REGISTRY/ospray/docker-images:ubuntu20.04
+  dependencies: [build-ubuntu20.04]
 
-test-functional-arch-clang:
+test-arch:
   <<: *test_functional_job_docker
-  image: ospray/docker-images:arch
-  dependencies:
-    - build-arch-clang
+  image: $DOCKER_REGISTRY/ospray/docker-images:arch
+  dependencies: [build-arch]
 
-test-functional-macOS:
+test-arch-clang:
+  <<: *test_functional_job_docker
+  image: $DOCKER_REGISTRY/ospray/docker-images:arch
+  dependencies: [build-arch-clang]
+
+test-macOS:
   <<: *base_functional_test_job
-  dependencies:
-    - build-macOS
-  tags:
-    - osx
-    - clang
+  dependencies: [build-macOS]
+  tags: [osx,clang]
 
-test-functional-windows-msvc15:
+test-windows-msvc15:
   <<: *base_functional_test_job
   script:
     - gitlab\run_tests.ps1
-  dependencies:
-    - build-windows-msvc15
-  tags:
-    - msvc15
-    - win
+  dependencies: [build-windows-msvc15]
+  tags: [msvc15,win]
+
+## Klocwork Jobs ##
+
+.job_template: &base_kw_job
+  image: $DOCKER_REGISTRY/ospray/docker-images:centos7
+  tags: [docker]
+
+build-kw:
+  <<: *base_kw_job
+  stage: build-kw
+  script:
+    - gitlab/build-kw.sh
+    - test -s $CI_PROJECT_DIR/kw_build_number
+  dependencies: []
+  artifacts:
+    paths:
+        - $CI_PROJECT_DIR/kw_build_number
+    expire_in: 3 day
+
+test-kw:
+  <<: *base_kw_job
+  stage: test-kw
+  script:
+    - gitlab/test-kw.sh
+  dependencies: [build-kw]
+  allow_failure: true

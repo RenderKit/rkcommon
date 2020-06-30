@@ -1,4 +1,4 @@
-// Copyright 2009-2019 Intel Corporation
+// Copyright 2009-2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include "library.h"
@@ -93,7 +93,9 @@ namespace rkcommon {
 #endif
     lib                  = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
     if (lib == nullptr) {
-      errorMsg = dlerror();  // remember original error
+      auto *_msg = dlerror();
+      if (_msg)
+        errorMsg = _msg;  // remember original error
       // retry with SOVERSION in case symlinks are missing
       std::string soversion(TOSTRING(OSPRAY_SOVERSION));
 #if defined(__MACOSX__) || defined(__APPLE__)

@@ -1,4 +1,4 @@
-// Copyright 2009-2019 Intel Corporation
+// Copyright 2009-2020 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -111,7 +111,7 @@ namespace rkcommon {
     // Inlined Optional definitions ///////////////////////////////////////////
 
     template <typename T>
-    inline Optional<T>::Optional(const Optional<T> &other)
+    inline Optional<T>::Optional(const Optional<T> &other) : Optional()
     {
       if (other.has_value())
         *this = other.value();
@@ -119,7 +119,7 @@ namespace rkcommon {
 
     template <typename T>
     template <typename U>
-    inline Optional<T>::Optional(const Optional<U> &other)
+    inline Optional<T>::Optional(const Optional<U> &other) : Optional()
     {
       static_assert(std::is_convertible<U, T>::value,
                     "rkcommon::utility::Optional<T> requires the type"
@@ -131,7 +131,7 @@ namespace rkcommon {
     }
 
     template <typename T>
-    inline Optional<T>::Optional(Optional<T> &&other)
+    inline Optional<T>::Optional(Optional<T> &&other) : Optional()
     {
       if (other.has_value()) {
         reset();
@@ -142,7 +142,7 @@ namespace rkcommon {
 
     template <typename T>
     template <typename U>
-    inline Optional<T>::Optional(Optional<U> &&other)
+    inline Optional<T>::Optional(Optional<U> &&other) : Optional()
     {
       static_assert(std::is_convertible<U, T>::value,
                     "rkcommon::utility::Optional<T> requires the type"
