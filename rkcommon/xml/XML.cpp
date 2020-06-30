@@ -191,10 +191,10 @@ namespace rkcommon {
       return false;
     }
 
-    static Node parseNode(char *&s, XMLDoc *doc)
+    static Node parseNode(char *&s)
     {
       consume(s, '<');
-      Node node(doc);
+      Node node;
 
       if (!parseIdentifier(s, node.name))
         throw std::runtime_error("XML error: could not parse node name");
@@ -232,7 +232,7 @@ namespace rkcommon {
           // either end of current node
         } else if (*s == '<') {
           // child node
-          node.child.push_back(parseNode(s, doc));
+          node.child.push_back(parseNode(s));
         } else if (*s == 0) {
           std::cout << "#osp:xml: warning: xml file ended with still-open"
                        " nodes (this typically indicates a partial xml file)"
@@ -280,7 +280,7 @@ namespace rkcommon {
       return true;
     }
 
-    void parseXML(std::shared_ptr<XMLDoc> doc, char *s)
+    void parseXML(XMLDoc &doc, char *s)
     {
       if (s[0] == '<' && s[1] == '?') {
         if (!parseHeader(s))
@@ -293,7 +293,7 @@ namespace rkcommon {
           continue;
         }
 
-        doc->child.push_back(parseNode(s, doc.get()));
+        doc.child.push_back(parseNode(s));
         skipWhites(s);
       }
 
@@ -343,7 +343,7 @@ namespace rkcommon {
       state.pop();
     }
 
-    std::shared_ptr<XMLDoc> readXML(const std::string &fn)
+    XMLDoc readXML(const std::string &fn)
     {
       FILE *file = fopen(fn.c_str(), "r");
       if (!file) {
@@ -359,19 +359,16 @@ namespace rkcommon {
           ftell(file);
 #endif
       fseek(file, 0, SEEK_SET);
-      char *mem = new char[numBytes + 1];
+      std::vector<char> mem(numBytes + 1, 0);
       try {
-        mem[numBytes] = 0;
-        auto rc       = fread(mem, 1, numBytes, file);
+        auto rc = fread(mem.data(), 1, numBytes, file);
         (void)rc;
-        std::shared_ptr<XMLDoc> doc = std::make_shared<XMLDoc>();
-        doc->fileName               = fn;
-        parseXML(doc, mem);
-        delete[] mem;
+        XMLDoc doc;
+        doc.fileName = fn;
+        parseXML(doc, mem.data());
         fclose(file);
         return doc;
       } catch (const std::runtime_error &e) {
-        delete[] mem;
         fclose(file);
         throw e;
       }

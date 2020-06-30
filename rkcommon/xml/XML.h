@@ -24,7 +24,8 @@ namespace rkcommon {
       set of child nodes */
     struct RKCOMMON_INTERFACE Node
     {
-      Node(XMLDoc *doc) : doc(doc) {}
+      Node() = default;
+      ~Node() = default;
 
       /*! checks if given node has given property */
       bool hasProp(const std::string &name) const;
@@ -55,23 +56,14 @@ namespace rkcommon {
 
       /*! list of child nodes */
       std::vector<Node> child;
-
-      //! pointer to parent doc
-      /*! \detailed this points back to the parent xml doc that
-          contained this node. note this is intentionally NOT a ref to
-          avoid cyclical dependencies. Ie, do NOT use this unless
-          you're sure that the XMLDoc node that contained the given
-          node is still around! */
-      XMLDoc *doc{nullptr};
     };
 
     /*! a entire xml document */
     struct RKCOMMON_INTERFACE XMLDoc : public Node
     {
-      //! constructor
-      XMLDoc() : Node(this) {}
+      XMLDoc() = default;
+      ~XMLDoc() = default;
 
-      //! the name (and path etc) of the file that this doc was read from
       FileName fileName;
     };
 
@@ -79,7 +71,7 @@ namespace rkcommon {
       to it.  In case of any error, this function will free all
       already-allocated data, and throw a std::runtime_error
       exception */
-    RKCOMMON_INTERFACE std::shared_ptr<XMLDoc> readXML(const std::string &fn);
+    RKCOMMON_INTERFACE XMLDoc readXML(const std::string &fn);
 
     /*! helper class for writing sg nodes in XML format */
     struct Writer
