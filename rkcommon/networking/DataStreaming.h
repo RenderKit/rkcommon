@@ -51,8 +51,7 @@ namespace rkcommon {
 
     /*! generic stream operators into/out of streams, for raw data blocks */
     template <typename T>
-    inline WriteStream &operator<<(WriteStream &buf,
-                                                       const T &rh)
+    inline WriteStream &operator<<(WriteStream &buf, const T &rh)
     {
       buf.write((const byte_t *)&rh, sizeof(T));
       return buf;
@@ -68,8 +67,7 @@ namespace rkcommon {
     /*! @{ stream operators into/out of read/write streams, for std::vectors
      * of non-POD types*/
     template <typename T>
-    inline WriteStream &operator<<(WriteStream &buf,
-                                                       const std::vector<T> &rh)
+    inline WriteStream &operator<<(WriteStream &buf, const std::vector<T> &rh)
     {
       const size_t sz = rh.size();
       buf << sz;
@@ -81,8 +79,7 @@ namespace rkcommon {
     }
 
     template <typename T>
-    inline ReadStream &operator>>(ReadStream &buf,
-                                                      std::vector<T> &rh)
+    inline ReadStream &operator>>(ReadStream &buf, std::vector<T> &rh)
     {
       size_t sz;
       buf >> sz;
@@ -98,8 +95,8 @@ namespace rkcommon {
     /*! @{ stream operators into/out of read/write streams, for AbstractArray<T>
      */
     template <typename T>
-    inline WriteStream &operator<<(
-        WriteStream &buf, const utility::AbstractArray<T> &rh)
+    inline WriteStream &operator<<(WriteStream &buf,
+                                   const utility::AbstractArray<T> &rh)
     {
       const size_t sz = rh.size();
       buf << sz;
@@ -109,8 +106,7 @@ namespace rkcommon {
     /*! @} */
 
     /*! @{ serialize operations for strings */
-    inline WriteStream &operator<<(WriteStream &buf,
-                                                       const std::string &rh)
+    inline WriteStream &operator<<(WriteStream &buf, const std::string &rh)
     {
       const size_t sz = rh.size();
       buf << sz;
@@ -118,8 +114,15 @@ namespace rkcommon {
       return buf;
     }
 
-    inline ReadStream &operator>>(ReadStream &buf,
-                                                      std::string &rh)
+    inline WriteStream &operator<<(WriteStream &buf, const char *rh)
+    {
+      const size_t sz = std::strlen(rh);
+      buf << sz;
+      buf.write((const void *)rh, sz);
+      return buf;
+    }
+
+    inline ReadStream &operator>>(ReadStream &buf, std::string &rh)
     {
       size_t sz;
       buf >> sz;
