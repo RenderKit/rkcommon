@@ -20,7 +20,7 @@ include(GNUInstallDirs)
 
 ## Establish project ##
 
-project(rkcommon VERSION 1.4.1 LANGUAGES CXX)
+project(rkcommon VERSION 1.4.2 LANGUAGES CXX)
 
 configure_file(
   ${CMAKE_SOURCE_DIR}/rkcommon/version.h.in
