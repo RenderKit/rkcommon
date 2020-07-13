@@ -8,7 +8,6 @@
 #define __TBB_NO_IMPLICIT_LINKAGE 1
 #define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
 #include <tbb/task_arena.h>
-#include <tbb/task_scheduler_init.h>
 #define TBB_PREVIEW_GLOBAL_CONTROL 1
 #include <tbb/global_control.h>
 #elif defined(RKCOMMON_TASKING_OMP)
@@ -42,9 +41,8 @@ namespace rkcommon {
 #if defined(RKCOMMON_TASKING_TBB)
             ,
             tbb_gc(tbb::global_control::max_allowed_parallelism,
-                   (numThreads > 0)
-                       ? numThreads
-                       : tbb::task_scheduler_init::default_num_threads())
+                   (numThreads > 0) ? numThreads
+                                    : std::thread::hardware_concurrency())
 
 #endif
       {
