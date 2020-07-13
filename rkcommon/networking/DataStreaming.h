@@ -28,6 +28,8 @@ namespace rkcommon {
       virtual ~ReadStream() = default;
 
       virtual void read(void *mem, size_t size) = 0;
+
+      virtual bool end() = 0;
     };
 
     struct RKCOMMON_INTERFACE BufferWriter : WriteStream
@@ -36,6 +38,9 @@ namespace rkcommon {
 
       void write(const void *mem, size_t size) override;
 
+      // TODO: maybe a fixed buffer writer which can track space remaining,
+      // also needs to be able to tell us how much space something will need
+      // so we know if something can write in there or not.
       std::shared_ptr<utility::OwnedArray<uint8_t>> buffer;
     };
 
@@ -44,6 +49,8 @@ namespace rkcommon {
       BufferReader(const std::shared_ptr<utility::AbstractArray<uint8_t>> &buf);
 
       void read(void *mem, size_t size) override;
+
+      bool end() override;
 
       size_t cursor = 0;
       const std::shared_ptr<utility::AbstractArray<uint8_t>> buffer;

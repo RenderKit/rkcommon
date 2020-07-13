@@ -35,6 +35,11 @@ namespace rkcommon {
       std::memcpy(mem, buffer->begin() + cursor, size);
       cursor += size;
     }
+
+    bool BufferReader::end()
+    {
+      return cursor >= buffer->size();
+    }
   }  // namespace networking
 }  // namespace rkcommon
 
