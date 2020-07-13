@@ -16,11 +16,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
-include(GNUInstallDirs)
-
 ## Establish project ##
 
-project(rkcommon VERSION 1.4.2 LANGUAGES CXX)
+project(rkcommon VERSION 1.4.3 LANGUAGES CXX)
+
+include(GNUInstallDirs)
 
 configure_file(
   ${CMAKE_SOURCE_DIR}/rkcommon/version.h.in
