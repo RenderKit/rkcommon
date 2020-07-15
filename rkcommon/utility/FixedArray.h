@@ -12,6 +12,9 @@
 namespace rkcommon {
   namespace utility {
 
+    template <typename T>
+    struct FixedArrayView;
+
     /*  'FixedArray<T>' implements an array interface on a pointer to
      *  data which is owned by the FixedArray. The array is not
      *  initialized on creation and cannot be resized, though it can
@@ -20,6 +23,8 @@ namespace rkcommon {
     template <typename T>
     struct FixedArray : public AbstractArray<T>
     {
+      using View = FixedArrayView<uint8_t>;
+
       FixedArray()           = default;
       ~FixedArray() override = default;
 
@@ -100,4 +105,3 @@ namespace rkcommon {
 
   }  // namespace utility
 }  // namespace rkcommon
-

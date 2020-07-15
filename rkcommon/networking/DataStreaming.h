@@ -5,6 +5,8 @@
 
 #include "../common.h"
 #include "../utility/AbstractArray.h"
+#include "../utility/FixedArray.h"
+#include "../utility/FixedArrayView.h"
 #include "../utility/OwnedArray.h"
 
 #include <vector>
@@ -38,9 +40,6 @@ namespace rkcommon {
 
       void write(const void *mem, size_t size) override;
 
-      // TODO: maybe a fixed buffer writer which can track space remaining,
-      // also needs to be able to tell us how much space something will need
-      // so we know if something can write in there or not.
       std::shared_ptr<utility::OwnedArray<uint8_t>> buffer;
     };
 
@@ -54,6 +53,41 @@ namespace rkcommon {
 
       size_t cursor = 0;
       const std::shared_ptr<utility::AbstractArray<uint8_t>> buffer;
+    };
+
+    /*! Utility which behaves as a write stream, but just computes the number of
+     * bytes which have been written to it
+     */
+    struct RKCOMMON_INTERFACE WriteSizeCalculator : public WriteStream
+    {
+      void write(const void *mem, size_t size) override;
+
+      size_t writtenSize = 0;
+    };
+
+    /*! Buffer writer for writing to a fixed size output buffer. The cursor
+     * points to the next location to write at. Trying to write more than the
+     * fixed buffer's size will throw an error
+     */
+    struct RKCOMMON_INTERFACE FixedBufferWriter : public WriteStream
+    {
+      FixedBufferWriter() = default;
+
+      FixedBufferWriter(size_t size);
+
+      void write(const void *mem, size_t size) override;
+
+      // Get a view of the region written so far of the buffer
+      std::shared_ptr<utility::FixedArray<uint8_t>::View> getWrittenView();
+
+      // Get the space available to write in the buffer
+      size_t available() const;
+
+      // Get the underlying buffer size being written to
+      size_t capacity() const;
+
+      size_t cursor = 0;
+      std::shared_ptr<utility::FixedArray<uint8_t>> buffer;
     };
 
     /*! generic stream operators into/out of streams, for raw data blocks */

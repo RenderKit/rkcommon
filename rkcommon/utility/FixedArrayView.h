@@ -21,7 +21,9 @@ namespace rkcommon {
       FixedArrayView()           = default;
       ~FixedArrayView() override = default;
 
-      FixedArrayView(std::shared_ptr<FixedArray<T>> &data, size_t offset, size_t size);
+      FixedArrayView(std::shared_ptr<FixedArray<T>> &data,
+                     size_t offset,
+                     size_t size);
 
      private:
       // The underlying array from the fixed array being viewed, to keep
@@ -43,4 +45,3 @@ namespace rkcommon {
 
   }  // namespace utility
 }  // namespace rkcommon
-
