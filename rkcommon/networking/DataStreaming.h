@@ -77,6 +77,9 @@ namespace rkcommon {
 
       void write(const void *mem, size_t size) override;
 
+      // Reserve space in the buffer and return the pointer to the start of it
+      void *reserve(size_t size);
+
       // Get a view of the region written so far of the buffer
       std::shared_ptr<utility::FixedArray<uint8_t>::View> getWrittenView();
 

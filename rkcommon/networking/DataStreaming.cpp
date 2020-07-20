@@ -61,6 +61,17 @@ namespace rkcommon {
       cursor += size;
     }
 
+    void *FixedBufferWriter::reserve(size_t size)
+    {
+      if (cursor + size >= buffer->size()) {
+        throw std::runtime_error(
+            "FixedBufferWriter::reserve size exceeds buffer");
+      }
+      void *mem = buffer->begin() + cursor;
+      cursor += size;
+      return mem;
+    }
+
     std::shared_ptr<utility::FixedArray<uint8_t>::View>
     FixedBufferWriter::getWrittenView()
     {
