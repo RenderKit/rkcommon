@@ -139,7 +139,7 @@ namespace rkcommon {
 
       // conversion constructor to other types to enable static_cast
       template <typename OT>
-      explicit operator vec_t<OT, 2>()
+      explicit operator vec_t<OT, 2>() const
       {
         return vec_t<OT, 2>(*this);
       }
@@ -218,7 +218,7 @@ namespace rkcommon {
 
       // conversion constructor to other types to enable static_cast
       template <typename OT>
-      explicit operator vec_t<OT, 3>()
+      explicit operator vec_t<OT, 3>() const
       {
         return vec_t<OT, 3>(*this);
       }
@@ -300,7 +300,7 @@ namespace rkcommon {
 
       // conversion constructor to other types to enable static_cast
       template <typename OT>
-      explicit operator vec_t<OT, 3, true>()
+      explicit operator vec_t<OT, 3, true>() const
       {
         return vec_t<OT, 3, true>(*this);
       }
@@ -382,7 +382,7 @@ namespace rkcommon {
 
       // conversion constructor to other types to enable static_cast
       template <typename OT>
-      explicit operator vec_t<OT, 4>()
+      explicit operator vec_t<OT, 4>() const
       {
         return vec_t<OT, 4>(*this);
       }
