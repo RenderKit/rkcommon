@@ -8,7 +8,7 @@
 #ifdef RKCOMMON_TASKING_TBB
 #  define __TBB_NO_IMPLICIT_LINKAGE 1
 #  define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
-#  include <tbb/task.h>
+#  include "tbb/task_arena.h"
 #elif defined(RKCOMMON_TASKING_OMP)
 #  include <thread>
 #elif defined(RKCOMMON_TASKING_INTERNAL)
@@ -23,16 +23,8 @@ namespace rkcommon {
       inline void schedule_impl(TASK_T fcn)
       {
 #ifdef RKCOMMON_TASKING_TBB
-        struct LocalTBBTask : public tbb::task
-        {
-          TASK_T func;
-          tbb::task* execute() override { func(); return nullptr; }
-          LocalTBBTask(TASK_T f) : func(std::move(f)) {}
-        };
-
-        auto *tbb_node =
-          new(tbb::task::allocate_root())LocalTBBTask(std::move(fcn));
-        tbb::task::enqueue(*tbb_node);
+        tbb::task_arena ta = tbb::task_arena(tbb::task_arena::attach());
+        ta.enqueue(fcn);
 #elif defined(RKCOMMON_TASKING_OMP)
         std::thread thread(fcn);
         thread.detach();
