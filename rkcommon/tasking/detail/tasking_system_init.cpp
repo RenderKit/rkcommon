@@ -7,7 +7,6 @@
 #if defined(RKCOMMON_TASKING_TBB)
 #define __TBB_NO_IMPLICIT_LINKAGE 1
 #define __TBBMALLOC_NO_IMPLICIT_LINKAGE 1
-#include <tbb/task_arena.h>
 #define TBB_PREVIEW_GLOBAL_CONTROL 1
 #include <tbb/global_control.h>
 #elif defined(RKCOMMON_TASKING_OMP)
@@ -36,28 +35,25 @@ namespace rkcommon {
 
     struct tasking_system_handle
     {
-      tasking_system_handle(int numThreads)
-          : numThreads(numThreads)
-#if defined(RKCOMMON_TASKING_TBB)
-            ,
-            tbb_gc(tbb::global_control::max_allowed_parallelism,
-                   (numThreads > 0) ? numThreads
-                                    : std::thread::hardware_concurrency())
-
-#endif
+      tasking_system_handle(int numThreads) : numThreads(numThreads)
       {
-#if defined(RKCOMMON_TASKING_OMP)
+#if defined(RKCOMMON_TASKING_TBB)
+        if (numThreads > 0)
+          tbb_gc = make_unique<tbb::global_control>(
+              tbb::global_control::max_allowed_parallelism, numThreads);
+#elif defined(RKCOMMON_TASKING_OMP)
         if (numThreads > 0)
           omp_set_num_threads(numThreads);
 #elif defined(RKCOMMON_TASKING_INTERNAL)
-        detail::initTaskSystemInternal(numThreads <= 0 ? -1 : numThreads + 1);
+        detail::initTaskSystemInternal(numThreads <= 0 ? -1 : numThreads);
 #endif
       }
 
       int num_threads()
       {
 #if defined(RKCOMMON_TASKING_TBB)
-        return tbb::this_task_arena::max_concurrency();
+        return tbb::global_control::active_value(
+            tbb::global_control::max_allowed_parallelism);
 #elif defined(RKCOMMON_TASKING_OMP)
         return omp_get_max_threads();
 #elif defined(RKCOMMON_TASKING_INTERNAL)
@@ -69,7 +65,7 @@ namespace rkcommon {
 
       int numThreads{-1};
 #if defined(RKCOMMON_TASKING_TBB)
-      tbb::global_control tbb_gc;
+      std::unique_ptr<tbb::global_control> tbb_gc;
 #endif
     };
 
