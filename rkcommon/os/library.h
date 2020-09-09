@@ -21,8 +21,12 @@ namespace rkcommon {
 
    private:
     Library(void *const lib);
+
+    bool loadLibrary(bool withAnchor);
+
     std::string libraryName;
-    void *lib;
+    std::string errorMessage;
+    void *lib{nullptr};
     bool freeLibOnDelete{true};
     friend class LibraryRepository;
   };
