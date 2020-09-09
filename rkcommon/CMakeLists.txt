@@ -54,16 +54,7 @@ if (WIN32)
   set(EXTRA_COMPILE_DEFINITIONS -DNOMINMAX -DWIN32_LEAN_AND_MEAN)
 endif()
 
-target_compile_definitions(${PROJECT_NAME}
-  PRIVATE
-    # NOTE(jda) - OSPRAY_SOVERSION fallbacks in library.cpp should be handled
-    #             in the Library object's interface directly, where librkcommon
-    #             would inject versioning information independent of rkcommon
-    #             version.
-    -DOSPRAY_SOVERSION=2
-  PUBLIC
-    ${EXTRA_COMPILE_DEFINITIONS}
-)
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${EXTRA_COMPILE_DEFINITIONS})
 
 set_property(TARGET rkcommon PROPERTY POSITION_INDEPENDENT_CODE ON)
 

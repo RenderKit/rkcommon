@@ -15,10 +15,16 @@
 #include <sys/times.h>
 #endif
 
+#if defined(__MACOSX__) || defined(__APPLE__)
+#define RKCOMMON_LIB_EXT ".dylib"
+#else
+#define RKCOMMON_LIB_EXT ".so"
+#endif
+
 extern "C" {
 /* Export a symbol to ask the dynamic loader about in order to locate this
  * library at runtime. */
-RKCOMMON_INTERFACE int _ospray_anchor()
+RKCOMMON_INTERFACE int _rkcommon_anchor()
 {
   return 0;
 }
@@ -30,7 +36,7 @@ namespace {
   {
 #if defined(_WIN32) && !defined(__CYGWIN__)
     MEMORY_BASIC_INFORMATION mbi;
-    VirtualQuery(&_ospray_anchor, &mbi, sizeof(mbi));
+    VirtualQuery(&_rkcommon_anchor, &mbi, sizeof(mbi));
     char pathBuf[16384];
     if (!GetModuleFileNameA(
             static_cast<HMODULE>(mbi.AllocationBase), pathBuf, sizeof(pathBuf)))
@@ -39,7 +45,7 @@ namespace {
     std::string path = std::string(pathBuf);
     path.resize(path.rfind('\\') + 1);
 #else
-    const char *anchor = "_ospray_anchor";
+    const char *anchor = "_rkcommon_anchor";
     void *handle       = dlsym(RTLD_DEFAULT, anchor);
     if (!handle)
       return std::string();
@@ -60,11 +66,26 @@ namespace {
 
 namespace rkcommon {
 
-  Library::Library(const std::string &name, bool anchor) : libraryName(name)
+  Library::Library(const std::string &name, bool) : libraryName(name)
   {
-    std::string file = name;
+    bool success = loadLibrary(false);
+    if (!success)
+      success = loadLibrary(true);
+
+    if (!success)
+      throw std::runtime_error(errorMessage);
+  }
+
+  Library::Library(void *const _lib)
+      : libraryName("<pre-loaded>"), lib(_lib), freeLibOnDelete(false)
+  {
+  }
+
+  bool Library::loadLibrary(bool withAnchor)
+  {
+    std::string file = libraryName;
     std::string errorMsg;
-    std::string libLocation = anchor ? library_location() : std::string();
+    std::string libLocation = withAnchor ? library_location() : std::string();
 #ifdef _WIN32
     std::string fullName = libLocation + file + ".dll";
     lib                  = LoadLibrary(fullName.c_str());
@@ -86,36 +107,17 @@ namespace rkcommon {
       LocalFree(lpMsgBuf);
     }
 #else
-#if defined(__MACOSX__) || defined(__APPLE__)
-    std::string fullName = libLocation + "lib" + file + ".dylib";
-#else
-    std::string fullName = libLocation + "lib" + file + ".so";
-#endif
-    lib                  = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
-    if (lib == nullptr) {
-      auto *_msg = dlerror();
-      if (_msg)
-        errorMsg = _msg;  // remember original error
-      // retry with SOVERSION in case symlinks are missing
-      std::string soversion(TOSTRING(OSPRAY_SOVERSION));
-#if defined(__MACOSX__) || defined(__APPLE__)
-      fullName = "lib" + file + "." + soversion + ".dylib";
-#else
-      fullName += "." + soversion;
-#endif
-      lib      = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
-    }
+    std::string fullName = libLocation + "lib" + file + RKCOMMON_LIB_EXT;
+    lib = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
 #endif
 
     if (lib == nullptr) {
-      throw std::runtime_error("could not open module lib " + name + ": " +
-                               errorMsg);
+      errorMessage =
+          "could not open module lib " + libraryName + ": " + errorMsg;
+      return false;
     }
-  }
 
-  Library::Library(void *const _lib)
-      : libraryName("<pre-loaded>"), lib(_lib), freeLibOnDelete(false)
-  {
+    return true;
   }
 
   Library::~Library()
