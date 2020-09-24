@@ -109,6 +109,8 @@ namespace rkcommon {
 #else
     std::string fullName = libLocation + "lib" + file + RKCOMMON_LIB_EXT;
     lib = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
+    if (lib == nullptr)
+      errorMsg = dlerror();
 #endif
 
     if (lib == nullptr) {
