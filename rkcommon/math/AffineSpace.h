@@ -99,6 +99,12 @@ namespace rkcommon {
         return L::rotate(u, r);
       }
 
+      /*! return matrix for rotation quaternion, only in 3D */
+      static inline AffineSpaceT rotate(const QuaternionT<ScalarT> &q)
+      {
+        return L(q);
+      }
+
       /*! return matrix for rotation around arbitrary axis and point, only in 3D
        */
       static inline AffineSpaceT rotate(const VectorT &p,
@@ -106,6 +112,14 @@ namespace rkcommon {
                                         const ScalarT &r)
       {
         return translate(+p) * rotate(u, r) * translate(-p);
+      }
+
+      /*! return matrix for rotation with quaternion around point, only in 3D
+       */
+      static inline AffineSpaceT rotate(const VectorT &p,
+                                        const QuaternionT<ScalarT> &q)
+      {
+        return translate(+p) * L(q) * translate(-p);
       }
 
       /*! return matrix for looking at given point, only in 3D; right-handed
