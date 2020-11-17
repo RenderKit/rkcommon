@@ -93,4 +93,5 @@ install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
   PATTERN *.h
   PATTERN *.inl
   PATTERN *.hpp
+  PATTERN *.ih
 )
