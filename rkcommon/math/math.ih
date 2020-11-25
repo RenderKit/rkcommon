@@ -325,7 +325,8 @@ inline uniform float similar(uniform float a, uniform float b)
 }
 #undef SIMILAR_EPSILON
 
-inline float to_float_unorm(unsigned int a)
+// convert 32bit unsigned int into float in [0..1]
+inline float to_float_unorm(uint32 a)
 {
-  return (float)a * 2.3283064365386962890625e-10;  // a / 2^32
+  return a * 0x1.0p-32f;
 }

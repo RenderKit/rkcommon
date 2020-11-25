@@ -722,6 +722,11 @@ inline vec2i to_int(const vec2f &a)
   return make_vec2i(a);
 }
 
+inline vec2f to_float_unorm(const vec2ui &a)
+{
+  return make_vec2f(to_float_unorm(a.x), to_float_unorm(a.y));
+}
+
 inline vec2f clamp(const vec2f &a,
                    const uniform vec2f &b,
                    const uniform vec2f &c)
@@ -805,7 +810,7 @@ inline uniform vec3i to_int(const uniform vec3f &a)
   return make_vec3i(a);
 }
 
-inline vec3f to_float_unorm(const vec3i &a)
+inline vec3f to_float_unorm(const vec3ui &a)
 {
   return make_vec3f(
       to_float_unorm(a.x), to_float_unorm(a.y), to_float_unorm(a.z));
