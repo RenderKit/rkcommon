@@ -41,5 +41,26 @@ namespace rkcommon {
       return (scale * rng()) * diff + lower;
     }
 
+    // The std::uniform_real_distribution from <random> is not portable and may give
+    // different results on different plaforms/compilers, we have to use our own
+    // implementation for consistency
+    template <typename T>
+    struct uniform_real_distribution
+    {
+      uniform_real_distribution(T lowerValue = 0, T upperValue = 1)
+          : l(lowerValue), u(upperValue)
+      {}
+
+      template <class G>
+      T operator()(G &g)
+      {
+        const T scale = (u - l) / T(g.max() - g.min());
+        return l + (g() - g.min()) * scale;
+      }
+
+     private:
+      T l, u;
+    };
+
   }  // namespace utility
 }  // namespace rkcommon
