@@ -1,4 +1,4 @@
-## Copyright 2009-2020 Intel Corporation
+## Copyright 2009-2021 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 #===============================================================================
@@ -327,6 +327,7 @@ function(rk_tbb_find_library COMPONENT_NAME BUILD_CONFIG)
     endif()
     set(DLL_NAME_VERSION "${LIB_NAME_VERSION}.dll")
 
+    set(BIN_FILE BIN_FILE-NOTFOUND)
     find_file(BIN_FILE
       NAMES ${DLL_NAME} ${DLL_NAME_VERSION}
       PATHS
