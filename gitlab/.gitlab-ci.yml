@@ -111,6 +111,10 @@ test-arch-clang:
 test-macOS:
   <<: *base_functional_test_job
   dependencies: [build-macOS]
+  script:
+    - export DYLD_FALLBACK_LIBRARY_PATH=./build
+    - ./build/rkcommon_test_suite
+
   tags: [osx,clang]
 
 test-windows-msvc15:
