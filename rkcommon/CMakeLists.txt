@@ -1,4 +1,4 @@
-## Copyright 2009-2020 Intel Corporation
+## Copyright 2009-2021 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 if (RKCOMMON_TASKING_INTERNAL)
@@ -16,7 +16,6 @@ add_library(${PROJECT_NAME}
   memory/malloc.cpp
 
   networking/DataStreaming.cpp
-  networking/Socket.cpp
   networking/Fabric.cpp
 
   os/FileName.cpp
