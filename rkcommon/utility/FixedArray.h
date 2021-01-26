@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -7,6 +7,7 @@
 #include "AbstractArray.h"
 
 #include <array>
+#include <cstring>
 #include <vector>
 
 namespace rkcommon {
@@ -61,7 +62,15 @@ namespace rkcommon {
     template <typename T>
     inline FixedArray<T>::FixedArray(T *_data, size_t _size) : FixedArray(_size)
     {
-      std::memcpy(array.get(), _data, _size * sizeof(T));
+      // Note:
+      // UB in memcpy if
+      //  1) source / destination are NULL, even if _size is 0
+      //  2) buffers overlap
+      //  3) destination is too small.
+      // We catch the first case here, and the others are impossible
+      // since we just allocated the destination.
+      if (_data && _size > 0)
+        std::memcpy(array.get(), _data, _size * sizeof(T));
     }
 
     template <typename T>
@@ -83,7 +92,8 @@ namespace rkcommon {
     {
       array = std::shared_ptr<T>(new T[rhs.size()], std::default_delete<T[]>());
       setPtr(rhs.size());
-      std::memcpy(array.get(), rhs.data(), rhs.size() * sizeof(T));
+      if (rhs.data() && rhs.size() > 0)
+        std::memcpy(array.get(), rhs.data(), rhs.size() * sizeof(T));
       return *this;
     }
 
@@ -92,7 +102,8 @@ namespace rkcommon {
     {
       array = std::shared_ptr<T>(new T[rhs.size()], std::default_delete<T[]>());
       setPtr(rhs.size());
-      std::memcpy(array.get(), rhs.data(), rhs.size() * sizeof(T));
+      if (rhs.data() && rhs.size() > 0)
+        std::memcpy(array.get(), rhs.data(), rhs.size() * sizeof(T));
       return *this;
     }
 
