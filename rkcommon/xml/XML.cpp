@@ -103,7 +103,7 @@ namespace rkcommon {
 
     static std::string makeString(const char *begin, const char *end)
     {
-      if (!begin || !end)
+      if (!begin || !end || begin > end)
         throw std::runtime_error("invalid substring in osp::xml::makeString");
       if (begin == end)
         return "";
