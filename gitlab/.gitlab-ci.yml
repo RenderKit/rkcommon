@@ -111,6 +111,10 @@ test-arch-clang:
 test-macOS:
   <<: *base_functional_test_job
   dependencies: [build-macOS]
+  script:
+    - export DYLD_FALLBACK_LIBRARY_PATH=./build
+    - ./build/rkcommon_test_suite
+
   tags: [osx,clang]
 
 test-windows-msvc15:
@@ -131,17 +135,28 @@ build-kw:
   stage: build-kw
   script:
     - gitlab/build-kw.sh
-    - test -s $CI_PROJECT_DIR/kw_build_number
-  dependencies: []
+    - test -s $CI_PROJECT_DIR/klocwork/build_name
   artifacts:
     paths:
-        - $CI_PROJECT_DIR/kw_build_number
-    expire_in: 3 day
+        - $CI_PROJECT_DIR/klocwork/*
+  needs: []
 
-test-kw:
+check-kw-issues:
   <<: *base_kw_job
   stage: test-kw
   script:
     - gitlab/test-kw.sh
-  dependencies: [build-kw]
+  needs: [build-kw]
   allow_failure: true
+
+gen-kw-report:
+  <<: *base_kw_job
+  stage: test-kw
+  needs: [build-kw]
+  script:
+    - gitlab/kw-gen-report.sh
+    - gitlab/store-files.sh $CI_PROJECT_NAME $CI_PIPELINE_ID klocwork "klocwork/report.log"
+  artifacts:
+    paths:
+      - ./klocwork/*
+

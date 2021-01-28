@@ -298,13 +298,13 @@ namespace rkcommon {
       /*! construction from quaternion */
       inline LinearSpace3(const QuaternionT<Scalar> &q)
           : vx((q.r * q.r + q.i * q.i - q.j * q.j - q.k * q.k),
-               2.0f * (q.i * q.j + q.r * q.k),
-               2.0f * (q.i * q.k - q.r * q.j)),
-            vy(2.0f * (q.i * q.j - q.r * q.k),
+               Scalar(2.0) * (q.i * q.j + q.r * q.k),
+               Scalar(2.0) * (q.i * q.k - q.r * q.j)),
+            vy(Scalar(2.0) * (q.i * q.j - q.r * q.k),
                (q.r * q.r - q.i * q.i + q.j * q.j - q.k * q.k),
-               2.0f * (q.j * q.k + q.r * q.i)),
-            vz(2.0f * (q.i * q.k + q.r * q.j),
-               2.0f * (q.j * q.k - q.r * q.i),
+               Scalar(2.0) * (q.j * q.k + q.r * q.i)),
+            vz(Scalar(2.0) * (q.i * q.k + q.r * q.j),
+               Scalar(2.0) * (q.j * q.k - q.r * q.i),
                (q.r * q.r - q.i * q.i - q.j * q.j + q.k * q.k))
       {
       }

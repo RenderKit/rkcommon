@@ -1,4 +1,4 @@
-## Copyright 2009-2020 Intel Corporation
+## Copyright 2009-2021 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 # use a backported version of find_dependency(), renamed as
@@ -174,6 +174,7 @@ macro(rkcommon_create_tasking_target FROM_INSTALL)
     endif()
     if (NOT RKCOMMON_TBB_ROOT STREQUAL "")
       set(TBB_ROOT ${RKCOMMON_TBB_ROOT})
+      list(APPEND CMAKE_PREFIX_PATH ${RKCOMMON_TBB_ROOT})
     endif()
 
     # Try getting TBB via config first

@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include "DataStreaming.h"
@@ -18,7 +18,8 @@ namespace rkcommon {
     {
       const size_t bsize = buffer->size();
       buffer->resize(buffer->size() + size, 0);
-      std::memcpy(buffer->begin() + bsize, mem, size);
+      if (mem && size > 0)
+        std::memcpy(buffer->begin() + bsize, mem, size);
     }
 
     BufferReader::BufferReader(
@@ -32,7 +33,8 @@ namespace rkcommon {
       if (cursor + size > buffer->size())
         throw std::runtime_error("Attempt to read past end of BufferReader!");
 
-      std::memcpy(mem, buffer->begin() + cursor, size);
+      if (mem && size > 0)
+        std::memcpy(mem, buffer->begin() + cursor, size);
       cursor += size;
     }
 
@@ -57,7 +59,8 @@ namespace rkcommon {
         throw std::runtime_error(
             "FixedBufferWriter::write size exceeds buffer");
       }
-      std::memcpy(buffer->begin() + cursor, mem, size);
+      if (mem && size > 0)
+        std::memcpy(buffer->begin() + cursor, mem, size);
       cursor += size;
     }
 

@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include "XML.h"
@@ -32,20 +32,15 @@ namespace rkcommon {
     std::string Node::getProp(const std::string &propName,
                               const std::string &fallbackValue) const
     {
-      if (!hasProp(propName))
-        return fallbackValue;
-      return properties.find(propName)->second;
+      const auto it = properties.find(propName);
+      return (it != properties.end()) ? it->second : fallbackValue;
     }
 
     /*! return value of property with given name if present; and throw an
      * exception if not */
     std::string Node::getProp(const std::string &propName) const
     {
-      if (!hasProp(propName))
-        return "";
-      // throw std::runtime_error("given xml::Node does have the queried
-      // property '"+name+"'");
-      return properties.find(propName)->second;
+      return getProp(propName, std::string());
     }
 
     static bool isWhite(char s)
@@ -108,7 +103,7 @@ namespace rkcommon {
 
     static std::string makeString(const char *begin, const char *end)
     {
-      if (!begin || !end)
+      if (!begin || !end || begin > end)
         throw std::runtime_error("invalid substring in osp::xml::makeString");
       if (begin == end)
         return "";

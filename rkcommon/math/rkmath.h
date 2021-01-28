@@ -59,7 +59,7 @@ namespace rkcommon {
 
     __forceinline float rcp_safe(float f)
     {
-      return rcp((abs(f) < 1e-8f) ? 1e-8f : f);
+      return rcp((std::abs(f) >= 1e-18f) ? f : 1e-18f);
     }
 
     __forceinline float rsqrt(const float x)

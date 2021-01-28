@@ -95,9 +95,14 @@ namespace rkcommon {
       return conj(a) * rcp(a.r * a.r + a.i * a.i + a.j * a.j + a.k * a.k);
     }
     template <typename T>
+    inline float dot(const QuaternionT<T> &a, const QuaternionT<T> &b)
+    {
+      return a.r * b.r + a.i * b.i + a.j * b.j + a.k * b.k;
+    }
+    template <typename T>
     inline QuaternionT<T> normalize(const QuaternionT<T> &a)
     {
-      return a * rsqrt(a.r * a.r + a.i * a.i + a.j * a.j + a.k * a.k);
+      return a * rsqrt(dot(a, a));
     }
 
     template <typename T>
@@ -301,6 +306,28 @@ namespace rkcommon {
     {
       return cout << "{ r = " << q.r << ", i = " << q.i << ", j = " << q.j
                   << ", k = " << q.k << " }";
+    }
+
+    template <typename T>
+    // a, b must be normalized
+    inline QuaternionT<T> slerp(const float factor, const QuaternionT<T> &_a, const QuaternionT<T> &b)
+    {
+      QuaternionT<T> a(_a);
+      float d = dot(a, b);
+      if (d < 0.f) { // prevent "long way around"
+        a = -a;
+        d = -d;
+      }
+      if (d > 0.9995) { // angles too small, fallback to linear interpolation
+        return normalize(rkcommon::math::lerp(factor, a, b));
+      }
+
+      const float theta0 = std::acos(d);
+      const float theta = theta0 * factor;
+      const float fb = std::sin(theta) / std::sin(theta0);
+      const float fa = std::cos(theta) - d * fb;
+
+      return fa * a + fb * b;
     }
 
     using quaternionf = QuaternionT<float>;
