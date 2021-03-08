@@ -7,7 +7,7 @@ used by various components of Intel® oneAPI Rendering Toolkit.
 
 - CMake
 - C++11 compiler
-- TBB (by default, other tasking system options available via
+- TBB 4.4.3 or higher (by default, other tasking system options available via
   the `RKCOMMON_TASKING_SYSTEM` CMake variable)
 
 ### Building
