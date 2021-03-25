@@ -8,6 +8,7 @@ stages:
   - test
   - build-kw
   - test-kw
+  - test-external
 
 ## Job Templates ##
 
@@ -159,4 +160,18 @@ gen-kw-report:
   artifacts:
     paths:
       - ./klocwork/*
+
+
+## External Jobs ##
+
+test-openvkl:
+  variables:
+    RKCOMMON_BRANCH_NAME: $CI_COMMIT_REF_NAME
+    RKCOMMON_PROJECT_PATH: $CI_PROJECT_PATH
+    RKCOMMON_GIT_SHA: $CI_COMMIT_SHA
+  stage: test-external
+  trigger:
+    project: renderkit/OpenVKL
+    branch: devel
+    strategy: depend
 
