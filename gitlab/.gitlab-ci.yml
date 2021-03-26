@@ -1,6 +1,5 @@
 variables:
   GIT_DEPTH: "15"
-  KW_PROJECT_NAME: rkcommon
   ErrorActionPreference: STOP
 
 stages:
