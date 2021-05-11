@@ -23,11 +23,11 @@ project(rkcommon VERSION 1.6.0 LANGUAGES CXX)
 include(GNUInstallDirs)
 
 configure_file(
-  ${CMAKE_SOURCE_DIR}/rkcommon/version.h.in
-  ${CMAKE_BINARY_DIR}/rkcommon/version.h
+  ${PROJECT_SOURCE_DIR}/rkcommon/version.h.in
+  ${PROJECT_BINARY_DIR}/rkcommon/version.h
   @ONLY
 )
-set(RKCOMMON_RESOURCE ${CMAKE_SOURCE_DIR}/rkcommon/rkcommon.rc)
+set(RKCOMMON_RESOURCE ${PROJECT_SOURCE_DIR}/rkcommon/rkcommon.rc)
 
 ## Add rkcommon specific macros ##
 
@@ -90,8 +90,8 @@ write_basic_package_version_file(
 )
 
 install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  ${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+  ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   cmake/FindTBB.cmake
   cmake/rkcommon_macros.cmake
 DESTINATION
