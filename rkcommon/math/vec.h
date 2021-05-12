@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -30,23 +30,6 @@ namespace rkcommon {
     {
       const static bool value = std::is_base_of<vec_base, T>::value;
     };
-
-    template <typename VEC_TYPE, typename SCALAR_TYPE>
-    struct is_valid_scalar_for_binary_op
-    {
-      // NOTE: decay types to throw out pointerness and/or constness
-      using vec_element_t =
-          typename std::decay<typename VEC_TYPE::scalar_t>::type;
-      using scalar_t = typename std::decay<SCALAR_TYPE>::type;
-
-      const static bool value =
-          std::is_constructible<vec_element_t, scalar_t>::value &&
-          !is_vec<scalar_t>::value;
-    };
-
-    template <typename VEC_TYPE, typename SCALAR_TYPE>
-    using is_valid_scalar_for_binary_op_t = enable_if_t<
-        is_valid_scalar_for_binary_op<VEC_TYPE, SCALAR_TYPE>::value>;
 
     template <typename VEC_ELEMENT_T, typename TYPE_IN_QUESTION>
     struct is_valid_vec_constructor_type
@@ -321,6 +304,12 @@ namespace rkcommon {
 
       vec_t(scalar_t s) : x(s), y(s), z(s), w(s) {}
 
+      template <typename OT,
+                typename = traits::is_valid_vec_constructor_type_t<T, OT>>
+      vec_t(const OT &s) : x(s), y(s), z(s), w(s)
+      {
+      }
+
       vec_t(scalar_t x, scalar_t y, scalar_t z, scalar_t w)
           : x(x), y(y), z(z), w(w)
       {
@@ -435,6 +424,8 @@ namespace rkcommon {
       return vec_t<T, 4>(+v.x, +v.y, +v.z, +v.w);
     }
 
+    using std::abs;
+
 // -------------------------------------------------------
 // unary functors
 // -------------------------------------------------------
@@ -494,86 +485,82 @@ namespace rkcommon {
   }                                                                         \
                                                                             \
   /* "vec<T, N> op vec<U, N>" (element types don't match) */                \
-  template <typename T1,                                                    \
-            typename T2,                                                    \
+  template <typename T,                                                     \
+            typename U,                                                     \
             int N,                                                          \
             bool A,                                                         \
-            typename = traits::is_not_same_t<T1, T2>>                       \
-  inline auto name(const vec_t<T1, N, A> &v1, const vec_t<T2, N, A> &v2)    \
-      ->vec_t<decltype(T1() op T2()), N, A>                                 \
+            typename = traits::is_not_same_t<T, U>>                         \
+  inline auto name(const vec_t<T, N, A> &a, const vec_t<U, N, A> &b)        \
+      ->vec_t<decltype(T() op U()), N, A>                                   \
   {                                                                         \
-    using result_t = vec_t<decltype(T1() op T2()), N, A>;                   \
-    return result_t(result_t(v1) op result_t(v2));                          \
+    using vector_t = vec_t<decltype(T() op U()), N, A>;                     \
+    return vector_t(vector_t(a) op vector_t(b));                            \
   }                                                                         \
                                                                             \
-  /* "vec op scalar" (SFINAE out scalar types which are ill-formed) */      \
-  template <typename T,                                                     \
-            typename U = T,                                                 \
-            typename =                                                      \
-                traits::is_valid_scalar_for_binary_op_t<vec_t<T, 2>, U>>    \
-  inline auto name(const vec_t<T, 2> &a, const U &b)                        \
-      ->vec_t<decltype(T() op U()), 2>                                      \
+  /* "vec op scalar" */                                                     \
+  template <typename T>                                                     \
+  inline vec_t<T, 2> name(const vec_t<T, 2> &a, const T &b)                 \
   {                                                                         \
-    using result_t = vec_t<decltype(T() op U()), 2>;                        \
-    return result_t(a.x op b, a.y op b);                                    \
+    return vec_t<T, 2>(a.x op b, a.y op b);                                 \
   }                                                                         \
                                                                             \
+  template <typename T, bool A>                                             \
+  inline vec_t<T, 3> name(const vec_t<T, 3, A> &a, const T &b)              \
+  {                                                                         \
+    return vec_t<T, 3>(a.x op b, a.y op b, a.z op b);                       \
+  }                                                                         \
+                                                                            \
+  template <typename T>                                                     \
+  inline vec_t<T, 4> name(const vec_t<T, 4> &a, const T &b)                 \
+  {                                                                         \
+    return vec_t<T, 4>(a.x op b, a.y op b, a.z op b, a.w op b);             \
+  }                                                                         \
+                                                                            \
+  /* "vec<T, N> op U" (element types don't match) */                        \
   template <typename T,                                                     \
+            typename U,                                                     \
+            int N,                                                          \
             bool A,                                                         \
-            typename U = T,                                                 \
-            typename =                                                      \
-                traits::is_valid_scalar_for_binary_op_t<vec_t<T, 3, A>, U>> \
-  inline auto name(const vec_t<T, 3, A> &a, const U &b)                     \
-      ->vec_t<decltype(T() op U()), 3, A>                                   \
+            typename = traits::is_not_same_t<T, U>>                         \
+  inline auto name(const vec_t<T, N, A> &a, const U &b)                     \
+      ->vec_t<decltype(T() op U()), N, A>                                   \
   {                                                                         \
-    using result_t = vec_t<decltype(T() op U()), 3, A>;                     \
-    return result_t(a.x op b, a.y op b, a.z op b);                          \
+    using scalar_t = decltype(T() op U());                                  \
+    using vector_t = vec_t<scalar_t, N, A>;                                 \
+    return vector_t(vector_t(a) op scalar_t(b));                            \
   }                                                                         \
                                                                             \
-  template <typename T,                                                     \
-            typename U = T,                                                 \
-            typename =                                                      \
-                traits::is_valid_scalar_for_binary_op_t<vec_t<T, 4>, U>>    \
-  inline auto name(const vec_t<T, 4> &a, const U &b)                        \
-      ->vec_t<decltype(T() op U()), 4>                                      \
+  /* "scalar op vec" */                                                     \
+  template <typename T>                                                     \
+  inline vec_t<T, 2> name(const T &a, const vec_t<T, 2> &b)                 \
   {                                                                         \
-    using result_t = vec_t<decltype(T() op U()), 4>;                        \
-    return result_t(a.x op b, a.y op b, a.z op b, a.w op b);                \
+    return vec_t<T, 2>(a op b.x, a op b.y);                                 \
   }                                                                         \
                                                                             \
-  /* "scalar op vec" (SFINAE out scalar types which are ill-formed) */      \
-  template <typename T,                                                     \
-            typename U = T,                                                 \
-            typename =                                                      \
-                traits::is_valid_scalar_for_binary_op_t<vec_t<T, 2>, U>>    \
-  inline auto name(const U &a, const vec_t<T, 2> &b)                        \
-      ->vec_t<decltype(U() op T()), 2>                                      \
+  template <typename T, bool A>                                             \
+  inline vec_t<T, 3> name(const T &a, const vec_t<T, 3, A> &b)              \
   {                                                                         \
-    using result_t = vec_t<decltype(U() op T()), 2>;                        \
-    return result_t(a op b.x, a op b.y);                                    \
+    return vec_t<T, 3>(a op b.x, a op b.y, a op b.z);                       \
   }                                                                         \
                                                                             \
+  template <typename T>                                                     \
+  inline vec_t<T, 4> name(const T &a, const vec_t<T, 4> &b)                 \
+  {                                                                         \
+    return vec_t<T, 4>(a op b.x, a op b.y, a op b.z, a op b.w);             \
+  }                                                                         \
+                                                                            \
+  /* "T op vec<U, N>" (element types don't match) */                        \
   template <typename T,                                                     \
+            typename U,                                                     \
+            int N,                                                          \
             bool A,                                                         \
-            typename U = T,                                                 \
-            typename =                                                      \
-                traits::is_valid_scalar_for_binary_op_t<vec_t<T, 3, A>, U>> \
-  inline auto name(const U &a, const vec_t<T, 3, A> &b)                     \
-      ->vec_t<decltype(U() op T()), 3, A>                                   \
+            typename = traits::is_not_same_t<T, U>>                         \
+  inline auto name(const T &a, const vec_t<U, N, A> &b)                     \
+      ->vec_t<decltype(T() op U()), N, A>                                   \
   {                                                                         \
-    using result_t = vec_t<decltype(U() op T()), 3, A>;                     \
-    return result_t(a op b.x, a op b.y, a op b.z);                          \
-  }                                                                         \
-                                                                            \
-  template <typename T,                                                     \
-            typename U = T,                                                 \
-            typename =                                                      \
-                traits::is_valid_scalar_for_binary_op_t<vec_t<T, 4>, U>>    \
-  inline auto name(const U &a, const vec_t<T, 4> &b)                        \
-      ->vec_t<decltype(U() op T()), 4>                                      \
-  {                                                                         \
-    using result_t = vec_t<decltype(U() op T()), 4>;                        \
-    return result_t(a op b.x, a op b.y, a op b.z, a op b.w);                \
+    using scalar_t = decltype(T() op U());                                  \
+    using vector_t = vec_t<scalar_t, N, A>;                                 \
+    return vector_t(scalar_t(a) op vector_t(b));                            \
   }
 
         // clang-format off
@@ -792,7 +779,7 @@ namespace rkcommon {
     template <typename T, int N, bool A>
     inline vec_t<T, N, A> safe_normalize(const vec_t<T, N, A> &v)
     {
-      return v * rsqrt(max(1e-6f, dot(v, v)));
+      return v * rsqrt(max(T(1e-6), dot(v, v)));
     }
 
     // -------------------------------------------------------
@@ -801,7 +788,7 @@ namespace rkcommon {
 
     // barycentric interpolation
     template <typename T, int N, bool A>
-    inline vec_t<T, N, A> interpolate_uv(const vec_t<float, 3> &f,
+    inline vec_t<T, N, A> interpolate_uv(const vec_t<T, 3> &f,
                                          const vec_t<T, N, A> &a,
                                          const vec_t<T, N, A> &b,
                                          const vec_t<T, N, A> &c)

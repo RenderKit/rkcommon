@@ -172,13 +172,15 @@ macro(rkcommon_create_tasking_target FROM_INSTALL)
       # CMP0074.
       cmake_policy(SET CMP0074 NEW)
     endif()
-    if (NOT RKCOMMON_TBB_ROOT STREQUAL "")
+    if (DEFINED RKCOMMON_TBB_ROOT AND NOT RKCOMMON_TBB_ROOT STREQUAL "")
+      set(TBB_FIND_PACKAGE_OPTION "ONLY_CMAKE_FIND_ROOT_PATH")
+      set(CMAKE_FIND_ROOT_PATH ${RKCOMMON_TBB_ROOT})
       set(TBB_ROOT ${RKCOMMON_TBB_ROOT})
       list(APPEND CMAKE_PREFIX_PATH ${RKCOMMON_TBB_ROOT})
     endif()
 
     # Try getting TBB via config first
-    find_package(TBB 2021.1 QUIET COMPONENTS tbb tbbmalloc CONFIG)
+    find_package(TBB 2021.1 QUIET COMPONENTS tbb tbbmalloc CONFIG ${TBB_FIND_PACKAGE_OPTION})
     if (TBB_FOUND)
       list(APPEND RKCOMMON_TASKING_LIBS TBB::tbb TBB::tbbmalloc)
       set(RKCOMMON_TASKING_DEFINITIONS RKCOMMON_TASKING_TBB)
