@@ -1,10 +1,11 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include "library.h"
 #include "FileName.h"
 
-// std
+#include <algorithm>
+
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -108,7 +109,7 @@ namespace rkcommon {
     }
 #else
     std::string fullName = libLocation + "lib" + file + RKCOMMON_LIB_EXT;
-    lib = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
+    lib                  = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
     if (lib == nullptr)
       errorMsg = dlerror();
 #endif
@@ -159,8 +160,10 @@ namespace rkcommon {
 
   LibraryRepository::~LibraryRepository()
   {
-    for (auto &l : repo)
-      delete l.second;
+    // Close libraries in the opposite order that they were opened
+    while (!repo.empty()) {
+      repo.pop_back();
+    }
   }
 
   void LibraryRepository::add(const std::string &name, bool anchor)
@@ -168,23 +171,23 @@ namespace rkcommon {
     if (libraryExists(name))
       return;  // lib already loaded.
 
-    repo[name] = new Library(name, anchor);
+    repo.push_back(rkcommon::make_unique<Library>(name, anchor));
   }
 
   void LibraryRepository::remove(const std::string &name)
   {
-    if (!libraryExists(name))
-      return;
-
-    delete repo[name];
-    repo.erase(name);
+    auto lib = findLibrary(name);
+    if (lib != repo.end()) {
+      repo.erase(lib);
+    }
   }
 
   void *LibraryRepository::getSymbol(const std::string &name) const
   {
     void *sym = nullptr;
-    for (auto lib = repo.cbegin(); sym == nullptr && lib != repo.end(); ++lib)
-      sym = lib->second->getSymbol(name);
+    for (auto lib = repo.cbegin(); sym == nullptr && lib != repo.end(); ++lib) {
+      sym = (*lib)->getSymbol(name);
+    }
 
     return sym;
   }
@@ -195,7 +198,7 @@ namespace rkcommon {
     // OSPRay core lib
 #ifdef _WIN32
     // look in exe (i.e. when OSPRay is linked statically into the application)
-    repo["exedefault"] = new Library(GetModuleHandle(0));
+    repo.push_back(rkcommon::make_unique<Library>(GetModuleHandle(0)));
 
     // look in ospray.dll (i.e. when linked dynamically)
 #if 0
@@ -209,16 +212,36 @@ namespace rkcommon {
     VirtualQuery(functionInOSPRayDLL, &mbi, sizeof(mbi));
     repo["dlldefault"] = new Library(mbi.AllocationBase);
 #else
-    repo["ospray"] = new Library(std::string("ospray"));
+    repo.push_back(rkcommon::make_unique<Library>(std::string("ospray")));
 #endif
 #else
-    repo["ospray"] = new Library(RTLD_DEFAULT);
+    repo.push_back(rkcommon::make_unique<Library>(RTLD_DEFAULT));
 #endif
   }
 
   bool LibraryRepository::libraryExists(const std::string &name) const
   {
-    return repo.find(name) != repo.end();
+    return findLibrary(name) != repo.end();
+  }
+
+  LibraryRepository::const_library_iterator_t LibraryRepository::findLibrary(
+      const std::string &name) const
+  {
+    auto fnd = std::find_if(
+        repo.begin(), repo.end(), [&](const std::unique_ptr<Library> &l) {
+          return l->libraryName == name;
+        });
+    return fnd;
+  }
+
+  LibraryRepository::library_iterator_t LibraryRepository::findLibrary(
+      const std::string &name)
+  {
+    auto fnd = std::find_if(
+        repo.begin(), repo.end(), [&](const std::unique_ptr<Library> &l) {
+          return l->libraryName == name;
+        });
+    return fnd;
   }
 
 }  // namespace rkcommon

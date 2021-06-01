@@ -1,11 +1,11 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include "../common.h"
 // std
-#include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace rkcommon {
 
@@ -28,7 +28,11 @@ namespace rkcommon {
     std::string errorMessage;
     void *lib{nullptr};
     bool freeLibOnDelete{true};
+
     friend class LibraryRepository;
+
+    template <typename T, typename... Args>
+    friend inline std::unique_ptr<T> make_unique(Args &&... args);
   };
 
   class RKCOMMON_INTERFACE LibraryRepository
@@ -38,6 +42,9 @@ namespace rkcommon {
     static void cleanupInstance();
 
     ~LibraryRepository();
+
+    LibraryRepository(const LibraryRepository &) = delete;
+    LibraryRepository &operator=(const LibraryRepository &) = delete;
 
     // add/remove a library to/from the repo
     void add(const std::string &name, bool anchor = false);
@@ -52,8 +59,16 @@ namespace rkcommon {
     bool libraryExists(const std::string &name) const;
 
    private:
+    using const_library_iterator_t =
+        std::vector<std::unique_ptr<Library>>::const_iterator;
+    using library_iterator_t = std::vector<std::unique_ptr<Library>>::iterator;
+
+    const_library_iterator_t findLibrary(const std::string &name) const;
+    library_iterator_t findLibrary(const std::string &name);
+
     static std::unique_ptr<LibraryRepository> instance;
     LibraryRepository() = default;
-    std::map<std::string, Library *> repo;
+
+    std::vector<std::unique_ptr<Library>> repo;
   };
 }  // namespace rkcommon
