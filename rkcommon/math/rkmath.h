@@ -34,7 +34,7 @@ namespace std {
 #endif
 #endif
 
-#if defined(__ARM_NEON)
+#if not defined(_WIN32) and defined(__ARM_NEON)
 #include "arm/emulation.h"
 #endif
 
