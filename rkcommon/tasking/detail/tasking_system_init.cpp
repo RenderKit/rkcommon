@@ -17,7 +17,11 @@
 // std
 #include <thread>
 // intrinsics
+#if not defined(__ARM_NEON)
 #include <xmmintrin.h>
+#elif not defined(_WIN32)
+#include "math/arm/emulation.h"
+#endif
 // rkcommon
 #include "../../common.h"
 
