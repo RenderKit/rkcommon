@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -58,24 +58,24 @@ namespace rkcommon {
     __forceinline float rcp(const float x)
     {
       const __m128 a = _mm_set_ss(x);
-      const __m128 r = _mm_rcp_ps(a);
+      const __m128 r = _mm_rcp_ss(a);
       return _mm_cvtss_f32(
-          _mm_mul_ps(r, _mm_sub_ps(_mm_set_ss(2.0f), _mm_mul_ps(r, a))));
+          _mm_mul_ss(r, _mm_sub_ss(_mm_set_ss(2.0f), _mm_mul_ss(r, a))));
     }
 
     __forceinline float rcp_safe(float f)
     {
-      return rcp((std::abs(f) >= 1e-18f) ? f : 1e-18f);
+      return rcp(std::abs(f) < flt_min ? (f >= 0.f ? flt_min : -flt_min) : f);
     }
 
     __forceinline float rsqrt(const float x)
     {
       const __m128 a = _mm_set_ss(x);
-      const __m128 r = _mm_rsqrt_ps(a);
-      const __m128 c = _mm_add_ps(
-          _mm_mul_ps(_mm_set_ps1(1.5f), r),
-          _mm_mul_ps(_mm_mul_ps(_mm_mul_ps(a, _mm_set_ps1(-0.5f)), r),
-                     _mm_mul_ps(r, r)));
+      const __m128 r = _mm_rsqrt_ss(a);
+      const __m128 c =
+          _mm_add_ss(_mm_mul_ss(_mm_set_ss(1.5f), r),
+                     _mm_mul_ss(_mm_mul_ss(_mm_mul_ss(a, _mm_set_ss(-0.5f)), r),
+                                _mm_mul_ss(r, r)));
       return _mm_cvtss_f32(c);
     }
 
