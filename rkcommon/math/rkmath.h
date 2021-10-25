@@ -28,13 +28,13 @@ namespace std {
 }  // namespace std
 #endif
 #else
-#if not defined(__ARM_NEON)
+#if !defined(__ARM_NEON)
 #include <emmintrin.h>
 #include <xmmintrin.h>
 #endif
 #endif
 
-#if not defined(_WIN32) and defined(__ARM_NEON)
+#if !defined(_WIN32) && defined(__ARM_NEON)
 #include "arm/emulation.h"
 #endif
 
