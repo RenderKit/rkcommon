@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -55,7 +55,7 @@ namespace rkcommon {
         return Vector(i, j, k);
       }
 
-      T r, i, j, k;
+      T i, j, k, r;
     };
 
     template <typename T>
@@ -331,7 +331,9 @@ namespace rkcommon {
     }
 
     using quaternionf = QuaternionT<float>;
+    using quatf = QuaternionT<float>;
     using quaterniond = QuaternionT<double>;
+    using quatd = QuaternionT<double>;
 
   }  // namespace math
 }  // namespace rkcommon
