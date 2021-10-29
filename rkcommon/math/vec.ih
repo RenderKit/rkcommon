@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2021 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -595,6 +595,7 @@ __lift_unary_fct(expf);
 __lift_unary_fct(logf);
 __lift_unary_fct(floor);
 __lift_unary_fct(abs);
+__lift_unary_fct(divide_safe);
 __lift_unary_fct(rcp);
 __lift_unary_fct(rcp_safe);
 __lift_unary_fct(exp);
