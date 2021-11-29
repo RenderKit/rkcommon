@@ -139,7 +139,9 @@ namespace rkcommon {
     template <typename T>
     inline IntrusivePtr<T> &IntrusivePtr<T>::operator=(IntrusivePtr &&input)
     {
-      ptr       = input.ptr;
+      if (ptr && ptr != input.ptr)
+        ptr->refDec();
+      ptr = input.ptr;
       input.ptr = nullptr;
       return *this;
     }
