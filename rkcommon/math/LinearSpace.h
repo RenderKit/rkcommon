@@ -440,7 +440,7 @@ namespace rkcommon {
     {
       const T dx0 = cross(T(one, zero, zero), N);
       const T dx1 = cross(T(zero, one, zero), N);
-      const T dx  = normalize(select(dot(dx0, dx0) > dot(dx1, dx1), dx0, dx1));
+      const T dx  = normalize(dot(dx0, dx0) > dot(dx1, dx1) ?  dx0 : dx1);
       const T dy  = normalize(cross(N, dx));
       return LinearSpace3<T>(dx, dy, N);
     }
