@@ -43,6 +43,7 @@ rkcommon_create_tasking_target(FALSE)
 ## Build options and specific configuration ##
 
 option(BUILD_SHARED_LIBS "Build rkcommon as a shared library" ON)
+option(RKCOMMON_ADDRSAN "Build rkcommon with dlclose disabled for addrsan" OFF)
 
 include(CTest)
 

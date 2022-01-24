@@ -55,6 +55,10 @@ endif()
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${EXTRA_COMPILE_DEFINITIONS})
 
+if (RKCOMMON_ADDRSAN)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC -DRKCOMMON_ADDRSAN)
+endif()
+
 set_property(TARGET rkcommon PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 ## Install library + targets ##################################################
