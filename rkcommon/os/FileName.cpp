@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include "FileName.h"
@@ -47,6 +47,21 @@ namespace rkcommon {
     if (home)
       return home;
     return "";
+  }
+
+  /*! returns the canonical absolute path to filename */
+  FileName FileName::canonical()
+  {
+    /* pre-C++17 implementation of std::filesystem::canonical */
+    char *cTemp = nullptr;
+#ifdef _WIN32
+    cTemp = _fullpath(NULL, filename.c_str(), 0);
+#else // POSIX
+    cTemp = realpath(filename.c_str(), NULL);
+#endif
+    rkcommon::FileName canonical(cTemp ? cTemp : "");
+    free(cTemp);
+    return canonical;
   }
 
   /*! returns the path */
