@@ -1,4 +1,4 @@
-## Copyright 2009-2021 Intel Corporation
+## Copyright 2009-2022 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 ## Global CMake options ##
@@ -18,7 +18,7 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 ## Establish project ##
 
-project(rkcommon VERSION 1.8.0 LANGUAGES CXX)
+project(rkcommon VERSION 1.9.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
@@ -43,6 +43,8 @@ rkcommon_create_tasking_target(FALSE)
 ## Build options and specific configuration ##
 
 option(BUILD_SHARED_LIBS "Build rkcommon as a shared library" ON)
+option(RKCOMMON_ADDRSAN "Build rkcommon with dlclose disabled for addrsan" OFF)
+option(RKCOMMON_NO_SIMD "Build rkcommon not using SIMD instructions" OFF)
 
 include(CTest)
 

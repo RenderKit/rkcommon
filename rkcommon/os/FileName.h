@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -40,6 +40,10 @@ namespace rkcommon {
     {
       return filename.c_str();
     }
+
+    /*! returns the canonical absolute path to filename */
+    /*! pre-C++17 implementation of std::filesystem::canonical */
+    RKCOMMON_INTERFACE FileName canonical();
 
     /*! returns the path of a filename with separator at the end */
     RKCOMMON_INTERFACE std::string path() const;

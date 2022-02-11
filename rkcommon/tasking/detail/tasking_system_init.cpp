@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009-2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include "../tasking_system_init.h"
@@ -14,17 +14,17 @@
 #elif defined(RKCOMMON_TASKING_INTERNAL)
 #include "TaskSys.h"
 #endif
+
 // std
 #include <thread>
+
 // intrinsics
+#ifndef RKCOMMON_NO_SIMD
 #if !defined(__ARM_NEON)
 #include <xmmintrin.h>
 #elif !defined(_WIN32)
 #include "math/arm/emulation.h"
 #endif
-// rkcommon
-#include "../../common.h"
-
 /* normally defined in pmmintrin.h, but we always need this */
 #if !defined(_MM_SET_DENORMALS_ZERO_MODE)
 #define _MM_DENORMALS_ZERO_ON (0x0040)
@@ -33,6 +33,19 @@
 #define _MM_SET_DENORMALS_ZERO_MODE(x) \
   (_mm_setcsr((_mm_getcsr() & ~_MM_DENORMALS_ZERO_MASK) | (x)))
 #endif
+#else
+#if !defined(_MM_SET_DENORMALS_ZERO_MODE)
+#define _MM_SET_FLUSH_ZERO_MODE(x)                                             \
+  do {                                                                         \
+  } while (0)
+#define _MM_SET_DENORMALS_ZERO_MODE(x)                                         \
+  do {                                                                         \
+  } while (0)
+#endif
+#endif
+
+// rkcommon
+#include "../../common.h"
 
 namespace rkcommon {
   namespace tasking {

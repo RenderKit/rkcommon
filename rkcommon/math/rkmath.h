@@ -1,4 +1,4 @@
-// Copyright 2009-2021 Intel Corporation
+// Copyright 2009-2022 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -9,9 +9,19 @@
 #include <algorithm>  // std::min()/std::max() on Windows
 #include <cmath>
 
-#ifdef _WIN32
+// Include vector intrinsics
+#ifndef RKCOMMON_NO_SIMD
+#if defined(_WIN32)
 #include <intrin.h>
-#if (__MSV_VER <= 1700)
+#elif defined(__ARM_NEON)
+#include "arm/emulation.h"
+#else
+#include <emmintrin.h>
+#include <xmmintrin.h>
+#endif
+#endif
+
+#if defined(_WIN32) && (__MSV_VER <= 1700)
 namespace std {
   __forceinline bool isinf(const float x)
   {
@@ -26,16 +36,6 @@ namespace std {
     return _finite(x);
   }
 }  // namespace std
-#endif
-#else
-#if !defined(__ARM_NEON)
-#include <emmintrin.h>
-#include <xmmintrin.h>
-#endif
-#endif
-
-#if !defined(_WIN32) && defined(__ARM_NEON)
-#include "arm/emulation.h"
 #endif
 
 namespace rkcommon {
@@ -57,10 +57,14 @@ namespace rkcommon {
 
     __forceinline float rcp(const float x)
     {
+#ifdef RKCOMMON_NO_SIMD
+      return 1.f / x;
+#else
       const __m128 a = _mm_set_ss(x);
       const __m128 r = _mm_rcp_ss(a);
       return _mm_cvtss_f32(
           _mm_mul_ss(r, _mm_sub_ss(_mm_set_ss(2.0f), _mm_mul_ss(r, a))));
+#endif
     }
 
     __forceinline float rcp_safe(float f)
@@ -70,6 +74,9 @@ namespace rkcommon {
 
     __forceinline float rsqrt(const float x)
     {
+#ifdef RKCOMMON_NO_SIMD
+      return 1.f / std::sqrt(x);
+#else
       const __m128 a = _mm_set_ss(x);
       const __m128 r = _mm_rsqrt_ss(a);
       const __m128 c =
@@ -77,6 +84,7 @@ namespace rkcommon {
                      _mm_mul_ss(_mm_mul_ss(_mm_mul_ss(a, _mm_set_ss(-0.5f)), r),
                                 _mm_mul_ss(r, r)));
       return _mm_cvtss_f32(c);
+#endif
     }
 
     template <typename T>

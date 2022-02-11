@@ -125,6 +125,11 @@ namespace rkcommon {
 
   Library::~Library()
   {
+    /* Only dlclose/free libraries if we're not running through addrsan
+     * so that the shared library symbols remain accessible to addrsan
+     * at exit (see https://github.com/google/sanitizers/issues/89)
+     */
+#ifndef RKCOMMON_ADDRSAN
     if (freeLibOnDelete && lib) {
 #ifdef _WIN32
       FreeLibrary((HMODULE)lib);
@@ -132,6 +137,7 @@ namespace rkcommon {
       dlclose(lib);
 #endif
     }
+#endif
   }
 
   void *Library::getSymbol(const std::string &sym) const

@@ -1,4 +1,4 @@
-## Copyright 2009-2021 Intel Corporation
+## Copyright 2009-2022 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 if (RKCOMMON_TASKING_INTERNAL)
@@ -54,6 +54,14 @@ if (WIN32)
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${EXTRA_COMPILE_DEFINITIONS})
+
+if (RKCOMMON_ADDRSAN)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC -DRKCOMMON_ADDRSAN)
+endif()
+
+if (RKCOMMON_NO_SIMD)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC -DRKCOMMON_NO_SIMD)
+endif()
 
 set_property(TARGET rkcommon PROPERTY POSITION_INDEPENDENT_CODE ON)
 
