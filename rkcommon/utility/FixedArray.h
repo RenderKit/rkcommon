@@ -44,8 +44,6 @@ namespace rkcommon {
       FixedArray &operator=(std::vector<T> &rhs);
 
      private:
-      void setPtr(size_t size);
-
       // We use a shared ptr to actually manage lifetime the data lifetime
       std::shared_ptr<T> array = nullptr;
     };
@@ -56,7 +54,7 @@ namespace rkcommon {
     inline FixedArray<T>::FixedArray(size_t _size)
         : array(std::shared_ptr<T>(new T[_size], std::default_delete<T[]>()))
     {
-      setPtr(_size);
+      AbstractArray<T>::setPtr(array.get(), _size);
     }
 
     template <typename T>
@@ -91,7 +89,7 @@ namespace rkcommon {
     inline FixedArray<T> &FixedArray<T>::operator=(std::array<T, SIZE> &rhs)
     {
       array = std::shared_ptr<T>(new T[rhs.size()], std::default_delete<T[]>());
-      setPtr(rhs.size());
+      AbstractArray<T>::setPtr(array.get(), rhs.size());
       if (rhs.data() && rhs.size() > 0)
         std::memcpy(array.get(), rhs.data(), rhs.size() * sizeof(T));
       return *this;
@@ -101,17 +99,10 @@ namespace rkcommon {
     inline FixedArray<T> &FixedArray<T>::operator=(std::vector<T> &rhs)
     {
       array = std::shared_ptr<T>(new T[rhs.size()], std::default_delete<T[]>());
-      setPtr(rhs.size());
+      AbstractArray<T>::setPtr(array.get(), rhs.size());
       if (rhs.data() && rhs.size() > 0)
         std::memcpy(array.get(), rhs.data(), rhs.size() * sizeof(T));
       return *this;
-    }
-
-    template <typename T>
-    inline void FixedArray<T>::setPtr(size_t size)
-    {
-      this->ptr      = array.get();
-      this->numItems = size;
     }
 
   }  // namespace utility

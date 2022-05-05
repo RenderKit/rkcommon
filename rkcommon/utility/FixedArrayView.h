@@ -39,8 +39,7 @@ namespace rkcommon {
                                       size_t size)
         : data(_data)
     {
-      this->ptr      = data->begin() + offset;
-      this->numItems = size;
+      AbstractArray<T>::setPtr(data->begin() + offset, size);
     }
 
   }  // namespace utility

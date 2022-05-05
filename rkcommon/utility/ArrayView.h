@@ -36,9 +36,6 @@ namespace rkcommon {
       ArrayView &operator=(std::array<T, SIZE> &rhs);
 
       ArrayView &operator=(std::vector<T> &rhs);
-
-     private:
-      void setPtr(T *data, size_t size);
     };
 
     // Inlined ArrayView definitions //////////////////////////////////////////
@@ -46,54 +43,47 @@ namespace rkcommon {
     template <typename T>
     inline ArrayView<T>::ArrayView(T *_data, size_t _size)
     {
-      setPtr(_data, _size);
+      AbstractArray<T>::setPtr(_data, _size);
     }
 
     template <typename T>
     template <size_t SIZE>
     inline ArrayView<T>::ArrayView(std::array<T, SIZE> &init)
     {
-      setPtr(init.data(), init.size());
+      AbstractArray<T>::setPtr(init.data(), init.size());
     }
 
     template <typename T>
     inline ArrayView<T>::ArrayView(std::vector<T> &init)
     {
-      setPtr(init.data(), init.size());
+      AbstractArray<T>::setPtr(init.data(), init.size());
     }
 
     template <typename T>
     inline void ArrayView<T>::reset()
     {
-      setPtr(nullptr, 0);
+      AbstractArray<T>::setPtr(nullptr, 0);
     }
 
     template <typename T>
     inline void ArrayView<T>::reset(T *_data, size_t _size)
     {
-      setPtr(_data, _size);
+      AbstractArray<T>::setPtr(_data, _size);
     }
 
     template <typename T>
     template <size_t SIZE>
     inline ArrayView<T> &ArrayView<T>::operator=(std::array<T, SIZE> &rhs)
     {
-      setPtr(rhs.data(), rhs.size());
+      AbstractArray<T>::setPtr(rhs.data(), rhs.size());
       return *this;
     }
 
     template <typename T>
     inline ArrayView<T> &ArrayView<T>::operator=(std::vector<T> &rhs)
     {
-      setPtr(rhs.data(), rhs.size());
+      AbstractArray<T>::setPtr(rhs.data(), rhs.size());
       return *this;
-    }
-
-    template <typename T>
-    inline void ArrayView<T>::setPtr(T *data, size_t size)
-    {
-      this->ptr      = data;
-      this->numItems = size;
     }
 
     // ArrayView utility functions ////////////////////////////////////////////

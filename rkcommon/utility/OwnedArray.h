@@ -39,8 +39,6 @@ namespace rkcommon {
       void resize(size_t size, const T &val);
 
      private:
-      void setPtr();
-
       std::vector<T> dataBuf;
     };
 
@@ -50,7 +48,7 @@ namespace rkcommon {
     inline OwnedArray<T>::OwnedArray(T *_data, size_t _size)
         : dataBuf(_data, _data + _size)
     {
-      setPtr();
+      AbstractArray<T>::setPtr(dataBuf.data(), dataBuf.size());
     }
 
     template <typename T>
@@ -58,13 +56,13 @@ namespace rkcommon {
     inline OwnedArray<T>::OwnedArray(std::array<T, SIZE> &init)
         : dataBuf(init.begin(), init.end())
     {
-      setPtr();
+      AbstractArray<T>::setPtr(dataBuf.data(), dataBuf.size());
     }
 
     template <typename T>
     inline OwnedArray<T>::OwnedArray(std::vector<T> &init) : dataBuf(init)
     {
-      setPtr();
+      AbstractArray<T>::setPtr(dataBuf.data(), dataBuf.size());
     }
 
     template <typename T>
@@ -72,7 +70,7 @@ namespace rkcommon {
     inline OwnedArray<T> &OwnedArray<T>::operator=(std::array<T, SIZE> &rhs)
     {
       dataBuf = std::vector<T>(rhs.begin(), rhs.end());
-      setPtr();
+      AbstractArray<T>::setPtr(dataBuf.data(), dataBuf.size());
       return *this;
     }
 
@@ -80,7 +78,7 @@ namespace rkcommon {
     inline OwnedArray<T> &OwnedArray<T>::operator=(std::vector<T> &rhs)
     {
       dataBuf = std::vector<T>(rhs.begin(), rhs.end());
-      setPtr();
+      AbstractArray<T>::setPtr(dataBuf.data(), dataBuf.size());
       return *this;
     }
 
@@ -89,27 +87,21 @@ namespace rkcommon {
     {
       dataBuf.clear();
       dataBuf.shrink_to_fit();
+      AbstractArray<T>::setPtr(nullptr, 0);
     }
 
     template <typename T>
     inline void OwnedArray<T>::reset(T *_data, size_t _size)
     {
       dataBuf = std::vector<T>(_data, _data + _size);
-      setPtr();
+      AbstractArray<T>::setPtr(dataBuf.data(), dataBuf.size());
     }
 
     template <typename T>
     inline void OwnedArray<T>::resize(size_t size, const T &val)
     {
       dataBuf.resize(size, val);
-      setPtr();
-    }
-
-    template <typename T>
-    inline void OwnedArray<T>::setPtr()
-    {
-      this->ptr      = dataBuf.data();
-      this->numItems = dataBuf.size();
+      AbstractArray<T>::setPtr(dataBuf.data(), dataBuf.size());
     }
 
   }  // namespace utility
