@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 /*! \file ArgumentList.h Defines an interface for storing - and consuming -

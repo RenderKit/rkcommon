@@ -1,4 +1,4 @@
-// Copyright 2016-2022 Intel Corporation
+// Copyright 2016 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #include "rkcommon/version.h"
@@ -24,7 +24,7 @@ BEGIN
             VALUE "FileDescription", "Intel® oneAPI Rendering Toolkit Common Library"
             VALUE "FileVersion", RKCOMMON_VERSION
             VALUE "ProductVersion", RKCOMMON_VERSION
-            VALUE "LegalCopyright", "© 2009-2022 Intel Corporation"
+            VALUE "LegalCopyright", "© 2009 Intel Corporation"
             VALUE "InternalName", "rkCommon"
             VALUE "ProductName", "rkCommon"
         END
