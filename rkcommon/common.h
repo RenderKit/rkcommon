@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -7,6 +7,7 @@
 #include "platform.h"
 // std
 #include <string>
+#include <vector>
 
 #ifdef _WIN32
 // ----------- windows only -----------
@@ -67,6 +68,12 @@ namespace rkcommon {
   inline std::unique_ptr<T> make_unique(Args &&... args)
   {
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+  }
+
+  template <typename T, typename A>
+  T *getDataSafe(std::vector<T, A> &v)
+  {
+    return v.empty() ? nullptr : v.data();
   }
 
 }  // namespace rkcommon

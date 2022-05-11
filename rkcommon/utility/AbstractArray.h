@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -41,6 +41,10 @@ namespace rkcommon {
       // Can only be constructed by child classes
       AbstractArray() = default;
 
+      // Called by children to initialize the ptr/numItems values
+      void setPtr(T *ptr, size_t numItems);
+
+     private:
       T *ptr{nullptr};
       size_t numItems{0};
     };
@@ -108,6 +112,12 @@ namespace rkcommon {
     inline const T *AbstractArray<T>::cend() const
     {
       return end();
+    }
+
+    template<typename T>
+    inline void AbstractArray<T>::setPtr(T *ptr, size_t numItems) {
+      this->ptr = numItems > 0 ? ptr : nullptr;
+      this->numItems = numItems;
     }
 
   }  // namespace utility

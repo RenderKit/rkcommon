@@ -1,4 +1,4 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
@@ -39,8 +39,7 @@ namespace rkcommon {
                                       size_t size)
         : data(_data)
     {
-      this->ptr      = data->begin() + offset;
-      this->numItems = size;
+      AbstractArray<T>::setPtr(data->begin() + offset, size);
     }
 
   }  // namespace utility

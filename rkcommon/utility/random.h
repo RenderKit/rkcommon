@@ -1,10 +1,11 @@
-// Copyright 2009-2020 Intel Corporation
+// Copyright 2009 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
 
 #include <cmath>
 #include "../common.h"
+#include "../math/vec.h"
 #include "detail/pcg_random.hpp"
 
 namespace rkcommon {
@@ -61,6 +62,17 @@ namespace rkcommon {
      private:
       T l, u;
     };
+
+    inline math::vec3f makeRandomColor(const unsigned int i)
+    {
+      const unsigned int mx = 13 * 17 * 43;
+      const unsigned int my = 11 * 29;
+      const unsigned int mz = 7 * 23 * 63;
+      const unsigned int g = (i * (3 * 5 * 127) + 12312314);
+      return math::vec3f((g % mx) * (1.f / (mx - 1)),
+          (g % my) * (1.f / (my - 1)),
+          (g % mz) * (1.f / (mz - 1)));
+    }
 
   }  // namespace utility
 }  // namespace rkcommon

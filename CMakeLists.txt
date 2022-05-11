@@ -1,4 +1,4 @@
-## Copyright 2009-2022 Intel Corporation
+## Copyright 2009 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
 ## Global CMake options ##
@@ -18,7 +18,7 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 ## Establish project ##
 
-project(rkcommon VERSION 1.9.0 LANGUAGES CXX)
+project(rkcommon VERSION 1.10.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
