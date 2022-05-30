@@ -49,12 +49,6 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
-if (WIN32)
-  set(EXTRA_COMPILE_DEFINITIONS -DNOMINMAX -DWIN32_LEAN_AND_MEAN)
-endif()
-
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${EXTRA_COMPILE_DEFINITIONS})
-
 if (RKCOMMON_ADDRSAN)
   target_compile_definitions(${PROJECT_NAME} PUBLIC -DRKCOMMON_ADDRSAN)
 endif()

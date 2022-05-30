@@ -3,7 +3,9 @@
 
 #pragma once
 
+#ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include <stdint.h>
 #include <cassert>
@@ -21,7 +23,15 @@
 
 #ifdef _WIN32
 #include <intrin.h>
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
+#undef NOMINMAX
+#undef WIN32_LEAN_AND_MEAN
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -204,6 +214,9 @@ typedef int32_t ssize_t;
                                  // int' requires a narrowing conversion)
 #pragma warning( \
     disable : 4227)  // anachronism used : qualifiers on reference are ignored
+#pragma warning(                                                               \
+    disable : 4251) // class 'type1' needs to have dll-interface
+                    // to be used by clients of class 'type2'
 #endif
 
 #if defined(__clang__) && !defined(__INTEL_COMPILER)
