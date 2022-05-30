@@ -973,6 +973,30 @@ namespace rkcommon {
       return maxIdx;
     }
 
+    inline vec4f linear_to_srgba(const vec4f c)
+    {
+      return vec4f(linear_to_srgb(c.x),
+          linear_to_srgb(c.y),
+          linear_to_srgb(c.z),
+          std::max(c.w, 0.f)); // alpha is never gamma-corrected
+    }
+
+    inline uint32_t cvt_uint32(const float f)
+    {
+      return (uint32_t)round(255.f * clamp(f, 0.f, 1.f));
+    }
+
+    inline uint32_t cvt_uint32(const vec4f &v)
+    {
+      return (cvt_uint32(v.x) << 0) | (cvt_uint32(v.y) << 8)
+          | (cvt_uint32(v.z) << 16) | (cvt_uint32(v.w) << 24);
+    }
+
+    inline uint32_t linear_to_srgba8(const vec4f c)
+    {
+      return cvt_uint32(linear_to_srgba(c));
+    }
+
   }  // namespace math
 }  // namespace rkcommon
 

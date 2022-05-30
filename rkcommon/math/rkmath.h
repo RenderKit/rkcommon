@@ -123,5 +123,18 @@ namespace rkcommon {
       return (a + b - 1) / b;
     }
 
+#define APPROXIMATE_SRGB
+
+    inline float linear_to_srgb(const float f)
+    {
+      const float c = std::max(f, 0.f);
+#ifdef APPROXIMATE_SRGB
+      return std::pow(c, 1.f / 2.2f);
+#else
+      return c <= 0.0031308f ? 12.92f * c
+                             : std::pow(c, 1.f / 2.4f) * 1.055f - 0.055f;
+#endif
+    }
+
   }  // namespace math
 }  // namespace rkcommon
