@@ -50,7 +50,8 @@ TEST_CASE("Vector unary operators", "[vec]")
   template <typename T>            \
   inline void test_##op()          \
   {                                \
-    REQUIRE(op(T(v)) == T(op(v))); \
+    using Scalar = typename T::scalar_t;   \
+    REQUIRE(op(T(v)) == T(op(Scalar(v)))); \
   }
 
 unary_functor_test(rcp, 0.5);

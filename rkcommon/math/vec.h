@@ -23,9 +23,6 @@ namespace rkcommon {
   namespace traits {
 
     template <typename T>
-    using is_arithmetic_t = enable_if_t<std::is_arithmetic<T>::value>;
-
-    template <typename T>
     struct is_vec
     {
       const static bool value = std::is_base_of<vec_base, T>::value;
@@ -50,7 +47,10 @@ namespace rkcommon {
 
     // vec_t<> types //////////////////////////////////////////////////////////
 
-    template <typename T, int N, bool ALIGN = false>
+    template <typename T,
+      int N,
+      bool ALIGN = false,
+      typename = typename traits::is_arithmetic_t<T>>
     struct vec_t : public vec_base
     {
       using scalar_t = T;

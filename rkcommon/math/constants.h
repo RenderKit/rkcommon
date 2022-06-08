@@ -292,6 +292,18 @@ namespace rkcommon {
       }
     } two_pi MAYBE_UNUSED;
 
+    static struct HalfPiTy
+    {
+      __forceinline operator double() const
+      {
+        return M_PI_2;
+      }
+      __forceinline operator float() const
+      {
+        return M_PI_2;
+      }
+    } half_pi MAYBE_UNUSED;
+
     static struct OneOverTwoPiTy
     {
       __forceinline operator double() const
@@ -315,6 +327,18 @@ namespace rkcommon {
         return 4.0 * M_PI;
       }
     } four_pi MAYBE_UNUSED;
+
+    static struct QuarterPiTy
+    {
+      __forceinline operator double() const
+      {
+        return M_PI_4;
+      }
+      __forceinline operator float() const
+      {
+        return M_PI_4;
+      }
+    } quarter_pi MAYBE_UNUSED;
 
     static struct OneOverFourPiTy
     {

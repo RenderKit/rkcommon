@@ -67,6 +67,11 @@ namespace rkcommon {
 #endif
     }
 
+    __forceinline double rcp(const double x)
+    {
+      return 1. / x;
+    }
+
     __forceinline float rcp_safe(float f)
     {
       return rcp(std::abs(f) < flt_min ? (f >= 0.f ? flt_min : -flt_min) : f);
@@ -85,6 +90,11 @@ namespace rkcommon {
                                 _mm_mul_ss(r, r)));
       return _mm_cvtss_f32(c);
 #endif
+    }
+
+    __forceinline double rsqrt(const double x)
+    {
+      return 1. / std::sqrt(x);
     }
 
     template <typename T>

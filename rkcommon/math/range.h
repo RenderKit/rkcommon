@@ -81,11 +81,6 @@ namespace rkcommon {
           const std::string &string,
           const range_t<T> &defaultValue = rkcommon::math::empty);
 
-      inline vec_t<T, 2> toVec2() const
-      {
-        return vec_t<T, 2>(lower, upper);
-      }
-
       inline bool empty() const
       {
         return anyLessThan(upper, lower);

@@ -132,5 +132,10 @@ namespace rkcommon {
     template <typename FROM, typename TO>
     using can_convert_t = enable_if_t<can_convert<FROM, TO>::value>;
 
+    // type 'T' is arithmetic /////////////////////////////////////////////////
+
+    template <typename T>
+    using is_arithmetic_t = enable_if_t<std::is_arithmetic<T>::value>;
+
   }  // namespace traits
 }  // namespace rkcommon
