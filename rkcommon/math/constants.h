@@ -16,12 +16,6 @@ namespace rkcommon {
   namespace math {
 
     static const float one_over_255 = 1.0f / 255.0f;
-    // smallest positive normal number 2^-126=0x1p-126 (needs a C++17 compiler)
-    static const float flt_min = 1.17549435e-38;
-
-    /* we consider floating point numbers in that range as valid input numbers
-     */
-    static float FLT_LARGE = 1.844E18f;
 
     static struct ZeroTy
     {

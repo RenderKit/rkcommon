@@ -779,7 +779,7 @@ namespace rkcommon {
     template <typename T, int N, bool A>
     inline vec_t<T, N, A> safe_normalize(const vec_t<T, N, A> &v)
     {
-      return v * rsqrt(max(T(1e-6), dot(v, v)));
+      return v * rsqrt(max(T(ulp), dot(v, v)));
     }
 
     // -------------------------------------------------------

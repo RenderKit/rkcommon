@@ -21,23 +21,6 @@
 #endif
 #endif
 
-#if defined(_WIN32) && (__MSV_VER <= 1700)
-namespace std {
-  __forceinline bool isinf(const float x)
-  {
-    return !_finite(x);
-  }
-  __forceinline bool isnan(const float x)
-  {
-    return _isnan(x);
-  }
-  __forceinline bool isfinite(const float x)
-  {
-    return _finite(x);
-  }
-}  // namespace std
-#endif
-
 namespace rkcommon {
   namespace math {
 
@@ -72,9 +55,21 @@ namespace rkcommon {
       return 1. / x;
     }
 
-    __forceinline float rcp_safe(float f)
+    template <typename T>
+    __forceinline T rcp_safe_t(const T x)
     {
-      return rcp(std::abs(f) < flt_min ? (f >= 0.f ? flt_min : -flt_min) : f);
+      const T flt_min = std::numeric_limits<T>::min();
+      return rcp(std::abs(x) < flt_min ? (x >= 0.f ? flt_min : -flt_min) : x);
+    }
+
+    __forceinline float rcp_safe(const float x)
+    {
+      return rcp_safe_t<float>(x);
+    }
+
+    __forceinline double rcp_safe(const double x)
+    {
+      return rcp_safe_t<double>(x);
     }
 
     __forceinline float rsqrt(const float x)

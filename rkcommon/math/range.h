@@ -27,6 +27,8 @@ namespace rkcommon {
     template <typename T>
     struct range_t
     {
+      using bound_t = T;
+
       range_t() : lower(pos_inf), upper(neg_inf) {}
       range_t(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
       range_t(const ZeroTy &) : lower(zero), upper(zero) {}
@@ -67,9 +69,7 @@ namespace rkcommon {
 
       /*! take given value t, and 'clamp' it to 'this->'range; ie, if it
           already is inside the range return as is, otherwise move it to
-          either lower or upper of this range. Warning: the value
-          returned by this can be 'upper', which is NOT strictly part of
-          the range! */
+          either lower or upper of this range. */
       inline T clamp(const T &t) const
       {
         return max(lower, min(t, upper));
@@ -86,9 +86,9 @@ namespace rkcommon {
         return anyLessThan(upper, lower);
       }
 
-      inline bool contains(const T &vec) const
+      inline bool contains(const T &t) const
       {
-        return !anyLessThan(vec, lower) && !anyLessThan(upper, vec);
+        return !anyLessThan(t, lower) && !anyLessThan(upper, t);
       }
 
       inline operator T*()
@@ -137,6 +137,20 @@ namespace rkcommon {
     inline range_t<T> operator+(const T &translation, const range_t<T> &range)
     {
       return range_t<T>(range.lower + translation, range.upper + translation);
+    }
+
+    // comparison operators ///////////////////////////////////////////////////
+
+    template <typename T>
+    inline bool operator==(const range_t<T> &a, const range_t<T> &b)
+    {
+      return a.lower == b.lower && a.upper == b.upper;
+    }
+
+    template <typename T>
+    inline bool operator!=(const range_t<T> &a, const range_t<T> &b)
+    {
+      return !(a == b);
     }
 
     // range_t aliases ////////////////////////////////////////////////////////

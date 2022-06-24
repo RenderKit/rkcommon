@@ -255,8 +255,8 @@ template <typename T>
 inline void test_normalize()
 {
   using Scalar = typename T::scalar_t;
-  REQUIRE(abs(Scalar(1) - length(normalize(T(1)))) < 1e-6);
-  REQUIRE(abs(Scalar(1) - length(safe_normalize(T(1)))) < 1e-6);
+  REQUIRE(abs(Scalar(1) - length(normalize(T(1)))) <= Scalar(ulp));
+  REQUIRE(abs(Scalar(1) - length(safe_normalize(T(1)))) <= Scalar(ulp));
 }
 
 TEST_CASE("Vector normalize", "[vec]")
