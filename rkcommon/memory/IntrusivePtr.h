@@ -77,11 +77,8 @@ namespace rkcommon {
 
       operator bool() const;
 
-      const T &operator*() const;
-      T &operator*();
-
-      const T *operator->() const;
-      T *operator->();
+      T &operator*() const;
+      T *operator->() const;
     };
 
     // Inlined definitions //
@@ -164,25 +161,13 @@ namespace rkcommon {
     }
 
     template <typename T>
-    inline const T &IntrusivePtr<T>::operator*() const
+    inline T &IntrusivePtr<T>::operator*() const
     {
       return *ptr;
     }
 
     template <typename T>
-    inline T &IntrusivePtr<T>::operator*()
-    {
-      return *ptr;
-    }
-
-    template <typename T>
-    inline const T *IntrusivePtr<T>::operator->() const
-    {
-      return ptr;
-    }
-
-    template <typename T>
-    inline T *IntrusivePtr<T>::operator->()
+    inline T *IntrusivePtr<T>::operator->() const
     {
       return ptr;
     }
