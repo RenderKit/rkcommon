@@ -1,0 +1,141 @@
+## Copyright 2022 Intel Corporation
+## SPDX-License-Identifier: Apache-2.0
+
+name: CI Linux
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  ## Build Jobs ##
+
+  build-centos7:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: centos:7
+      cmd: |
+        gitlab/build.sh
+      artifact-out: build-centos7
+      artifact-path: build
+
+  build-ubuntu1804:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:18.04
+      cmd: |
+        gitlab/build.sh -G Ninja
+      artifact-out: build-ubuntu1804
+      artifact-path: build
+
+  build-ubuntu2004:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:20.04
+      cmd: |
+        gitlab/build.sh -G Ninja
+      artifact-out: build-ubuntu2004
+      artifact-path: build
+
+  build-ubuntu2204:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:22.04
+      cmd: |
+        gitlab/build.sh -G Ninja
+      artifact-out: build-ubuntu2204
+      artifact-path: build
+
+  build-arch:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ospray/docker-images:arch
+      cmd: |
+        gitlab/build.sh -G Ninja
+      artifact-out: build-arch
+      artifact-path: build
+        
+  build-arch-clang:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ospray/docker-images:arch
+      cmd: |
+        export CC=clang
+        export CXX=clang++
+        gitlab/build.sh -G Ninja
+      artifact-out: build-arch-clang
+      artifact-path: build
+
+  ## Functional Test Jobs ##
+
+  test-centos7:
+    needs: build-centos7
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: centos:7
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-centos7
+
+  test-ubuntu1804:
+    needs: build-ubuntu1804
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:18.04
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-ubuntu1804
+
+  test-ubuntu2004:
+    needs: build-ubuntu2004
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:20.04
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-ubuntu2004
+
+  test-ubuntu2204:
+    needs: build-ubuntu2204
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:22.04
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-ubuntu2204
+
+  test-arch:
+    needs: build-arch
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ospray/docker-images:arch
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-arch
+
+  test-arch-clang:
+    needs: build-arch-clang
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ospray/docker-images:arch
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-arch-clang
+
+  ## Static Analysis ##
+
+  static-analysis:
+    secrets: inherit
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/static_analysis.yml@main
+    with:
+      project: rkcommon
+      prebuild: |
+        mkdir build
+        cd build
+        cmake -DRKCOMMON_TASKING_SYSTEM=INTERNAL ..
+      build: cmake --build build

@@ -1,0 +1,35 @@
+## Copyright 2022 Intel Corporation
+## SPDX-License-Identifier: Apache-2.0
+
+name: CI MacOS
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+  ## Build Jobs ##
+
+  build-macos:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/macos.yml@main
+    with:
+      cmd: |
+        gitlab/build.sh
+      artifact-out: build-macos
+      artifact-path: build
+
+  ## Functional Test Jobs ##
+
+  test-macos:
+    needs: build-macos
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/macos.yml@main
+    with:
+      cmd: |
+        export DYLD_FALLBACK_LIBRARY_PATH=./build:$DYLD_FALLBACK_LIBRARY_PATH
+        ./build/rkcommon_test_suite
+      artifact-in: build-macos
