@@ -135,7 +135,5 @@ jobs:
     with:
       project: rkcommon
       prebuild: |
-        mkdir build
-        cd build
-        cmake -DRKCOMMON_TASKING_SYSTEM=INTERNAL ..
+        cmake -S . -B build -DRKCOMMON_TASKING_SYSTEM=INTERNAL
       build: cmake --build build
