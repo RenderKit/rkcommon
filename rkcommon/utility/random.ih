@@ -5,7 +5,11 @@
 
 #include "../math/vec.ih"
 
-inline vec3f make_random_color(const uint32 i)
+#ifndef ISPC
+namespace ispc {
+#endif
+
+inline vec3f makeRandomColor(const uint32 i)
 {
   const uniform uint32 mx = 13 * 17 * 43;
   const uniform uint32 my = 11 * 29;
@@ -15,3 +19,7 @@ inline vec3f make_random_color(const uint32 i)
       (g % my) * (1.f / (my - 1)),
       (g % mz) * (1.f / (mz - 1)));
 }
+
+#ifndef ISPC
+}
+#endif
