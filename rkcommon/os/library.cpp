@@ -65,11 +65,15 @@ namespace rkcommon {
   Library::Library(const std::string &name, bool) : libraryName(name)
   {
     bool success = loadLibrary(false);
+    const std::string firstErrorMessage = errorMessage;
     if (!success)
       success = loadLibrary(true);
 
-    if (!success)
-      throw std::runtime_error(errorMessage);
+    if (!success) {
+      throw std::runtime_error("First load of " + name +
+          " failed due to: '" + firstErrorMessage +
+          "', second attempt failed due to: '" + errorMessage + "'");
+    }
   }
 
   Library::Library(void *const _lib)
