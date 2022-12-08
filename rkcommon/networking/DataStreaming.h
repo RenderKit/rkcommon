@@ -5,6 +5,7 @@
 
 #include "../common.h"
 #include "../utility/AbstractArray.h"
+#include "../utility/ArrayView.h"
 #include "../utility/FixedArray.h"
 #include "../utility/FixedArrayView.h"
 #include "../utility/OwnedArray.h"
@@ -48,6 +49,14 @@ namespace rkcommon {
       BufferReader(const std::shared_ptr<utility::AbstractArray<uint8_t>> &buf);
 
       void read(void *mem, size_t size) override;
+
+      /* Get a view of the buffer at the current cursor with the desired number of
+       * elements. This creates a view, not a copy of the data, so the underlying
+       * buffer must be kept valid while the view is in use. The cursor will be
+       * advanced to the data following this view
+       */
+      template <typename T>
+      std::shared_ptr<utility::ArrayView<T>> getView(size_t count);
 
       bool end() override;
 
@@ -170,11 +179,24 @@ namespace rkcommon {
     {
       size_t sz;
       buf >> sz;
-      rh.resize(sz + 1);
+      rh.resize(sz);
       buf.read((void *)rh.data(), sz);
       return buf;
     }
-    /*! @} */
+
+    template <typename T>
+    std::shared_ptr<utility::ArrayView<T>> BufferReader::getView(size_t count)
+    {
+      const size_t size = count * sizeof(T);
+
+      if (cursor + size > buffer->size()) {
+        throw std::runtime_error("Attempt to read past end of BufferReader!");
+      }
+
+      auto view = std::make_shared<utility::ArrayView<T>>(buffer->begin() + cursor, size);
+      cursor += size;
+      return view;
+    }
 
   }  // namespace networking
 }  // namespace rkcommon
