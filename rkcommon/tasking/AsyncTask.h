@@ -48,8 +48,9 @@ namespace rkcommon {
       }
 
      private:
-      detail::AsyncTaskImpl<std::function<void()>> taskImpl;
+      // declaration before taskImpl: ensure initialization before task finishes
       std::atomic<bool> jobFinished{false};
+      detail::AsyncTaskImpl<std::function<void()>> taskImpl;
       T retValue;
     };
 
