@@ -31,6 +31,7 @@ struct box2f
   box2f() = default;
   box2f(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
   box2f(const float v) : lower(v), upper(v) {}
+  box2f(const float l, const float u) : lower(l), upper(u) {}
 #endif
 };
 
@@ -42,6 +43,8 @@ struct box2i
 #ifndef ISPC
   box2i() = default;
   box2i(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
+  box2i(const int v) : lower(v), upper(v) {}
+  box2i(const int l, const int u) : lower(l), upper(u) {}
 #endif
 };
 
@@ -50,6 +53,12 @@ struct box3f
 {
   vec3f lower;
   vec3f upper;
+#ifndef ISPC
+  box3f() = default;
+  box3f(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
+  box3f(const float v) : lower(v), upper(v) {}
+  box3f(const float l, const float u) : lower(l), upper(u) {}
+#endif
 };
 
 // a 3-d int bounding box
@@ -57,6 +66,12 @@ struct box3i
 {
   vec3i lower;
   vec3i upper;
+#ifndef ISPC
+  box3i() = default;
+  box3i(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
+  box3i(const int v) : lower(v), upper(v) {}
+  box3i(const int l, const int u) : lower(l), upper(u) {}
+#endif
 };
 
 // a 3-d float bounding box with aligned vec3f coordinates
@@ -66,6 +81,12 @@ struct box3fa
   int32 align0;
   vec3f upper;
   int32 align1;
+#ifndef ISPC
+  box3fa() = default;
+  box3fa(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
+  box3fa(const int v) : lower(v), upper(v) {}
+  box3fa(const float l, const float u) : lower(l), upper(u) {}
+#endif
 };
 
 // a 4-d float bounding box
@@ -73,6 +94,12 @@ struct box4f
 {
   vec4f lower;
   vec4f upper;
+#ifndef ISPC
+  box4f() = default;
+  box4f(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
+  box4f(const int v) : lower(v), upper(v) {}
+  box4f(const float l, const float u) : lower(l), upper(u) {}
+#endif
 };
 
 // this is just a renaming - in some cases the code reads cleaner if we're
