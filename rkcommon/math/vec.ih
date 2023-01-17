@@ -843,7 +843,7 @@ inline vec4f pow(const vec4f &a, const float b)
  * round to nearest, see "2.3.5 Fixed-Point Data Conversions" of OpenGL 4.6 */
 inline uint32 cvt_uint32(const float f)
 {
-  return (int32)round(255.f * clamp(f, 0.f, 1.f));
+  return (uint32)roundf(255.f * clamp(f, 0.f, 1.f));
 }
 
 inline uint32 cvt_uint32(const vec4f &v)

@@ -99,6 +99,10 @@ inline void sincos(const float phi, float *sinPhi, float *cosPhi)
   *sinPhi = sycl::native::sin(phi);
   *cosPhi = sycl::native::cos(phi);
 }
+inline float roundf(const float f)
+{
+  return sycl::round(f);
+}
 
 // Math functions with precision guaranteed both on host and device
 inline float abs(const float a)
@@ -302,6 +306,16 @@ inline float sin2cos(const float f)
 }
 
 #ifdef ISPC
+inline float roundf(const float f)
+{
+  return round(f);
+}
+
+inline uniform float roundf(const uniform float f)
+{
+  return round(f);
+}
+
 inline uniform float nextafter(const uniform float a, const uniform float b)
 {
   // Match the behavior of the C99 math.h function
