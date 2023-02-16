@@ -54,9 +54,6 @@ namespace rkcommon {
     /* returns address of a symbol from any library in the repo */
     void *getSymbol(const std::string &sym) const;
 
-    /* add the default library to the repo */
-    void addDefaultLibrary();
-
     bool libraryExists(const std::string &name) const;
 
    private:

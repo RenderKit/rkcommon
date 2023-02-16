@@ -56,8 +56,6 @@ namespace rkcommon {
 
   RKCOMMON_INTERFACE void unloadLibrary(const std::string &name);
 
-  RKCOMMON_INTERFACE void loadDefaultLibrary();
-
   RKCOMMON_INTERFACE void *getSymbol(const std::string &name);
 
   RKCOMMON_INTERFACE std::string prettyDouble(double x);

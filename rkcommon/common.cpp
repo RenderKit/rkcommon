@@ -24,11 +24,6 @@ namespace rkcommon {
     LibraryRepository::getInstance()->remove(name);
   }
 
-  void loadDefaultLibrary()
-  {
-    LibraryRepository::getInstance()->addDefaultLibrary();
-  }
-
   void *getSymbol(const std::string &name)
   {
     return LibraryRepository::getInstance()->getSymbol(name);
