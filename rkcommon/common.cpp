@@ -14,9 +14,9 @@ namespace rkcommon {
     ac -= howMany;
   }
 
-  void loadLibrary(const std::string &name, bool anchor)
+  void loadLibrary(const std::string &name, const void *anchorAddress)
   {
-    LibraryRepository::getInstance()->add(name, anchor);
+    LibraryRepository::getInstance()->add(name, anchorAddress);
   }
 
   void unloadLibrary(const std::string &name)
