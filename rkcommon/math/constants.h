@@ -16,12 +16,6 @@ namespace rkcommon {
   namespace math {
 
     static const float one_over_255 = 1.0f / 255.0f;
-    // smallest positive normal number 2^-126=0x1p-126 (needs a C++17 compiler)
-    static const float flt_min = 1.17549435e-38;
-
-    /* we consider floating point numbers in that range as valid input numbers
-     */
-    static float FLT_LARGE = 1.844E18f;
 
     static struct ZeroTy
     {
@@ -292,6 +286,18 @@ namespace rkcommon {
       }
     } two_pi MAYBE_UNUSED;
 
+    static struct HalfPiTy
+    {
+      __forceinline operator double() const
+      {
+        return M_PI_2;
+      }
+      __forceinline operator float() const
+      {
+        return M_PI_2;
+      }
+    } half_pi MAYBE_UNUSED;
+
     static struct OneOverTwoPiTy
     {
       __forceinline operator double() const
@@ -315,6 +321,18 @@ namespace rkcommon {
         return 4.0 * M_PI;
       }
     } four_pi MAYBE_UNUSED;
+
+    static struct QuarterPiTy
+    {
+      __forceinline operator double() const
+      {
+        return M_PI_4;
+      }
+      __forceinline operator float() const
+      {
+        return M_PI_4;
+      }
+    } quarter_pi MAYBE_UNUSED;
 
     static struct OneOverFourPiTy
     {

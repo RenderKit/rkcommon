@@ -86,8 +86,8 @@ namespace rkcommon {
       return box_t<T, N, A>(max(a.lower, b.lower), min(a.upper, b.upper));
     }
 
-    template <typename T, int N>
-    inline bool disjoint(const box_t<T, N> &a, const box_t<T, N> &b)
+    template <typename T, int N, bool A>
+    inline bool disjoint(const box_t<T, N, A> &a, const box_t<T, N, A> &b)
     {
       return anyLessThan(a.upper, b.lower) || anyLessThan(b.upper, a.lower);
     }
@@ -111,31 +111,6 @@ namespace rkcommon {
       return range_t<T>(
           reduce_max(vec_t<T, N + 1>(min(mins, maxs), tRange.lower)),
           reduce_min(vec_t<T, N + 1>(max(mins, maxs), tRange.upper)));
-    }
-
-    // -------------------------------------------------------
-    // comparison operator
-    // -------------------------------------------------------
-    template <typename T, int N, bool A>
-    inline bool operator==(const box_t<T, N, A> &a, const box_t<T, N, A> &b)
-    {
-      return a.lower == b.lower && a.upper == b.upper;
-    }
-
-    template <typename T, int N, bool A>
-    inline bool operator!=(const box_t<T, N, A> &a, const box_t<T, N, A> &b)
-    {
-      return !(a == b);
-    }
-
-    // -------------------------------------------------------
-    // output operator
-    // -------------------------------------------------------
-    template <typename T, int N, bool A>
-    inline std::ostream &operator<<(std::ostream &o, const box_t<T, N, A> &b)
-    {
-      o << "[" << b.lower << ":" << b.upper << "]";
-      return o;
     }
 
     using box1i  = range_t<int32_t>;

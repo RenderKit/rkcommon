@@ -6,12 +6,7 @@
 
 #include <algorithm>
 
-#ifdef _WIN32
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#else
+#ifndef _WIN32
 #include <dlfcn.h>
 #include <sys/times.h>
 #endif
@@ -22,59 +17,130 @@
 #define RKCOMMON_LIB_EXT ".so"
 #endif
 
-extern "C" {
-/* Export a symbol to ask the dynamic loader about in order to locate this
- * library at runtime. */
-RKCOMMON_INTERFACE int _rkcommon_anchor()
-{
-  return 0;
-}
-}
-
 namespace {
 
-  std::string library_location()
+  std::string directory_from_path(const std::string &path)
   {
-#if defined(_WIN32) && !defined(__CYGWIN__)
-    MEMORY_BASIC_INFORMATION mbi;
-    VirtualQuery(&_rkcommon_anchor, &mbi, sizeof(mbi));
-    char pathBuf[16384];
-    if (!GetModuleFileNameA(
-            static_cast<HMODULE>(mbi.AllocationBase), pathBuf, sizeof(pathBuf)))
-      return std::string();
+    // Remove the filename from the path
+    const size_t lastPathSep = path.find_last_of("/\\");
+    if (lastPathSep == std::string::npos)
+      throw std::runtime_error("could not get absolute path of module directory");
+    return path.substr(0, lastPathSep + 1);
+  }
 
-    std::string path = std::string(pathBuf);
-    path.resize(path.rfind('\\') + 1);
-#else
-    const char *anchor = "_rkcommon_anchor";
-    void *handle       = dlsym(RTLD_DEFAULT, anchor);
-    if (!handle)
-      return std::string();
+  std::string library_location(const void *address)
+  {
+    // implementation taken from OIDN module.cpp
 
-    Dl_info di;
-    int ret = dladdr(handle, &di);
-    if (!ret || !di.dli_saddr || !di.dli_fname)
-      return std::string();
+    if (address == nullptr)
+      throw std::runtime_error("library_location(): NULL address provided");
 
-    std::string path = std::string(di.dli_fname);
-    path.resize(path.rfind('/') + 1);
-#endif
+  #if defined(_WIN32)
 
-    return path;
+    // Get the handle of the module which contains the address
+    HMODULE module;
+    const DWORD flags = GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS
+        | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT;
+    if (!GetModuleHandleExA(flags, reinterpret_cast<LPCSTR>(address), &module))
+      throw std::runtime_error("GetModuleHandleExA failed");
+
+    // Get the path of the module
+    // Since we don't know the length of the path, we use a buffer of increasing
+    // size
+    DWORD pathSize = MAX_PATH + 1;
+    for (;;) {
+      std::vector<char> path(pathSize);
+      DWORD result = GetModuleFileNameA(module, path.data(), pathSize);
+      if (result == 0)
+        throw std::runtime_error("GetModuleFileNameA failed");
+      else if (result < pathSize)
+        return directory_from_path(path.data());
+      else
+        pathSize *= 2;
+    }
+
+  #else
+
+    // dladdr should return an absolute path on Linux except for the main
+    // executable On macOS it should always return an absolute path
+    Dl_info info;
+    if (dladdr(address, &info)) {
+      // Check whether the path is absolute
+      if (info.dli_fname && info.dli_fname[0] == '/')
+        return directory_from_path(info.dli_fname);
+    }
+
+  #if defined(__APPLE__)
+    // This shouldn't happen
+    throw std::runtime_error("failed to get absolute path with dladdr");
+  #else
+    // We failed to get an absolute path, so we try to parse /proc/self/maps
+    std::ifstream file("/proc/self/maps");
+    if (!file)
+      throw std::runtime_error("could not open /proc/self/maps");
+
+    // Parse the lines
+    for (std::string lineStr; std::getline(file, lineStr);) {
+      std::istringstream line(lineStr);
+
+      // Parse the address range
+      uintptr_t addressBegin, addressEnd;
+      line >> std::hex;
+      line >> addressBegin;
+      if (line.get() != '-')
+        continue; // parse error
+      line >> addressEnd;
+      if (!isspace(line.peek()) || !line)
+        continue; // parse error
+
+      // Check whether the address is in this range
+      if (reinterpret_cast<uintptr_t>(address) < addressBegin
+          || reinterpret_cast<uintptr_t>(address) >= addressEnd)
+        continue;
+
+      // Skip the permissions, offset, device, inode
+      std::string str;
+      for (int i = 0; i < 4; ++i)
+        line >> str;
+
+      // Parse the path
+      line >> std::ws;
+      if (!std::getline(line, str))
+        continue; // no path or parse error
+
+      // Check whether the path is absolute
+      if (str[0] == '/')
+        return directory_from_path(str);
+    }
+
+    throw std::runtime_error("could not find address in /proc/self/maps");
+  #endif
+
+  #endif
   }
 
 }  // namespace
 
 namespace rkcommon {
 
-  Library::Library(const std::string &name, bool) : libraryName(name)
+  Library::Library(
+      const std::string &name, const void *anchorAddress)
+      : libraryName(name)
   {
-    bool success = loadLibrary(false);
-    if (!success)
-      success = loadLibrary(true);
+    bool success = false;
 
-    if (!success)
-      throw std::runtime_error(errorMessage);
+    try {
+      success = loadLibrary(anchorAddress);
+    } catch (const std::exception &e) {
+      // handle exceptions from e.g. library_location()
+      throw std::runtime_error(
+          "Load of " + name + " failed due to: '" + e.what() + "'");
+    }
+
+    if (!success) {
+      throw std::runtime_error(
+          "Load of " + name + " failed due to: '" + errorMessage + "'");
+    }
   }
 
   Library::Library(void *const _lib)
@@ -82,11 +148,14 @@ namespace rkcommon {
   {
   }
 
-  bool Library::loadLibrary(bool withAnchor)
+  bool Library::loadLibrary(const void *anchorAddress)
   {
     std::string file = libraryName;
     std::string errorMsg;
-    std::string libLocation = withAnchor ? library_location() : std::string();
+    std::string libLocation = anchorAddress != nullptr
+        ? library_location(anchorAddress)
+        : std::string();
+
 #ifdef _WIN32
     std::string fullName = libLocation + file + ".dll";
     lib                  = LoadLibrary(fullName.c_str());
@@ -172,12 +241,13 @@ namespace rkcommon {
     }
   }
 
-  void LibraryRepository::add(const std::string &name, bool anchor)
+  void LibraryRepository::add(
+      const std::string &name, const void *anchorAddress)
   {
     if (libraryExists(name))
-      return;  // lib already loaded.
+      return; // lib already loaded.
 
-    repo.push_back(rkcommon::make_unique<Library>(name, anchor));
+    repo.push_back(rkcommon::make_unique<Library>(name, anchorAddress));
   }
 
   void LibraryRepository::remove(const std::string &name)
@@ -196,33 +266,6 @@ namespace rkcommon {
     }
 
     return sym;
-  }
-
-  void LibraryRepository::addDefaultLibrary()
-  {
-    // already populate the repo with "virtual" libs, representing the default
-    // OSPRay core lib
-#ifdef _WIN32
-    // look in exe (i.e. when OSPRay is linked statically into the application)
-    repo.push_back(rkcommon::make_unique<Library>(GetModuleHandle(0)));
-
-    // look in ospray.dll (i.e. when linked dynamically)
-#if 0
-    // we cannot get a function from ospray.dll, because this would create a
-    // cyclic dependency between ospray.dll and ospray_common.dll
-
-    // only works when ospray_common is linked statically into ospray
-    const void * functionInOSPRayDLL = rkcommon::getSymbol;
-    // get handle to current dll via a known function
-    MEMORY_BASIC_INFORMATION mbi;
-    VirtualQuery(functionInOSPRayDLL, &mbi, sizeof(mbi));
-    repo["dlldefault"] = new Library(mbi.AllocationBase);
-#else
-    repo.push_back(rkcommon::make_unique<Library>(std::string("ospray")));
-#endif
-#else
-    repo.push_back(rkcommon::make_unique<Library>(RTLD_DEFAULT));
-#endif
   }
 
   bool LibraryRepository::libraryExists(const std::string &name) const

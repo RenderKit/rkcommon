@@ -14,19 +14,14 @@ namespace rkcommon {
     ac -= howMany;
   }
 
-  void loadLibrary(const std::string &name, bool anchor)
+  void loadLibrary(const std::string &name, const void *anchorAddress)
   {
-    LibraryRepository::getInstance()->add(name, anchor);
+    LibraryRepository::getInstance()->add(name, anchorAddress);
   }
 
   void unloadLibrary(const std::string &name)
   {
     LibraryRepository::getInstance()->remove(name);
-  }
-
-  void loadDefaultLibrary()
-  {
-    LibraryRepository::getInstance()->addDefaultLibrary();
   }
 
   void *getSymbol(const std::string &name)
@@ -90,7 +85,7 @@ namespace rkcommon {
     else if (val >= 1e+03f)
       osp_snprintf(result, 1000, "%.1f%c", val / 1e03f, 'k');
     else
-      osp_snprintf(result, 1000, "%lu", s);
+      osp_snprintf(result, 1000, "%zu", s);
     return result;
   }
 

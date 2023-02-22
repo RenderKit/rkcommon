@@ -1,0 +1,276 @@
+// Copyright 2009 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+#pragma once
+
+#include "vec.ih"
+
+#ifndef ISPC
+namespace ispc {
+#endif
+
+// Linear vector space, or a linear transformation
+struct LinearSpace3f
+{
+  vec3f vx;
+  vec3f vy;
+  vec3f vz;
+#ifndef ISPC
+  LinearSpace3f() = default;
+  LinearSpace3f(const float v) : vx(v), vy(v), vz(v) {}
+  LinearSpace3f(const vec3f &vx, const vec3f &vy, const vec3f &vz)
+      : vx(vx), vy(vy), vz(vz)
+  {}
+#endif
+};
+
+// short-hand name for LinearSpace3f
+typedef LinearSpace3f linear3f;
+
+////////////////////////////////////////////////////////////////////////////////
+/// Constructors
+////////////////////////////////////////////////////////////////////////////////
+
+#define __define_make_LinearSpace3f(univary)                                   \
+  inline univary LinearSpace3f make_LinearSpace3f(                             \
+      const univary vec3f x, const univary vec3f y, const univary vec3f z)     \
+  {                                                                            \
+    univary LinearSpace3f l;                                                   \
+    l.vx = x;                                                                  \
+    l.vy = y;                                                                  \
+    l.vz = z;                                                                  \
+    return l;                                                                  \
+  }
+
+#ifdef ISPC
+__define_make_LinearSpace3f(uniform);
+__define_make_LinearSpace3f(varying);
+#else
+__define_make_LinearSpace3f();
+#endif
+
+#undef __define_make_LinearSpace3f
+
+inline ISPC_UNIFORM LinearSpace3f make_LinearSpace3f_identity()
+{
+  return make_LinearSpace3f(make_vec3f(1.f, 0.f, 0.f),
+      make_vec3f(0.f, 1.f, 0.f),
+      make_vec3f(0.f, 0.f, 1.f));
+}
+
+inline ISPC_VARYING LinearSpace3f make_LinearSpace3f_varying_identity()
+{
+  return make_LinearSpace3f(make_vec3f(1.f, 0.f, 0.f),
+      make_vec3f(0.f, 1.f, 0.f),
+      make_vec3f(0.f, 0.f, 1.f));
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Transformation
+////////////////////////////////////////////////////////////////////////////////
+
+#define __define_transform(univary_r, univary_l, univary_v)                    \
+  inline univary_r vec3f operator*(                                            \
+      const univary_l LinearSpace3f l, const univary_v vec3f v)                \
+  {                                                                            \
+    return v.x * l.vx + v.y * l.vy + v.z * l.vz;                               \
+  }                                                                            \
+  inline univary_r vec3f xfmVector(                                            \
+      const univary_l LinearSpace3f l, const univary_v vec3f v)                \
+  {                                                                            \
+    return v.x * l.vx + v.y * l.vy + v.z * l.vz;                               \
+  }
+
+#ifdef ISPC
+__define_transform(uniform, uniform, uniform);
+__define_transform(varying, uniform, varying);
+__define_transform(varying, varying, varying);
+#else
+__define_transform(, , );
+#endif
+
+#undef __define_transform
+
+////////////////////////////////////////////////////////////////////////////////
+/// Binary Operators
+////////////////////////////////////////////////////////////////////////////////
+
+#define __define_binary_ops(univary)                                           \
+  inline univary LinearSpace3f operator+(                                      \
+      const univary LinearSpace3f a, const univary LinearSpace3f b)            \
+  {                                                                            \
+    return make_LinearSpace3f(a.vx + b.vx, a.vy + b.vy, a.vz + b.vz);          \
+  }                                                                            \
+  inline univary LinearSpace3f operator-(                                      \
+      const univary LinearSpace3f a, const univary LinearSpace3f b)            \
+  {                                                                            \
+    return make_LinearSpace3f(a.vx - b.vx, a.vy - b.vy, a.vz - b.vz);          \
+  }                                                                            \
+  inline univary LinearSpace3f operator*(                                      \
+      const univary float a, const univary LinearSpace3f b)                    \
+  {                                                                            \
+    return make_LinearSpace3f((a * b.vx), (a * b.vy), (a * b.vz));             \
+  }                                                                            \
+  inline univary LinearSpace3f operator*(                                      \
+      const univary LinearSpace3f a, const univary float b)                    \
+  {                                                                            \
+    return make_LinearSpace3f((a.vx * b), (a.vy * b), (a.vz * b));             \
+  }                                                                            \
+  inline univary LinearSpace3f operator*(                                      \
+      const univary LinearSpace3f a, const univary LinearSpace3f b)            \
+  {                                                                            \
+    return make_LinearSpace3f((a * b.vx), (a * b.vy), (a * b.vz));             \
+  }
+
+#ifdef ISPC
+__define_binary_ops(uniform);
+__define_binary_ops(varying);
+#else
+__define_binary_ops();
+#endif
+
+#undef __define_binary_ops
+
+////////////////////////////////////////////////////////////////////////////////
+/// Comparison Operators
+////////////////////////////////////////////////////////////////////////////////
+
+#define __define_comp_ops(univary)                                             \
+  inline univary bool eq(                                                      \
+      const univary LinearSpace3f a, const univary LinearSpace3f b)            \
+  {                                                                            \
+    return eq(a.vx, b.vx) & eq(a.vy, b.vy) & eq(a.vz, b.vz);                   \
+  }                                                                            \
+  inline univary bool ne(                                                      \
+      const univary LinearSpace3f a, const univary LinearSpace3f b)            \
+  {                                                                            \
+    return ne(a.vx, b.vx) | ne(a.vy, b.vy) | ne(a.vz, b.vz);                   \
+  }
+
+#ifdef ISPC
+__define_comp_ops(uniform);
+__define_comp_ops(varying);
+#else
+__define_comp_ops();
+#endif
+
+#undef __define_comp_ops
+
+////////////////////////////////////////////////////////////////////////////////
+// Unary Operators
+////////////////////////////////////////////////////////////////////////////////
+
+#define __define_unary_fct(univary)                                            \
+  inline univary LinearSpace3f neg(const univary LinearSpace3f l)              \
+  {                                                                            \
+    return make_LinearSpace3f(neg(l.vx), neg(l.vy), neg(l.vz));                \
+  }                                                                            \
+  /* compute the determinant of the matrix */                                  \
+  inline univary float det(const univary LinearSpace3f l)                      \
+  {                                                                            \
+    return dot(l.vx, cross(l.vy, l.vz));                                       \
+  }                                                                            \
+  /* compute transposed matrix */                                              \
+  inline univary LinearSpace3f transposed(const univary LinearSpace3f l)       \
+  {                                                                            \
+    return make_LinearSpace3f(make_vec3f(l.vx.x, l.vy.x, l.vz.x),              \
+        make_vec3f(l.vx.y, l.vy.y, l.vz.y),                                    \
+        make_vec3f(l.vx.z, l.vy.z, l.vz.z));                                   \
+  }                                                                            \
+  /* compute adjoint matrix */                                                 \
+  inline univary LinearSpace3f adjoint(const univary LinearSpace3f l)          \
+  {                                                                            \
+    return transposed(make_LinearSpace3f(                                      \
+        cross(l.vy, l.vz), cross(l.vz, l.vx), cross(l.vx, l.vy)));             \
+  }                                                                            \
+  /* calculates orthogonal coordinate frame with z-vector pointing towards N   \
+   */                                                                          \
+  inline univary LinearSpace3f frame(const univary vec3f N)                    \
+  {                                                                            \
+    const univary vec3f dx0 = make_vec3f(0.0f, N.z, -N.y);                     \
+    const univary vec3f dx1 = make_vec3f(-N.z, 0.0f, N.x);                     \
+    const univary vec3f dx = normalize(abs(N.x) < abs(N.y) ? dx0 : dx1);       \
+    const univary vec3f dy = cross(N, dx);                                     \
+    return make_LinearSpace3f(dx, dy, N);                                      \
+  }                                                                            \
+  inline univary LinearSpace3f rcp(const univary LinearSpace3f l)              \
+  {                                                                            \
+    return adjoint(l) * rcpf(det(l));                                          \
+  }
+
+#ifdef ISPC
+__define_unary_fct(uniform);
+__define_unary_fct(varying);
+#else
+__define_unary_fct();
+#endif
+
+#undef __define_unary_fct
+
+////////////////////////////////////////////////////////////////////////////////
+// Rudimentary 2D linear space, used for texture coordinate transformations
+////////////////////////////////////////////////////////////////////////////////
+
+struct LinearSpace2f
+{
+  vec2f vx;
+  vec2f vy;
+#ifndef ISPC
+  LinearSpace2f() = default;
+  LinearSpace2f(const float v) : vx(v), vy(v) {}
+  LinearSpace2f(const vec2f &vx, const vec2f &vy) : vx(vx), vy(vy) {}
+#endif
+};
+
+// short-hand name for LinearSpace2f
+typedef LinearSpace2f linear2f;
+
+#define __define_make_LinearSpace2f(univary)                                   \
+  inline univary LinearSpace2f make_LinearSpace2f(                             \
+      const univary vec2f x, const univary vec2f y)                            \
+  {                                                                            \
+    univary LinearSpace2f l;                                                   \
+    l.vx = x;                                                                  \
+    l.vy = y;                                                                  \
+    return l;                                                                  \
+  }
+
+#ifdef ISPC
+__define_make_LinearSpace2f(uniform);
+__define_make_LinearSpace2f(varying);
+#else
+__define_make_LinearSpace2f();
+#endif
+
+#undef __define_make_LinearSpace2f
+
+inline ISPC_UNIFORM LinearSpace2f make_LinearSpace2f_identity()
+{
+  return make_LinearSpace2f(make_vec2f(1.f, 0.f), make_vec2f(0.f, 1.f));
+}
+
+#define __define_transform2f(univary_r, univary_l, univary_v)                  \
+  inline univary_r vec2f operator*(                                            \
+      const univary_l LinearSpace2f l, const univary_v vec2f v)                \
+  {                                                                            \
+    return v.x * l.vx + v.y * l.vy;                                            \
+  }                                                                            \
+  inline univary_r vec2f xfmVector(                                            \
+      const univary_l LinearSpace2f l, const univary_v vec2f v)                \
+  {                                                                            \
+    return v.x * l.vx + v.y * l.vy;                                            \
+  }
+
+#ifdef ISPC
+__define_transform2f(uniform, uniform, uniform);
+__define_transform2f(varying, uniform, varying);
+__define_transform2f(varying, varying, varying);
+#else
+__define_transform2f(, , );
+#endif
+
+#undef __define_transform2f
+
+#ifndef ISPC
+}
+#endif

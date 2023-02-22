@@ -1,0 +1,210 @@
+// Copyright 2009 Intel Corporation
+// SPDX-License-Identifier: Apache-2.0
+
+#pragma once
+
+#include "LinearSpace.ih"
+
+#ifndef ISPC
+namespace ispc {
+#endif
+
+// A Affine vector space; i.e., a Linear Space with a translation
+struct AffineSpace3f
+{
+  LinearSpace3f l;
+  vec3f p;
+#ifndef ISPC
+  AffineSpace3f() = default;
+  AffineSpace3f(const float v) : l(v), p(v) {}
+#endif
+};
+
+// short-hand name for AffineSpace3f
+typedef AffineSpace3f affine3f;
+
+// create a new affine space from given basis vectors v{x,y,z} and translation p
+inline ISPC_UNIFORM AffineSpace3f make_AffineSpace3f(
+    const ISPC_UNIFORM vec3f vx,
+    const ISPC_UNIFORM vec3f vy,
+    const ISPC_UNIFORM vec3f vz,
+    const ISPC_UNIFORM vec3f p)
+{
+  ISPC_UNIFORM AffineSpace3f xfm;
+  xfm.l.vx = vx;
+  xfm.l.vy = vy;
+  xfm.l.vz = vz;
+  xfm.p = p;
+  return xfm;
+}
+
+inline ISPC_UNIFORM AffineSpace3f make_AffineSpace3f_identity()
+{
+  return make_AffineSpace3f(make_vec3f(1.f, 0.f, 0.f),
+      make_vec3f(0.f, 1.f, 0.f),
+      make_vec3f(0.f, 0.f, 1.f),
+      make_vec3f(0.f));
+}
+
+inline ISPC_UNIFORM AffineSpace3f make_AffineSpace3f(
+    const ISPC_UNIFORM LinearSpace3f l)
+{
+  ISPC_UNIFORM AffineSpace3f xfm;
+  xfm.l = l;
+  xfm.p = make_vec3f(0, 0, 0);
+  return xfm;
+}
+
+#define __define_transform(univary_r, univary_a, univary_v)                    \
+  /* apply given affine transformation to given _point_ v */                   \
+  inline univary_r vec3f xfmPoint(                                             \
+      const univary_a AffineSpace3f a, const univary_v vec3f v)                \
+  {                                                                            \
+    return a.p + xfmVector(a.l, v);                                            \
+  }                                                                            \
+  /* apply affine transform to given _vector_ v, i.e., _without_ the           \
+   * translation */                                                            \
+  inline univary_r vec3f xfmVector(                                            \
+      const univary_a AffineSpace3f a, const univary_v vec3f v)                \
+  {                                                                            \
+    return xfmVector(a.l, v);                                                  \
+  }
+
+#ifdef ISPC
+__define_transform(uniform, uniform, uniform);
+__define_transform(varying, uniform, varying);
+__define_transform(varying, varying, varying);
+#else
+__define_transform(, , );
+#endif
+
+#undef __define_transform
+
+#define __define_other(univary)                                                \
+  inline univary AffineSpace3f make_AffineSpace3f(                             \
+      const univary LinearSpace3f l, const univary vec3f p)                    \
+  {                                                                            \
+    univary AffineSpace3f xfm;                                                 \
+    xfm.l = l;                                                                 \
+    xfm.p = p;                                                                 \
+    return xfm;                                                                \
+  }                                                                            \
+  inline univary AffineSpace3f operator+(                                      \
+      const univary AffineSpace3f a, const univary AffineSpace3f b)            \
+  {                                                                            \
+    return make_AffineSpace3f(a.l + b.l, a.p + b.p);                           \
+  }                                                                            \
+  inline univary AffineSpace3f operator-(                                      \
+      const univary AffineSpace3f a, const univary AffineSpace3f b)            \
+  {                                                                            \
+    return make_AffineSpace3f(a.l - b.l, a.p - b.p);                           \
+  }                                                                            \
+  inline univary AffineSpace3f operator*(                                      \
+      const univary float a, const univary AffineSpace3f b)                    \
+  {                                                                            \
+    return make_AffineSpace3f(a * b.l, a * b.p);                               \
+  }                                                                            \
+  inline univary AffineSpace3f operator*(                                      \
+      const univary AffineSpace3f a, const univary float b)                    \
+  {                                                                            \
+    return make_AffineSpace3f(a.l * b, a.p * b);                               \
+  }                                                                            \
+  inline univary AffineSpace3f operator*(                                      \
+      const univary AffineSpace3f a, const univary AffineSpace3f b)            \
+  {                                                                            \
+    return make_AffineSpace3f(a.l * b.l, a.l * b.p + a.p);                     \
+  }                                                                            \
+  inline univary AffineSpace3f neg(const univary AffineSpace3f a)              \
+  {                                                                            \
+    return make_AffineSpace3f(neg(a.l), neg(a.p));                             \
+  }                                                                            \
+  inline univary AffineSpace3f rcp(const univary AffineSpace3f a)              \
+  {                                                                            \
+    univary LinearSpace3f il = rcp(a.l);                                       \
+    return make_AffineSpace3f(il, neg(il * a.p));                              \
+  }
+
+#ifdef ISPC
+__define_other(uniform);
+__define_other(varying);
+#else
+__define_other();
+#endif
+
+#undef __define_other
+
+////////////////////////////////////////////////////////////////////////////////
+// Rudimentary 2D affine space, used for texture coordinate transformations
+////////////////////////////////////////////////////////////////////////////////
+
+// A 2D Affine vector space; i.e., a Linear Space with a translation
+struct AffineSpace2f
+{
+  LinearSpace2f l;
+  vec2f p;
+#ifndef ISPC
+  AffineSpace2f() = default;
+  AffineSpace2f(const float v) : l(v), p(v) {}
+#endif
+};
+
+// short-hand name for AffineSpace2f
+typedef AffineSpace2f affine2f;
+
+// create a new affine space from given basis vectors v{x,y,z} and translation p
+inline ISPC_UNIFORM AffineSpace2f make_AffineSpace2f(
+    const ISPC_UNIFORM LinearSpace2f l, const ISPC_UNIFORM vec2f p)
+{
+  ISPC_UNIFORM AffineSpace2f xfm;
+  xfm.l = l;
+  xfm.p = p;
+  return xfm;
+}
+
+inline ISPC_UNIFORM AffineSpace2f make_AffineSpace2f(
+    const ISPC_UNIFORM vec2f vx,
+    const ISPC_UNIFORM vec2f vy,
+    const ISPC_UNIFORM vec2f p)
+{
+  return make_AffineSpace2f(make_LinearSpace2f(vx, vy), p);
+}
+
+inline ISPC_UNIFORM AffineSpace2f make_AffineSpace2f_identity()
+{
+  return make_AffineSpace2f(
+      make_vec2f(1.f, 0.f), make_vec2f(0.f, 1.f), make_vec2f(0.f));
+}
+
+#define __define_transform2f(univary_r, univary_a, univary_v)                  \
+  inline univary_r vec2f operator*(                                            \
+      const univary_a AffineSpace2f a, const univary_v vec2f v)                \
+  {                                                                            \
+    return a.p + xfmVector(a.l, v);                                            \
+  }                                                                            \
+  /* apply given affine transformation to given _point_ v */                   \
+  inline univary_r vec2f xfmPoint(                                             \
+      const univary_a AffineSpace2f a, const univary_v vec2f v)                \
+  {                                                                            \
+    return a.p + xfmVector(a.l, v);                                            \
+  }                                                                            \
+  /* apply affine transform to given _vector_ v, i.e., _without_ the           \
+   * translation */                                                            \
+  inline univary_r vec2f xfmVector(                                            \
+      const univary_a AffineSpace2f a, const univary_v vec2f v)                \
+  {                                                                            \
+    return xfmVector(a.l, v);                                                  \
+  }
+
+#ifdef ISPC
+__define_transform2f(uniform, uniform, uniform);
+__define_transform2f(varying, uniform, varying);
+__define_transform2f(varying, varying, varying);
+#else
+__define_transform2f(, , );
+#endif
+
+#undef __define_transform2f
+
+#ifndef ISPC
+}
+#endif

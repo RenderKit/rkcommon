@@ -23,9 +23,6 @@ namespace rkcommon {
   namespace traits {
 
     template <typename T>
-    using is_arithmetic_t = enable_if_t<std::is_arithmetic<T>::value>;
-
-    template <typename T>
     struct is_vec
     {
       const static bool value = std::is_base_of<vec_base, T>::value;
@@ -50,7 +47,10 @@ namespace rkcommon {
 
     // vec_t<> types //////////////////////////////////////////////////////////
 
-    template <typename T, int N, bool ALIGN = false>
+    template <typename T,
+      int N,
+      bool ALIGN = false,
+      typename = typename traits::is_arithmetic_t<T>>
     struct vec_t : public vec_base
     {
       using scalar_t = T;
@@ -779,7 +779,7 @@ namespace rkcommon {
     template <typename T, int N, bool A>
     inline vec_t<T, N, A> safe_normalize(const vec_t<T, N, A> &v)
     {
-      return v * rsqrt(max(T(1e-6), dot(v, v)));
+      return v * rsqrt(max(T(ulp), dot(v, v)));
     }
 
     // -------------------------------------------------------
@@ -971,6 +971,30 @@ namespace rkcommon {
         if (v[i] > v[maxIdx])
           maxIdx = i;
       return maxIdx;
+    }
+
+    inline vec4f linear_to_srgba(const vec4f c)
+    {
+      return vec4f(linear_to_srgb(c.x),
+          linear_to_srgb(c.y),
+          linear_to_srgb(c.z),
+          std::max(c.w, 0.f)); // alpha is never gamma-corrected
+    }
+
+    inline uint32_t cvt_uint32(const float f)
+    {
+      return (uint32_t)round(255.f * clamp(f, 0.f, 1.f));
+    }
+
+    inline uint32_t cvt_uint32(const vec4f &v)
+    {
+      return (cvt_uint32(v.x) << 0) | (cvt_uint32(v.y) << 8)
+          | (cvt_uint32(v.z) << 16) | (cvt_uint32(v.w) << 24);
+    }
+
+    inline uint32_t linear_to_srgba8(const vec4f c)
+    {
+      return cvt_uint32(linear_to_srgba(c));
     }
 
   }  // namespace math

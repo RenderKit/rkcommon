@@ -21,23 +21,6 @@
 #endif
 #endif
 
-#if defined(_WIN32) && (__MSV_VER <= 1700)
-namespace std {
-  __forceinline bool isinf(const float x)
-  {
-    return !_finite(x);
-  }
-  __forceinline bool isnan(const float x)
-  {
-    return _isnan(x);
-  }
-  __forceinline bool isfinite(const float x)
-  {
-    return _finite(x);
-  }
-}  // namespace std
-#endif
-
 namespace rkcommon {
   namespace math {
 
@@ -67,9 +50,26 @@ namespace rkcommon {
 #endif
     }
 
-    __forceinline float rcp_safe(float f)
+    __forceinline double rcp(const double x)
     {
-      return rcp(std::abs(f) < flt_min ? (f >= 0.f ? flt_min : -flt_min) : f);
+      return 1. / x;
+    }
+
+    template <typename T>
+    __forceinline T rcp_safe_t(const T x)
+    {
+      const T flt_min = std::numeric_limits<T>::min();
+      return rcp(std::abs(x) < flt_min ? (x >= 0.f ? flt_min : -flt_min) : x);
+    }
+
+    __forceinline float rcp_safe(const float x)
+    {
+      return rcp_safe_t<float>(x);
+    }
+
+    __forceinline double rcp_safe(const double x)
+    {
+      return rcp_safe_t<double>(x);
     }
 
     __forceinline float rsqrt(const float x)
@@ -85,6 +85,11 @@ namespace rkcommon {
                                 _mm_mul_ss(r, r)));
       return _mm_cvtss_f32(c);
 #endif
+    }
+
+    __forceinline double rsqrt(const double x)
+    {
+      return 1. / std::sqrt(x);
     }
 
     template <typename T>
@@ -116,6 +121,19 @@ namespace rkcommon {
     inline T divRoundUp(T a, T b)
     {
       return (a + b - 1) / b;
+    }
+
+#define APPROXIMATE_SRGB
+
+    inline float linear_to_srgb(const float f)
+    {
+      const float c = std::max(f, 0.f);
+#ifdef APPROXIMATE_SRGB
+      return std::pow(c, 1.f / 2.2f);
+#else
+      return c <= 0.0031308f ? 12.92f * c
+                             : std::pow(c, 1.f / 2.4f) * 1.055f - 0.055f;
+#endif
     }
 
   }  // namespace math

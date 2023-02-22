@@ -88,7 +88,7 @@ namespace rkcommon {
 
     inline int ArgumentList::size() const
     {
-      return arg.size();
+      return static_cast<int>(arg.size());
     }
 
     inline bool ArgumentList::empty() const

@@ -434,7 +434,7 @@ namespace rkcommon {
       return a.inverse();
     }
 
-    /* constructs a coordinate frame form a normalized normal */
+    /* constructs a coordinate frame from a normalized normal */
     template <typename T>
     inline LinearSpace3<T> frame(const T &N)
     {
@@ -445,14 +445,14 @@ namespace rkcommon {
       return LinearSpace3<T>(dx, dy, N);
     }
 
-    /* constructs a coordinate frame from a normal and approximate x-direction
+    /* constructs a coordinate frame from a normal and approximate up direction
      */
     template <typename T>
-    inline LinearSpace3<T> frame(const T &N, const T &dxi)
+    inline LinearSpace3<T> frame(const T &N, const T &up)
     {
-      if (abs(dot(dxi, N)) > 0.99f)
-        return frame(N);  // fallback in case N and dxi are very parallel
-      const T dx = normalize(cross(dxi, N));
+      if (abs(dot(up, N)) > 0.99f)
+        return frame(N);  // fallback in case N and up are very parallel
+      const T dx = normalize(cross(up, N));
       const T dy = normalize(cross(N, dx));
       return LinearSpace3<T>(dx, dy, N);
     }

@@ -12,8 +12,9 @@ namespace rkcommon {
   class RKCOMMON_INTERFACE Library
   {
    public:
-    /* opens a shared library */
-    Library(const std::string &name, bool anchor = false);
+    /* opens a shared library; anchorAddress = nullptr will disable anchored
+     * loads */
+    Library(const std::string &name, const void *anchorAddress);
     ~Library();
 
     /* returns address of a symbol from the library */
@@ -22,7 +23,7 @@ namespace rkcommon {
    private:
     Library(void *const lib);
 
-    bool loadLibrary(bool withAnchor);
+    bool loadLibrary(const void *anchorAddress);
 
     std::string libraryName;
     std::string errorMessage;
@@ -47,14 +48,11 @@ namespace rkcommon {
     LibraryRepository &operator=(const LibraryRepository &) = delete;
 
     // add/remove a library to/from the repo
-    void add(const std::string &name, bool anchor = false);
+    void add(const std::string &name, const void *anchorAddress);
     void remove(const std::string &name);
 
     /* returns address of a symbol from any library in the repo */
     void *getSymbol(const std::string &sym) const;
-
-    /* add the default library to the repo */
-    void addDefaultLibrary();
 
     bool libraryExists(const std::string &name) const;
 

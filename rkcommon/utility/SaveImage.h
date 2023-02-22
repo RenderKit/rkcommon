@@ -3,6 +3,11 @@
 
 #pragma once
 
+// Quiet `fopen` MSVC warning
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #include <errno.h>
 #include <stdio.h>
 #include <string>
@@ -61,16 +66,46 @@ namespace rkcommon {
 
     template <typename T>
     inline void writePFM(const std::string &fName,
-                         const int sizeX,
-                         const int sizeY,
-                         const T *p)
+        const int sizeX,
+        const int sizeY,
+        const T *p) = delete;
+
+    using namespace rkcommon::math;
+
+    template <>
+    inline void writePFM<float>(const std::string &fName,
+        const int sizeX,
+        const int sizeY,
+        const float *p)
     {
-      using namespace rkcommon::math;
-      static_assert(std::is_same<T, vec4f>::value ||
-                        std::is_same<T, vec3fa>::value ||
-                        std::is_same<T, vec3f>::value,
-                    "writePFM needs pixels as vec3f(a)* or vec4f*");
-      writeImage<float, 3, T, std::is_same<T, vec3f>::value ? 3 : 4, false>(
+      writeImage<float, 1, float, 1, false>(
+          fName, "Pf\n%i %i\n-1.0\n", sizeX, sizeY, p);
+    }
+    template <>
+    inline void writePFM<vec3f>(const std::string &fName,
+        const int sizeX,
+        const int sizeY,
+        const vec3f *p)
+    {
+      writeImage<float, 3, vec3f, 3, false>(
+          fName, "PF\n%i %i\n-1.0\n", sizeX, sizeY, p);
+    }
+    template <>
+    inline void writePFM<vec3fa>(const std::string &fName,
+        const int sizeX,
+        const int sizeY,
+        const vec3fa *p)
+    {
+      writeImage<float, 3, vec3fa, 4, false>(
+          fName, "PF\n%i %i\n-1.0\n", sizeX, sizeY, p);
+    }
+    template <>
+    inline void writePFM<vec4f>(const std::string &fName,
+        const int sizeX,
+        const int sizeY,
+        const vec4f *p)
+    {
+      writeImage<float, 3, vec4f, 4, false>(
           fName, "PF\n%i %i\n-1.0\n", sizeX, sizeY, p);
     }
 
