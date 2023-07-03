@@ -105,8 +105,8 @@ namespace rkcommon {
         const int sizeY,
         const vec4f *p)
     {
-      writeImage<float, 3, vec4f, 4, false>(
-          fName, "PF\n%i %i\n-1.0\n", sizeX, sizeY, p);
+      writeImage<float, 4, vec4f, 4, false>(
+          fName, "PF4\n%i %i\n-1.0\n", sizeX, sizeY, p);
     }
 
   }  // namespace utility
