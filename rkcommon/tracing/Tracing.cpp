@@ -195,8 +195,9 @@ void TraceRecorder::saveLog(const char *logFile, const char *processName)
       // Compute CPU utilization % over the begin/end interval for end events
       float utilization = 0.f;
       uint64_t duration = 0;
+      const TraceEvent *begin = nullptr;
       if (evt.type == EventType::END) {
-        const TraceEvent *begin = beginEvents.top();
+        begin = beginEvents.top();
         utilization = cpuUtilization(*begin, evt);
         duration = std::chrono::duration_cast<std::chrono::microseconds>(
             evt.time - begin->time)
@@ -212,13 +213,19 @@ void TraceRecorder::saveLog(const char *logFile, const char *processName)
 
       // For each end event also emit an update of the CPU % utilization
       // counter for events that were long enough to reasonably measure
-      // utilization
-      if (evt.type == EventType::END && duration > 100) {
+      // utilization. CPU % is emitted at the time of the beginning of the
+      // event to display the counter properly over the interval
+      if (evt.type == EventType::END && duration > 100 && begin) {
+        const uint64_t beginTimestamp =
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                begin->time.time_since_epoch())
+                .count();
+
         fout << "{"
              << "\"ph\": \"C\","
              << "\"pid\":" << pid << ","
              << "\"tid\":" << nextTid << ","
-             << "\"ts\":" << timestamp << ","
+             << "\"ts\":" << beginTimestamp << ","
              << "\"name\":\"cpuUtilization\","
              << "\"cat\":\"perf\","
              << "\"args\":{\"value\":" << utilization << "}},";
