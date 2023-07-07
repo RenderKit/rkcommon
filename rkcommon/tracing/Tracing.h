@@ -20,7 +20,7 @@
 #include <unistd.h>
 #endif
 
-#include "common.h"
+#include "rkcommon/common.h"
 
 namespace rkcommon {
 namespace tracing {
