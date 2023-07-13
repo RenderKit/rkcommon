@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <stack>
+#include <vector>
 
 #ifdef _WIN32
 #include <process.h>
@@ -17,6 +18,8 @@
 // will see the empty defines
 #define ENABLE_PROFILING
 #include "Tracing.h"
+
+#define THREAD_EVENT_CHUNK_SIZE 4096
 
 namespace rkcommon {
 namespace tracing {
@@ -66,14 +69,13 @@ TraceEvent::TraceEvent(const EventType ty) : TraceEvent()
   type = ty;
 }
 
-TraceEvent::TraceEvent(const EventType type, const std::string &n)
-    : TraceEvent(type)
+TraceEvent::TraceEvent(const EventType type, const char *n) : TraceEvent(type)
 {
   name = n;
 }
 
 TraceEvent::TraceEvent(
-    const EventType type, const std::string &name, const uint64_t value)
+    const EventType type, const char *name, const uint64_t value)
     : TraceEvent(type, name)
 {
   counterValue = value;
@@ -81,22 +83,45 @@ TraceEvent::TraceEvent(
 
 void ThreadEventList::beginEvent(const char *name)
 {
-  events.push_back(TraceEvent(EventType::BEGIN, name));
+  getCurrentEventList().push_back(
+      TraceEvent(EventType::BEGIN, getCachedEventName(name)));
 }
 
 void ThreadEventList::endEvent()
 {
-  events.push_back(TraceEvent(EventType::END));
+  getCurrentEventList().push_back(TraceEvent(EventType::END));
 }
 
 void ThreadEventList::setMarker(const char *name)
 {
-  events.push_back(TraceEvent(EventType::MARKER, name));
+  getCurrentEventList().push_back(
+      TraceEvent(EventType::MARKER, getCachedEventName(name)));
 }
 
 void ThreadEventList::setCounter(const char *name, const uint64_t counterValue)
 {
-  events.push_back(TraceEvent(EventType::COUNTER, name, counterValue));
+  getCurrentEventList().push_back(
+      TraceEvent(EventType::COUNTER, getCachedEventName(name), counterValue));
+}
+
+std::vector<TraceEvent> &ThreadEventList::getCurrentEventList()
+{
+  if (events.empty() || events.back().size() >= THREAD_EVENT_CHUNK_SIZE) {
+    events.push_back(std::vector<TraceEvent>());
+  }
+  return events.back();
+}
+
+const char *ThreadEventList::getCachedEventName(const char *name)
+{
+  // Lookup string in the uniqueEventNames list
+  auto fnd = uniqueEventNames.find(name);
+  if (fnd == uniqueEventNames.end()) {
+    auto en = std::make_shared<std::string>(name);
+    uniqueEventNames[name] = en;
+    return en->c_str();
+  }
+  return fnd->second->c_str();
 }
 
 std::shared_ptr<ThreadEventList> TraceRecorder::getThreadTraceList(
@@ -167,68 +192,70 @@ void TraceRecorder::saveLog(const char *logFile, const char *processName)
     // Track the begin events so that when we hit an end we can compute CPU %
     // and other stats to include
     std::stack<const TraceEvent *> beginEvents;
-    for (const auto &evt : trace.second->events) {
-      if (evt.type == EventType::INVALID) {
-        std::cerr << "Got invalid event type!?\n";
-      }
-      if (evt.type == EventType::BEGIN) {
-        beginEvents.push(&evt);
-      }
-      if (evt.type == EventType::END && beginEvents.empty()) {
-        std::cerr << "Tracing Error: Too many rkTraceEndEvent calls!\n";
-        break;
-      }
+    for (const auto &evtChunk : trace.second->events) {
+      for (const auto &evt : evtChunk) {
+        if (evt.type == EventType::INVALID) {
+          std::cerr << "Got invalid event type!?\n";
+        }
+        if (evt.type == EventType::BEGIN) {
+          beginEvents.push(&evt);
+        }
+        if (evt.type == EventType::END && beginEvents.empty()) {
+          std::cerr << "Tracing Error: Too many rkTraceEndEvent calls!\n";
+          break;
+        }
 
-      const uint64_t timestamp =
-          std::chrono::duration_cast<std::chrono::microseconds>(
-              evt.time.time_since_epoch())
-              .count();
-
-      fout << "{"
-           << "\"ph\": \"" << evt.type << "\","
-           << "\"pid\":" << pid << ","
-           << "\"tid\":" << nextTid << ","
-           << "\"ts\":" << timestamp << ","
-           << "\"name\":\"" << evt.name << "\","
-           << "\"cat\":\"perf\"";
-
-      // Compute CPU utilization % over the begin/end interval for end events
-      float utilization = 0.f;
-      uint64_t duration = 0;
-      const TraceEvent *begin = nullptr;
-      if (evt.type == EventType::END) {
-        begin = beginEvents.top();
-        utilization = cpuUtilization(*begin, evt);
-        duration = std::chrono::duration_cast<std::chrono::microseconds>(
-            evt.time - begin->time)
-                       .count();
-
-        fout << ", \"args\":{\"cpuUtilization\":" << utilization << "}";
-
-        beginEvents.pop();
-      } else if (evt.type == EventType::COUNTER) {
-        fout << ", \"args\":{\"value\":" << evt.counterValue << "}";
-      }
-      fout << "},";
-
-      // For each end event also emit an update of the CPU % utilization
-      // counter for events that were long enough to reasonably measure
-      // utilization. CPU % is emitted at the time of the beginning of the
-      // event to display the counter properly over the interval
-      if (evt.type == EventType::END && duration > 100 && begin) {
-        const uint64_t beginTimestamp =
+        const uint64_t timestamp =
             std::chrono::duration_cast<std::chrono::microseconds>(
-                begin->time.time_since_epoch())
+                evt.time.time_since_epoch())
                 .count();
 
         fout << "{"
-             << "\"ph\": \"C\","
+             << "\"ph\": \"" << evt.type << "\","
              << "\"pid\":" << pid << ","
              << "\"tid\":" << nextTid << ","
-             << "\"ts\":" << beginTimestamp << ","
-             << "\"name\":\"cpuUtilization\","
-             << "\"cat\":\"perf\","
-             << "\"args\":{\"value\":" << utilization << "}},";
+             << "\"ts\":" << timestamp << ","
+             << "\"name\":\"" << (evt.name ? evt.name : "") << "\","
+             << "\"cat\":\"perf\"";
+
+        // Compute CPU utilization % over the begin/end interval for end events
+        float utilization = 0.f;
+        uint64_t duration = 0;
+        const TraceEvent *begin = nullptr;
+        if (evt.type == EventType::END) {
+          begin = beginEvents.top();
+          utilization = cpuUtilization(*begin, evt);
+          duration = std::chrono::duration_cast<std::chrono::microseconds>(
+              evt.time - begin->time)
+                         .count();
+
+          fout << ", \"args\":{\"cpuUtilization\":" << utilization << "}";
+
+          beginEvents.pop();
+        } else if (evt.type == EventType::COUNTER) {
+          fout << ", \"args\":{\"value\":" << evt.counterValue << "}";
+        }
+        fout << "},";
+
+        // For each end event also emit an update of the CPU % utilization
+        // counter for events that were long enough to reasonably measure
+        // utilization. CPU % is emitted at the time of the beginning of the
+        // event to display the counter properly over the interval
+        if (evt.type == EventType::END && duration > 100 && begin) {
+          const uint64_t beginTimestamp =
+              std::chrono::duration_cast<std::chrono::microseconds>(
+                  begin->time.time_since_epoch())
+                  .count();
+
+          fout << "{"
+               << "\"ph\": \"C\","
+               << "\"pid\":" << pid << ","
+               << "\"tid\":" << nextTid << ","
+               << "\"ts\":" << beginTimestamp << ","
+               << "\"name\":\"cpuUtilization\","
+               << "\"cat\":\"perf\","
+               << "\"args\":{\"value\":" << utilization << "}},";
+        }
       }
     }
     if (!beginEvents.empty()) {

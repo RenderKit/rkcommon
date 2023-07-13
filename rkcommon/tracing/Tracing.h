@@ -37,7 +37,8 @@ enum class EventType
 struct RKCOMMON_INTERFACE TraceEvent
 {
   EventType type = EventType::INVALID;
-  std::string name;
+  // Refers to a string in the thread's uniqueEventNames, nullptr for end events
+  const char *name = nullptr;
 #ifdef __linux__
   rusage usage;
 #endif
@@ -49,17 +50,27 @@ struct RKCOMMON_INTERFACE TraceEvent
 
   TraceEvent(const EventType type);
 
-  TraceEvent(const EventType type, const std::string &name);
+  TraceEvent(const EventType type, const char *name);
 
-  TraceEvent(const EventType type,
-      const std::string &name,
-      const uint64_t counterValue);
+  TraceEvent(
+      const EventType type, const char *name, const uint64_t counterValue);
 };
 
 struct RKCOMMON_INTERFACE ThreadEventList
 {
-  std::vector<TraceEvent> events;
+  // We store events in chunks to reduce memory copy
+  // costs when when tracking very large numbers of events
+  std::vector<std::vector<TraceEvent>> events;
   std::string threadName;
+  // Applications are typically running a rendering loop, emitting
+  // the same event name repeatedly. If these names are inline
+  // strings they will have the same pointer and we can cache
+  // them in a map to reduce string copying costs and overhead
+  // Note: the string is wrapped in a shared/unique ptr
+  // to guard against copy ctor use when adding to the map which would
+  // invalidate the pointer to the string data
+  std::unordered_map<const char *, std::shared_ptr<std::string>>
+      uniqueEventNames;
 
   void beginEvent(const char *name);
 
@@ -68,6 +79,11 @@ struct RKCOMMON_INTERFACE ThreadEventList
   void setMarker(const char *name);
 
   void setCounter(const char *name, const uint64_t value);
+
+ private:
+  std::vector<TraceEvent> &getCurrentEventList();
+
+  const char *getCachedEventName(const char *name);
 };
 
 class RKCOMMON_INTERFACE TraceRecorder
