@@ -115,7 +115,12 @@ std::vector<TraceEvent> &ThreadEventList::getCurrentEventList()
 
 const char *ThreadEventList::getCachedEventName(const char *name)
 {
-  // Lookup string in the uniqueEventNames list
+  // Lookup string in the uniqueEventNames list, since most strings are likely
+  // to just be static/constant data strings (e.g., rkTraceBeginEvent("X"))
+  // this caching is just based on the pointer and we skip doing more
+  // expensive string comparison. Dynamically generated strings will likely
+  // have different ptrs, though this will be wrong if some memory is
+  // re-used with different text content.
   auto fnd = uniqueEventNames.find(name);
   if (fnd == uniqueEventNames.end()) {
     auto en = std::make_shared<std::string>(name);
