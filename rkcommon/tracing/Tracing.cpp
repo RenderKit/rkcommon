@@ -108,6 +108,7 @@ std::vector<TraceEvent> &ThreadEventList::getCurrentEventList()
 {
   if (events.empty() || events.back().size() >= THREAD_EVENT_CHUNK_SIZE) {
     events.push_back(std::vector<TraceEvent>());
+    events.back().reserve(THREAD_EVENT_CHUNK_SIZE);
   }
   return events.back();
 }
