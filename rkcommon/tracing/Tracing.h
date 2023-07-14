@@ -5,6 +5,7 @@
 
 #include <chrono>
 #include <cstdint>
+#include <list>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -40,7 +41,8 @@ struct RKCOMMON_INTERFACE TraceEvent
   // Refers to a string in the thread's uniqueEventNames, nullptr for end events
   const char *name = nullptr;
 #ifdef __linux__
-  rusage usage;
+  timeval ru_utime;
+  timeval ru_stime;
 #endif
   std::chrono::steady_clock::time_point time;
 
@@ -60,7 +62,7 @@ struct RKCOMMON_INTERFACE ThreadEventList
 {
   // We store events in chunks to reduce memory copy
   // costs when when tracking very large numbers of events
-  std::vector<std::vector<TraceEvent>> events;
+  std::list<std::vector<TraceEvent>> events;
   std::string threadName;
   // Applications are typically running a rendering loop, emitting
   // the same event name repeatedly. If these names are inline

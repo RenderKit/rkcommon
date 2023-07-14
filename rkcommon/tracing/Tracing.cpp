@@ -19,7 +19,7 @@
 #define ENABLE_PROFILING
 #include "Tracing.h"
 
-#define THREAD_EVENT_CHUNK_SIZE 4096
+#define THREAD_EVENT_CHUNK_SIZE 8192
 
 namespace rkcommon {
 namespace tracing {
@@ -58,8 +58,10 @@ std::ostream &operator<<(std::ostream &os, const EventType &ty)
 TraceEvent::TraceEvent()
 {
 #ifdef __linux__
-  std::memset(&usage, 0, sizeof(rusage));
+  rusage usage;
   getrusage(RUSAGE_SELF, &usage);
+  ru_utime = usage.ru_utime;
+  ru_stime = usage.ru_stime;
 #endif
   time = steady_clock::now();
 }
@@ -282,12 +284,11 @@ void TraceRecorder::saveLog(const char *logFile, const char *processName)
 float cpuUtilization(const TraceEvent &start, const TraceEvent &end)
 {
 #ifdef __linux__
-  const double elapsed_cpu = end.usage.ru_utime.tv_sec
-      + end.usage.ru_stime.tv_sec
-      - (start.usage.ru_utime.tv_sec + start.usage.ru_stime.tv_sec)
+  const double elapsed_cpu = end.ru_utime.tv_sec + end.ru_stime.tv_sec
+      - (start.ru_utime.tv_sec + start.ru_stime.tv_sec)
       + 1e-6f
-          * (end.usage.ru_utime.tv_usec + end.usage.ru_stime.tv_usec
-              - (start.usage.ru_utime.tv_usec + start.usage.ru_stime.tv_usec));
+          * (end.ru_utime.tv_usec + end.ru_stime.tv_usec
+              - (start.ru_utime.tv_usec + start.ru_stime.tv_usec));
 
   const double elapsed_wall =
       duration_cast<duration<double>>(end.time - start.time).count();
