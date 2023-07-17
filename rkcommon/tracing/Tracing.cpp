@@ -323,8 +323,8 @@ void getProcMemUse(uint64_t &virtMem, uint64_t &resMem)
     const int pageSize = getpagesize();
     virtMem *= pageSize;
     resMem *= pageSize;
+    std::fclose(file);
   }
-  std::fclose(file);
 #endif
 }
 

@@ -46,7 +46,7 @@ struct RKCOMMON_INTERFACE TraceEvent
 #endif
   std::chrono::steady_clock::time_point time;
 
-  uint64_t counterValue;
+  uint64_t counterValue = 0;
 
   TraceEvent();
 
