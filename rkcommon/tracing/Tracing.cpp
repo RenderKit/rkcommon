@@ -16,7 +16,7 @@
 // We force the define on here to build the right header
 // at compile time, but apps that build with profiling off
 // will see the empty defines
-#define ENABLE_PROFILING
+#define RKCOMMON_ENABLE_PROFILING
 #include "Tracing.h"
 
 #define THREAD_EVENT_CHUNK_SIZE 8192

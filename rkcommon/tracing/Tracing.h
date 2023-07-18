@@ -116,7 +116,7 @@ std::string getProcStatus();
 
 // TODO: I think having rkcommon always build the code but the client app
 // set the defines should work fine?
-#ifdef ENABLE_PROFILING
+#ifdef RKCOMMON_ENABLE_PROFILING
 
 // Top-level C API for tracing, all functions are #define'd to nothing
 // when tracing is disabled
