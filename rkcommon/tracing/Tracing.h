@@ -111,41 +111,33 @@ float cpuUtilization(const TraceEvent &start, const TraceEvent &end);
 
 std::string getProcStatus();
 
-} // namespace tracing
-} // namespace rkcommon
+void beginEvent(const char *name);
 
-// TODO: I think having rkcommon always build the code but the client app
-// set the defines should work fine?
-#ifdef RKCOMMON_ENABLE_PROFILING
+void endEvent();
 
-// Top-level C API for tracing, all functions are #define'd to nothing
-// when tracing is disabled
-void rkTraceBeginEvent(const char *name);
-
-void rkTraceEndEvent();
-
-void rkTraceSetMarker(const char *name);
+void setMarker(const char *name);
 
 // Counter values are displayed per-process by chrome:://tracing
 // but are recorded per-thread without synchronization
-void rkTraceSetCounter(const char *name, uint64_t value);
+void setCounter(const char *name, uint64_t value);
 
 // Record the built-in counters traceVirtMem and traceRssMem tracking the
 // virtual and resident memory sizes respectively
-void rkTraceRecordMemUse();
+void recordMemUse();
 
-void rkTraceSetThreadName(const char *name);
+void setThreadName(const char *name);
 
-void rkTraceSaveLog(const char *logFile, const char *processName);
+void saveLog(const char *logFile, const char *processName);
+
+} // namespace tracing
+} // namespace rkcommon
+
+#ifdef RKCOMMON_ENABLE_PROFILING
+
+#define RKCOMMON_IF_TRACING_ENABLED(CMD) CMD
 
 #else
 
-#define rkTraceBeginEvent(X)
-#define rkTraceEndEvent()
-#define rkTraceSetMarker(X)
-#define rkTraceSetThreadName(X)
-#define rkTraceSetCounter(X, Y)
-#define rkTraceRecordMemUse()
-#define rkTraceSaveLog(X, Y)
+#define RKCOMMON_IF_TRACING_ENABLED(CMD)
 
 #endif

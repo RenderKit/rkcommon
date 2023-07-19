@@ -336,41 +336,33 @@ void initThreadEventList()
   }
 }
 
-} // namespace tracing
-} // namespace rkcommon
-
-void rkTraceBeginEvent(const char *name)
+void beginEvent(const char *name)
 {
-  using namespace rkcommon::tracing;
   initThreadEventList();
   threadEventList->beginEvent(name);
 }
 
-void rkTraceEndEvent()
+void endEvent()
 {
-  using namespace rkcommon::tracing;
   // Begin takes care of getting the threadEventList set
   // in thread_local storage so we can assume it exists here
   threadEventList->endEvent();
 }
 
-void rkTraceSetMarker(const char *name)
+void setMarker(const char *name)
 {
-  using namespace rkcommon::tracing;
   initThreadEventList();
   threadEventList->setMarker(name);
 }
 
-void rkTraceSetCounter(const char *name, uint64_t value)
+void setCounter(const char *name, uint64_t value)
 {
-  using namespace rkcommon::tracing;
   initThreadEventList();
   threadEventList->setCounter(name, value);
 }
 
-void rkTraceRecordMemUse()
+void recordMemUse()
 {
-  using namespace rkcommon::tracing;
   initThreadEventList();
   uint64_t virtMem = 0;
   uint64_t resMem = 0;
@@ -380,15 +372,16 @@ void rkTraceRecordMemUse()
   threadEventList->setCounter("rkTraceRssMem_B", resMem);
 }
 
-void rkTraceSetThreadName(const char *name)
+void setThreadName(const char *name)
 {
-  using namespace rkcommon::tracing;
   initThreadEventList();
   threadEventList->threadName = name;
 }
 
-void rkTraceSaveLog(const char *logFile, const char *processName)
+void saveLog(const char *logFile, const char *processName)
 {
-  using namespace rkcommon::tracing;
   traceRecorder->saveLog(logFile, processName);
 }
+
+} // namespace tracing
+} // namespace rkcommon
