@@ -71,22 +71,24 @@ TraceEvent::TraceEvent(const EventType ty) : TraceEvent()
   type = ty;
 }
 
-TraceEvent::TraceEvent(const EventType type, const char *n) : TraceEvent(type)
+TraceEvent::TraceEvent(const EventType type, const char *n, const char *c)
+    : TraceEvent(type)
 {
   name = n;
+  category = c;
 }
 
 TraceEvent::TraceEvent(
     const EventType type, const char *name, const uint64_t value)
-    : TraceEvent(type, name)
+    : TraceEvent(type, name, nullptr)
 {
   counterValue = value;
 }
 
-void ThreadEventList::beginEvent(const char *name)
+void ThreadEventList::beginEvent(const char *name, const char *category)
 {
-  getCurrentEventList().push_back(
-      TraceEvent(EventType::BEGIN, getCachedEventName(name)));
+  getCurrentEventList().push_back(TraceEvent(
+      EventType::BEGIN, getCachedString(name), getCachedString(category)));
 }
 
 void ThreadEventList::endEvent()
@@ -94,16 +96,16 @@ void ThreadEventList::endEvent()
   getCurrentEventList().push_back(TraceEvent(EventType::END));
 }
 
-void ThreadEventList::setMarker(const char *name)
+void ThreadEventList::setMarker(const char *name, const char *category)
 {
-  getCurrentEventList().push_back(
-      TraceEvent(EventType::MARKER, getCachedEventName(name)));
+  getCurrentEventList().push_back(TraceEvent(
+      EventType::MARKER, getCachedString(name), getCachedString(category)));
 }
 
 void ThreadEventList::setCounter(const char *name, const uint64_t counterValue)
 {
   getCurrentEventList().push_back(
-      TraceEvent(EventType::COUNTER, getCachedEventName(name), counterValue));
+      TraceEvent(EventType::COUNTER, getCachedString(name), counterValue));
 }
 
 std::vector<TraceEvent> &ThreadEventList::getCurrentEventList()
@@ -115,18 +117,21 @@ std::vector<TraceEvent> &ThreadEventList::getCurrentEventList()
   return events.back();
 }
 
-const char *ThreadEventList::getCachedEventName(const char *name)
+const char *ThreadEventList::getCachedString(const char *str)
 {
+  if (!str) {
+    return nullptr;
+  }
   // Lookup string in the uniqueEventNames list, since most strings are likely
   // to just be static/constant data strings (e.g., rkTraceBeginEvent("X"))
   // this caching is just based on the pointer and we skip doing more
   // expensive string comparison. Dynamically generated strings will likely
   // have different ptrs, though this will be wrong if some memory is
   // re-used with different text content.
-  auto fnd = uniqueEventNames.find(name);
-  if (fnd == uniqueEventNames.end()) {
-    auto en = std::make_shared<std::string>(name);
-    uniqueEventNames[name] = en;
+  auto fnd = stringCache.find(str);
+  if (fnd == stringCache.end()) {
+    auto en = std::make_shared<std::string>(str);
+    stringCache[str] = en;
     return en->c_str();
   }
   return fnd->second->c_str();
@@ -223,8 +228,10 @@ void TraceRecorder::saveLog(const char *logFile, const char *processName)
              << "\"pid\":" << pid << ","
              << "\"tid\":" << nextTid << ","
              << "\"ts\":" << timestamp << ","
-             << "\"name\":\"" << (evt.name ? evt.name : "") << "\","
-             << "\"cat\":\"perf\"";
+             << "\"name\":\"" << (evt.name ? evt.name : "") << "\"";
+        if (evt.type != EventType::END && evt.category) {
+          fout << ",\"cat\":\"" << evt.category << "\"";
+        }
 
         // Compute CPU utilization % over the begin/end interval for end events
         float utilization = 0.f;
@@ -237,11 +244,11 @@ void TraceRecorder::saveLog(const char *logFile, const char *processName)
               evt.time - begin->time)
                          .count();
 
-          fout << ", \"args\":{\"cpuUtilization\":" << utilization << "}";
+          fout << ",\"args\":{\"cpuUtilization\":" << utilization << "}";
 
           beginEvents.pop();
         } else if (evt.type == EventType::COUNTER) {
-          fout << ", \"args\":{\"value\":" << evt.counterValue << "}";
+          fout << ",\"args\":{\"value\":" << evt.counterValue << "}";
         }
         fout << "},";
 
@@ -261,7 +268,7 @@ void TraceRecorder::saveLog(const char *logFile, const char *processName)
                << "\"tid\":" << nextTid << ","
                << "\"ts\":" << beginTimestamp << ","
                << "\"name\":\"cpuUtilization\","
-               << "\"cat\":\"perf\","
+               << "\"cat\":\"builtin\","
                << "\"args\":{\"value\":" << utilization << "}},";
         }
       }
@@ -336,10 +343,10 @@ void initThreadEventList()
   }
 }
 
-void beginEvent(const char *name)
+void beginEvent(const char *name, const char *category)
 {
   initThreadEventList();
-  threadEventList->beginEvent(name);
+  threadEventList->beginEvent(name, category);
 }
 
 void endEvent()
@@ -349,10 +356,10 @@ void endEvent()
   threadEventList->endEvent();
 }
 
-void setMarker(const char *name)
+void setMarker(const char *name, const char *category)
 {
   initThreadEventList();
-  threadEventList->setMarker(name);
+  threadEventList->setMarker(name, category);
 }
 
 void setCounter(const char *name, uint64_t value)

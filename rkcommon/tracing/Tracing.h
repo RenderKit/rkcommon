@@ -38,8 +38,10 @@ enum class EventType
 struct RKCOMMON_INTERFACE TraceEvent
 {
   EventType type = EventType::INVALID;
-  // Refers to a string in the thread's uniqueEventNames, nullptr for end events
+  // Refers to a string in the thread's stringCache, nullptr for end events
   const char *name = nullptr;
+  // Refers to the event category in the thread's stringCache, may be null
+  const char *category = nullptr;
 #ifdef __linux__
   timeval ru_utime;
   timeval ru_stime;
@@ -52,7 +54,7 @@ struct RKCOMMON_INTERFACE TraceEvent
 
   TraceEvent(const EventType type);
 
-  TraceEvent(const EventType type, const char *name);
+  TraceEvent(const EventType type, const char *name, const char *category);
 
   TraceEvent(
       const EventType type, const char *name, const uint64_t counterValue);
@@ -71,21 +73,20 @@ struct RKCOMMON_INTERFACE ThreadEventList
   // Note: the string is wrapped in a shared/unique ptr
   // to guard against copy ctor use when adding to the map which would
   // invalidate the pointer to the string data
-  std::unordered_map<const char *, std::shared_ptr<std::string>>
-      uniqueEventNames;
+  std::unordered_map<const char *, std::shared_ptr<std::string>> stringCache;
 
-  void beginEvent(const char *name);
+  void beginEvent(const char *name, const char *category);
 
   void endEvent();
 
-  void setMarker(const char *name);
+  void setMarker(const char *name, const char *category);
 
   void setCounter(const char *name, const uint64_t value);
 
  private:
   std::vector<TraceEvent> &getCurrentEventList();
 
-  const char *getCachedEventName(const char *name);
+  const char *getCachedString(const char *str);
 };
 
 class RKCOMMON_INTERFACE TraceRecorder
@@ -111,11 +112,15 @@ float cpuUtilization(const TraceEvent &start, const TraceEvent &end);
 
 std::string getProcStatus();
 
-void beginEvent(const char *name);
+// Begin an event, must be paired with an end event. Name is required,
+// category is optional
+void beginEvent(const char *name, const char *category);
 
 void endEvent();
 
-void setMarker(const char *name);
+// Set a marker in the trace timeline, e.g., for things that have no duration
+// Name is required, category is optional
+void setMarker(const char *name, const char *category);
 
 // Counter values are displayed per-process by chrome:://tracing
 // but are recorded per-thread without synchronization
