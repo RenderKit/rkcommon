@@ -33,15 +33,19 @@
 #define _MM_SET_DENORMALS_ZERO_MODE(x) \
   (_mm_setcsr((_mm_getcsr() & ~_MM_DENORMALS_ZERO_MASK) | (x)))
 #endif
+
+#define RKCOMMON_MM_SET_DENORMALS_ZERO_MODE(x)                                 \
+  _MM_SET_DENORMALS_ZERO_MODE(x)
+#define RKCOMMON_MM_SET_FLUSH_ZERO_MODE(x)                                     \
+  _MM_SET_FLUSH_ZERO_MODE(x)
+
 #else
-#if !defined(_MM_SET_DENORMALS_ZERO_MODE)
-#define _MM_SET_FLUSH_ZERO_MODE(x)                                             \
+#define RKCOMMON_MM_SET_FLUSH_ZERO_MODE(x)                                     \
   do {                                                                         \
   } while (0)
-#define _MM_SET_DENORMALS_ZERO_MODE(x)                                         \
+#define RKCOMMON_MM_SET_DENORMALS_ZERO_MODE(x)                                 \
   do {                                                                         \
   } while (0)
-#endif
 #endif
 
 // rkcommon
@@ -91,8 +95,8 @@ namespace rkcommon {
     void initTaskingSystem(int numThreads, bool flushDenormals)
     {
       if (flushDenormals) {
-        _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-        _MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
+        RKCOMMON_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+        RKCOMMON_MM_SET_DENORMALS_ZERO_MODE(_MM_DENORMALS_ZERO_ON);
       }
 
       g_tasking_handle = make_unique<tasking_system_handle>(numThreads);
