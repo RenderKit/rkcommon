@@ -52,7 +52,8 @@ namespace rkcommon {
 
   // anchorAddress = nullptr will disable anchored loads
   RKCOMMON_INTERFACE void loadLibrary(
-      const std::string &name, const void *anchorAddress);
+      const void *anchorAddress, const std::string &name,
+      const std::vector<int> &version = {});
 
   RKCOMMON_INTERFACE void unloadLibrary(const std::string &name);
 
