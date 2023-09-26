@@ -326,10 +326,11 @@ void getProcMemUse(uint64_t &virtMem, uint64_t &resMem)
   FILE *file = std::fopen("/proc/self/statm", "r");
   if (file) {
     // These values are measured in pages
-    std::fscanf(file, "%lu %lu", &virtMem, &resMem);
-    const int pageSize = getpagesize();
-    virtMem *= pageSize;
-    resMem *= pageSize;
+    if (std::fscanf(file, "%lu %lu", &virtMem, &resMem) == 2) {
+      const int pageSize = getpagesize();
+      virtMem *= pageSize;
+      resMem *= pageSize;
+    }
     std::fclose(file);
   }
 #endif
