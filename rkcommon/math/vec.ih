@@ -28,6 +28,8 @@ __define_vectors(int32, i);
 __define_vectors(uint32, ui);
 __define_vectors(uint8, uc);
 __define_vectors(float, f);
+__define_vectors(int64, l);
+__define_vectors(uint64, ul);
 #undef __define_vectors
 #else
 template <typename T, int N>
@@ -75,18 +77,24 @@ struct vec_t<T, 4>
 typedef vec_t<uint8_t, 2> vec2uc;
 typedef vec_t<uint32_t, 2> vec2ui;
 typedef vec_t<int32_t, 2> vec2i;
+typedef vec_t<int64_t, 2> vec2l;
+typedef vec_t<uint64_t, 2> vec2ul;
 typedef vec_t<float, 2> vec2f;
 
 // vec3 variants
 typedef vec_t<uint8_t, 3> vec3uc;
 typedef vec_t<uint32_t, 3> vec3ui;
 typedef vec_t<int32_t, 3> vec3i;
+typedef vec_t<int64_t, 3> vec3l;
+typedef vec_t<uint64_t, 3> vec3ul;
 typedef vec_t<float, 3> vec3f;
 
 // vec4 variants
 typedef vec_t<uint8_t, 4> vec4uc;
 typedef vec_t<uint32_t, 4> vec4ui;
 typedef vec_t<int32_t, 4> vec4i;
+typedef vec_t<int64_t, 4> vec4l;
+typedef vec_t<uint64_t, 4> vec4ul;
 typedef vec_t<float, 4> vec4f;
 #endif
 

@@ -31,6 +31,8 @@ add_library(${PROJECT_NAME}
   utility/TimeStamp.cpp
 
   xml/XML.cpp
+
+  tracing/Tracing.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

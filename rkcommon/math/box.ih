@@ -9,6 +9,19 @@
 namespace ispc {
 #endif
 
+// a 1-d int bounding box (ie, a range<int>
+struct box1i
+{
+  int32 lower;
+  int32 upper;
+#ifndef ISPC
+  box1i() = default;
+  box1i(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
+  box1i(const int32 v) : lower(v), upper(v) {}
+  box1i(const int32 l, const int32 u) : lower(l), upper(u) {}
+#endif
+};
+
 // a 1-d float bounding box (ie, a range<float>
 struct box1f
 {
@@ -56,8 +69,8 @@ struct box3f
 #ifndef ISPC
   box3f() = default;
   box3f(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
-  box3f(const float v) : lower(v), upper(v) {}
-  box3f(const float l, const float u) : lower(l), upper(u) {}
+  box3f(const vec3f v) : lower(v), upper(v) {}
+  box3f(const vec3f l, const vec3f u) : lower(l), upper(u) {}
 #endif
 };
 
@@ -84,8 +97,21 @@ struct box3fa
 #ifndef ISPC
   box3fa() = default;
   box3fa(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
-  box3fa(const int v) : lower(v), upper(v) {}
-  box3fa(const float l, const float u) : lower(l), upper(u) {}
+  box3fa(const vec3f v) : lower(v), upper(v) {}
+  box3fa(const vec3f l, const vec3f u) : lower(l), upper(u) {}
+#endif
+};
+
+// a 4-d int bounding box
+struct box4i
+{
+  vec4i lower;
+  vec4i upper;
+#ifndef ISPC
+  box4i() = default;
+  box4i(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
+  box4i(const vec4i v) : lower(v), upper(v) {}
+  box4i(const vec4i l, const vec4i u) : lower(l), upper(u) {}
 #endif
 };
 
@@ -97,8 +123,8 @@ struct box4f
 #ifndef ISPC
   box4f() = default;
   box4f(const EmptyTy &) : lower(pos_inf), upper(neg_inf) {}
-  box4f(const int v) : lower(v), upper(v) {}
-  box4f(const float l, const float u) : lower(l), upper(u) {}
+  box4f(const vec4f v) : lower(v), upper(v) {}
+  box4f(const vec4f l, const vec4f u) : lower(l), upper(u) {}
 #endif
 };
 

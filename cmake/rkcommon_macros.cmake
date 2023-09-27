@@ -125,6 +125,12 @@ macro(rkcommon_configure_compiler)
     message(FATAL_ERROR
             "Unsupported compiler specified: '${CMAKE_CXX_COMPILER_ID}'")
   endif()
+
+  if (WIN32 AND NOT RKCOMMON_COMPILER_MSVC)
+    # workaround for https://gitlab.kitware.com/cmake/cmake/-/issues/18311
+    set(CMAKE_NINJA_CMCLDEPS_RC OFF)
+  endif()
+
 endmacro()
 
 ## Tasking System macros ##

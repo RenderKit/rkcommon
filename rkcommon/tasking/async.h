@@ -12,7 +12,11 @@ namespace rkcommon {
   namespace tasking {
 
     template <typename TASK_T>
+#if defined(__cpp_lib_is_invocable) && __cpp_lib_is_invocable >= 201703
+    using operator_return_t = std::invoke_result_t<TASK_T>;
+#else
     using operator_return_t = typename std::result_of<TASK_T()>::type;
+#endif
 
     // NOTE(jda) - This abstraction takes a lambda which should take captured
     //             variables by *value* to ensure no captured references race

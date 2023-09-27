@@ -11,12 +11,6 @@
 #include <sys/times.h>
 #endif
 
-#if defined(__MACOSX__) || defined(__APPLE__)
-#define RKCOMMON_LIB_EXT ".dylib"
-#else
-#define RKCOMMON_LIB_EXT ".so"
-#endif
-
 namespace {
 
   std::string directory_from_path(const std::string &path)
@@ -124,8 +118,8 @@ namespace {
 namespace rkcommon {
 
   Library::Library(
-      const std::string &name, const void *anchorAddress)
-      : libraryName(name)
+      const void *anchorAddress, const std::string &name, const Version &version)
+      : libraryName(name), libraryVersion(version)
   {
     bool success = false;
 
@@ -177,8 +171,18 @@ namespace rkcommon {
       LocalFree(lpMsgBuf);
     }
 #else
-    std::string fullName = libLocation + "lib" + file + RKCOMMON_LIB_EXT;
-    lib                  = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
+    std::string versionStr;
+    for (int i: libraryVersion)
+      versionStr += "." + std::to_string(i);
+
+    std::string fullName = libLocation + "lib" + file;
+#if defined(__MACOSX__) || defined(__APPLE__)
+    fullName += versionStr + ".dylib";
+#else
+    fullName += ".so" + versionStr;
+#endif
+
+    lib = dlopen(fullName.c_str(), RTLD_LAZY | RTLD_LOCAL);
     if (lib == nullptr)
       errorMsg = dlerror();
 #endif
@@ -241,13 +245,14 @@ namespace rkcommon {
     }
   }
 
-  void LibraryRepository::add(
-      const std::string &name, const void *anchorAddress)
+  void LibraryRepository::add(const void *anchorAddress,
+    const std::string &name, const Library::Version &version)
   {
     if (libraryExists(name))
       return; // lib already loaded.
 
-    repo.push_back(rkcommon::make_unique<Library>(name, anchorAddress));
+    repo.push_back(rkcommon::make_unique<Library>(
+      anchorAddress, name, version));
   }
 
   void LibraryRepository::remove(const std::string &name)
