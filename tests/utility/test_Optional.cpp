@@ -96,6 +96,7 @@ SCENARIO("Optional<> construction", "[Optional]")
 
     WHEN("Used to move construct from Optional<> with value")
     {
+      Optional<int> value_opt(5);
       Optional<int> copy_opt(std::move(value_opt));
       THEN("The new Optional<> should have the same value")
       {
@@ -105,6 +106,7 @@ SCENARIO("Optional<> construction", "[Optional]")
 
     WHEN("Used to move construct from Optional<> with value and different type")
     {
+      Optional<int> value_opt(5);
       Optional<float> copy_opt(std::move(value_opt));
       THEN("The new Optional<> should have the right value")
       {

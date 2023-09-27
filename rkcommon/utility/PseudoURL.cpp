@@ -114,7 +114,7 @@ namespace rkcommon {
     /*! check if the given parameter was specified */
     bool PseudoURL::hasParam(const std::string &name)
     {
-      for (auto param : params)
+      for (auto &param : params)
         if (param.first == name)
           return true;
       return false;

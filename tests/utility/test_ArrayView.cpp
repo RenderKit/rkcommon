@@ -42,7 +42,7 @@ inline void verify_N(const ArrayView<T> &v, int N)
 template <typename T, int SIZE>
 inline std::array<T, SIZE> make_test_array()
 {
-  std::array<T, SIZE> a;
+  std::array<T, SIZE> a = {};
   std::iota(a.begin(), a.end(), 0);
   return a;
 }
