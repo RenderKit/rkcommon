@@ -169,9 +169,9 @@ inline T extract(const T &t, int)
 }
 template <typename T,
     typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
-inline T exclusive_scan_add(const T &t)
+inline T exclusive_scan_add(const T &)
 {
-  return t;
+  return zero;
 }
 template <typename T,
     typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
