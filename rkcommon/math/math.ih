@@ -171,7 +171,7 @@ template <typename T,
     typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 inline T exclusive_scan_add(const T &)
 {
-  return zero;
+  return 0;
 }
 template <typename T,
     typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
