@@ -131,6 +131,19 @@ macro(rkcommon_configure_compiler)
     set(CMAKE_NINJA_CMCLDEPS_RC OFF)
   endif()
 
+  # setting DEPENDENTLOADFLAG:LOAD_LIBRARY_SAFE_CURRENT_DIRS on rkcommon DLL
+  if(WIN32)
+    if(RKCOMMON_COMPILER_MSVC)
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEPENDENTLOADFLAG:0x2000")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /DEPENDENTLOADFLAG:0x2000")
+    elseif(RKCOMMON_COMPILER_DPCPP)
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /Qoption,link,/DEPENDENTLOADFLAG:0x2000")
+      set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /Qoption,link,/DEPENDENTLOADFLAG:0x2000")
+    else()
+      message(WARNING "Unrecognized WIN32 compiler, DEPENDENTLOADFLAG can't be set")
+    endif()
+  endif()
+
 endmacro()
 
 ## Tasking System macros ##

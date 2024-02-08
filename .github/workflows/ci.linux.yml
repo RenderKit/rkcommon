@@ -133,7 +133,6 @@ jobs:
     secrets: inherit
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/static_analysis.yml@main
     with:
-      project: rkcommon
-      prebuild: |
-        cmake -S . -B build -DRKCOMMON_TASKING_SYSTEM=INTERNAL
+      project: RKCommon
+      prebuild: cmake -S . -B build -DRKCOMMON_TASKING_SYSTEM=INTERNAL
       build: cmake --build build
