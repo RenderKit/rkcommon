@@ -183,15 +183,14 @@ jobs:
         ./build/rkcommon_test_suite
       artifact-in: build-arch-clang
 
-#  EnkiTS generates heap-use-after-free, uncomment after EnkiTS removal
-#  test-arch-clang-sanitizer:
-#    needs: build-arch-clang-sanitizer
-#    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
-#    with:
-#      image: archlinux:latest
-#      cmd: |
-#        ./build/rkcommon_test_suite
-#      artifact-in: build-arch-clang-sanitizer
+  test-arch-clang-sanitizer:
+    needs: build-arch-clang-sanitizer
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: archlinux:latest
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-arch-clang-sanitizer
 
   ## Static Analysis ##
 
