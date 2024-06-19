@@ -21,7 +21,7 @@ jobs:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/macos.yml@main
     with:
       cmd: |
-        gitlab/build.sh
+        .github/scripts/build.sh
       artifact-out: build-macos
       artifact-path: build
 

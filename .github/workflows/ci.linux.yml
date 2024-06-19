@@ -22,7 +22,7 @@ jobs:
     with:
       image: centos:7
       cmd: |
-        gitlab/build.sh
+        .github/scripts/build.sh
       artifact-out: build-centos7
       artifact-path: build
 
@@ -31,7 +31,7 @@ jobs:
     with:
       image: ubuntu:18.04
       cmd: |
-        gitlab/build.sh -G Ninja
+        .github/scripts/build.sh -G Ninja
       artifact-out: build-ubuntu1804
       artifact-path: build
 
@@ -40,7 +40,7 @@ jobs:
     with:
       image: ubuntu:20.04
       cmd: |
-        gitlab/build.sh -G Ninja
+        .github/scripts/build.sh -G Ninja
       artifact-out: build-ubuntu2004
       artifact-path: build
 
@@ -49,7 +49,7 @@ jobs:
     with:
       image: ubuntu:22.04
       cmd: |
-        gitlab/build.sh -G Ninja
+        .github/scripts/build.sh -G Ninja
       artifact-out: build-ubuntu2204
       artifact-path: build
 
@@ -58,7 +58,7 @@ jobs:
     with:
       image: ospray/docker-images:arch
       cmd: |
-        gitlab/build.sh -G Ninja
+        .github/scripts/build.sh -G Ninja
       artifact-out: build-arch
       artifact-path: build
         
@@ -69,7 +69,7 @@ jobs:
       cmd: |
         export CC=clang
         export CXX=clang++
-        gitlab/build.sh -G Ninja
+        .github/scripts/build.sh -G Ninja
       artifact-out: build-arch-clang
       artifact-path: build
 
