@@ -17,22 +17,13 @@ jobs:
 
   ## Build Jobs ##
 
-  build-centos7:
+  build-rocky8:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: centos:7
+      image: rockylinux:8
       cmd: |
         .github/scripts/build.sh
-      artifact-out: build-centos7
-      artifact-path: build
-
-  build-ubuntu1804:
-    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
-    with:
-      image: ubuntu:18.04
-      cmd: |
-        .github/scripts/build.sh -G Ninja
-      artifact-out: build-ubuntu1804
+      artifact-out: build-rocky8
       artifact-path: build
 
   build-ubuntu2004:
@@ -51,6 +42,15 @@ jobs:
       cmd: |
         .github/scripts/build.sh -G Ninja
       artifact-out: build-ubuntu2204
+      artifact-path: build
+
+  build-ubuntu2404:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:24.04
+      cmd: |
+        .github/scripts/build.sh -G Ninja
+      artifact-out: build-ubuntu2404
       artifact-path: build
 
   build-arch:
@@ -75,23 +75,14 @@ jobs:
 
   ## Functional Test Jobs ##
 
-  test-centos7:
-    needs: build-centos7
+  test-rocky8:
+    needs: build-rocky8
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: centos:7
+      image: rockylinux:8
       cmd: |
         ./build/rkcommon_test_suite
-      artifact-in: build-centos7
-
-  test-ubuntu1804:
-    needs: build-ubuntu1804
-    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
-    with:
-      image: ubuntu:18.04
-      cmd: |
-        ./build/rkcommon_test_suite
-      artifact-in: build-ubuntu1804
+      artifact-in: build-rocky8
 
   test-ubuntu2004:
     needs: build-ubuntu2004
@@ -110,6 +101,15 @@ jobs:
       cmd: |
         ./build/rkcommon_test_suite
       artifact-in: build-ubuntu2204
+
+  test-ubuntu2404:
+    needs: build-ubuntu2404
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:24.04
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-ubuntu2404
 
   test-arch:
     needs: build-arch

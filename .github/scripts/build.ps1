@@ -8,7 +8,6 @@ cmake --version
 
 cmake -L `
 -G $args[0] `
--T $args[1] `
 -D RKCOMMON_TASKING_SYSTEM=INTERNAL `
 ..
 
