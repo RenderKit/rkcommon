@@ -47,7 +47,8 @@ namespace rkcommon {
 
     /* split a string on a set of delimiters */
     inline std::vector<std::string> split(const std::string &input,
-                                          const std::string &delim)
+                                          const std::string &delim,
+                                          const bool keepDelim = false)
     {
       std::vector<std::string> tokens;
       size_t pos = 0;
@@ -56,6 +57,8 @@ namespace rkcommon {
         if (begin == input.npos)
           return tokens;
         size_t end = input.find_first_of(delim, begin);
+        if (keepDelim && begin != 0)
+          begin--;
         tokens.push_back(input.substr(
             begin, (end == input.npos) ? input.npos : (end - begin)));
         pos = end;
