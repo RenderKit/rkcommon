@@ -191,6 +191,10 @@ inline T reduce_min(const T &t)
 {
   return t;
 }
+inline float half_to_float(sycl::half x)
+{
+  return x;
+}
 #endif
 
 #define __define_functions(univary)                                            \
