@@ -26,6 +26,28 @@ jobs:
       artifact-out: build-rocky8
       artifact-path: build
 
+  build-rocky8-icx:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: rockylinux:8
+      cmd: |
+        module load intel/2022.1
+        export CC=icx
+        export CXX=icpx
+        export LDFLAGS="-static-intel"
+        .github/scripts/build.sh
+      artifact-out: build-rocky8-icx
+      artifact-path: build
+
+  build-rocky9:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: rockylinux:9
+      cmd: |
+        .github/scripts/build.sh
+      artifact-out: build-rocky9
+      artifact-path: build
+
   build-ubuntu2004:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
@@ -56,7 +78,7 @@ jobs:
   build-arch:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ospray/docker-images:arch
+      image: archlinux:latest
       cmd: |
         .github/scripts/build.sh -G Ninja
       artifact-out: build-arch
@@ -65,12 +87,26 @@ jobs:
   build-arch-clang:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ospray/docker-images:arch
+      image: archlinux:latest
       cmd: |
         export CC=clang
         export CXX=clang++
         .github/scripts/build.sh -G Ninja
       artifact-out: build-arch-clang
+      artifact-path: build
+
+  build-arch-clang-sanitizer:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: archlinux:latest
+      cmd: |
+        export CC=clang
+        export CXX=clang++
+        export CFLAGS=-fsanitize=address
+        export CXXFLAGS=-fsanitize=address
+        export LDFLAGS=-fsanitize=address
+        .github/scripts/build.sh -G Ninja -DCMAKE_BUILD_TYPE=Debug
+      artifact-out: build-arch-clang-sanitizer
       artifact-path: build
 
   ## Functional Test Jobs ##
@@ -83,6 +119,24 @@ jobs:
       cmd: |
         ./build/rkcommon_test_suite
       artifact-in: build-rocky8
+
+  test-rocky8-icx:
+    needs: build-rocky8-icx
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: rockylinux:8
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-rocky8-icx
+
+  test-rocky9:
+    needs: build-rocky9
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: rockylinux:9
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-rocky9
 
   test-ubuntu2004:
     needs: build-ubuntu2004
@@ -115,7 +169,7 @@ jobs:
     needs: build-arch
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ospray/docker-images:arch
+      image: archlinux:latest
       cmd: |
         ./build/rkcommon_test_suite
       artifact-in: build-arch
@@ -124,10 +178,20 @@ jobs:
     needs: build-arch-clang
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ospray/docker-images:arch
+      image: archlinux:latest
       cmd: |
         ./build/rkcommon_test_suite
       artifact-in: build-arch-clang
+
+#  EnkiTS generates heap-use-after-free, uncomment after EnkiTS removal
+#  test-arch-clang-sanitizer:
+#    needs: build-arch-clang-sanitizer
+#    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+#    with:
+#      image: archlinux:latest
+#      cmd: |
+#        ./build/rkcommon_test_suite
+#      artifact-in: build-arch-clang-sanitizer
 
   ## Static Analysis ##
 
