@@ -489,7 +489,7 @@ namespace rkcommon {
             typename U,                                                     \
             int N,                                                          \
             bool A,                                                         \
-            typename = traits::is_not_same_t<T, U>>                         \
+            typename = traits::is_not_same_and_arithmetic_t<T, U>>          \
   inline auto name(const vec_t<T, N, A> &a, const vec_t<U, N, A> &b)        \
       ->vec_t<decltype(T() op U()), N, A>                                   \
   {                                                                         \
@@ -521,7 +521,7 @@ namespace rkcommon {
             typename U,                                                     \
             int N,                                                          \
             bool A,                                                         \
-            typename = traits::is_not_same_t<T, U>>                         \
+            typename = traits::is_not_same_and_arithmetic_t<T, U>>          \
   inline auto name(const vec_t<T, N, A> &a, const U &b)                     \
       ->vec_t<decltype(T() op U()), N, A>                                   \
   {                                                                         \
@@ -554,7 +554,7 @@ namespace rkcommon {
             typename U,                                                     \
             int N,                                                          \
             bool A,                                                         \
-            typename = traits::is_not_same_t<T, U>>                         \
+            typename = traits::is_not_same_and_arithmetic_t<T, U>>          \
   inline auto name(const T &a, const vec_t<U, N, A> &b)                     \
       ->vec_t<decltype(T() op U()), N, A>                                   \
   {                                                                         \
@@ -563,7 +563,7 @@ namespace rkcommon {
     return vector_t(scalar_t(a) op vector_t(b));                            \
   }
 
-        // clang-format off
+    // clang-format off
     binary_operator(operator+, +)
     binary_operator(operator-, -)
     binary_operator(operator*, *)

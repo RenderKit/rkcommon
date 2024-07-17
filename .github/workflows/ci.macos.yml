@@ -11,6 +11,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: read-all
+
 jobs:
 
   ## Build Jobs ##
@@ -18,9 +20,19 @@ jobs:
   build-macos:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/macos.yml@main
     with:
+      runs-on: '[ "macOS", "build", "x86_64" ]'
       cmd: |
-        gitlab/build.sh
+        .github/scripts/build-openmp.sh
       artifact-out: build-macos
+      artifact-path: build
+
+  build-macos-arm:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/macos.yml@main
+    with:
+      runs-on: '[ "macOS", "build", "arm" ]'
+      cmd: |
+        .github/scripts/build-openmp.sh
+      artifact-out: build-macos-arm
       artifact-path: build
 
   ## Functional Test Jobs ##
@@ -29,7 +41,18 @@ jobs:
     needs: build-macos
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/macos.yml@main
     with:
+      runs-on: '[ "macOS", "build", "x86_64" ]'
       cmd: |
         export DYLD_FALLBACK_LIBRARY_PATH=./build:$DYLD_FALLBACK_LIBRARY_PATH
         ./build/rkcommon_test_suite
       artifact-in: build-macos
+
+  test-macos-arm:
+    needs: build-macos-arm
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/macos.yml@main
+    with:
+      runs-on: '[ "macOS", "build", "arm" ]'
+      cmd: |
+        export DYLD_FALLBACK_LIBRARY_PATH=./build:$DYLD_FALLBACK_LIBRARY_PATH
+        ./build/rkcommon_test_suite
+      artifact-in: build-macos-arm

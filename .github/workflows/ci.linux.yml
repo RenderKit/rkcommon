@@ -11,26 +11,41 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: read-all
+
 jobs:
 
   ## Build Jobs ##
 
-  build-centos7:
+  build-rocky8:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: centos:7
+      image: rockylinux:8
       cmd: |
-        gitlab/build.sh
-      artifact-out: build-centos7
+        .github/scripts/build.sh
+      artifact-out: build-rocky8
       artifact-path: build
 
-  build-ubuntu1804:
+  build-rocky8-icx:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ubuntu:18.04
+      image: rockylinux:8
       cmd: |
-        gitlab/build.sh -G Ninja
-      artifact-out: build-ubuntu1804
+        module load intel/2022.1
+        export CC=icx
+        export CXX=icpx
+        export LDFLAGS="-static-intel"
+        .github/scripts/build.sh
+      artifact-out: build-rocky8-icx
+      artifact-path: build
+
+  build-rocky9:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: rockylinux:9
+      cmd: |
+        .github/scripts/build.sh
+      artifact-out: build-rocky9
       artifact-path: build
 
   build-ubuntu2004:
@@ -38,7 +53,7 @@ jobs:
     with:
       image: ubuntu:20.04
       cmd: |
-        gitlab/build.sh -G Ninja
+        .github/scripts/build.sh -G Ninja
       artifact-out: build-ubuntu2004
       artifact-path: build
 
@@ -47,49 +62,81 @@ jobs:
     with:
       image: ubuntu:22.04
       cmd: |
-        gitlab/build.sh -G Ninja
+        .github/scripts/build.sh -G Ninja
       artifact-out: build-ubuntu2204
+      artifact-path: build
+
+  build-ubuntu2404:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:24.04
+      cmd: |
+        .github/scripts/build.sh -G Ninja
+      artifact-out: build-ubuntu2404
       artifact-path: build
 
   build-arch:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ospray/docker-images:arch
+      image: archlinux:latest
       cmd: |
-        gitlab/build.sh -G Ninja
+        .github/scripts/build.sh -G Ninja
       artifact-out: build-arch
       artifact-path: build
         
   build-arch-clang:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ospray/docker-images:arch
+      image: archlinux:latest
       cmd: |
         export CC=clang
         export CXX=clang++
-        gitlab/build.sh -G Ninja
+        .github/scripts/build.sh -G Ninja
       artifact-out: build-arch-clang
+      artifact-path: build
+
+  build-arch-clang-sanitizer:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: archlinux:latest
+      cmd: |
+        export CC=clang
+        export CXX=clang++
+        export CFLAGS=-fsanitize=address
+        export CXXFLAGS=-fsanitize=address
+        export LDFLAGS=-fsanitize=address
+        .github/scripts/build.sh -G Ninja -DCMAKE_BUILD_TYPE=Debug
+      artifact-out: build-arch-clang-sanitizer
       artifact-path: build
 
   ## Functional Test Jobs ##
 
-  test-centos7:
-    needs: build-centos7
+  test-rocky8:
+    needs: build-rocky8
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: centos:7
+      image: rockylinux:8
       cmd: |
         ./build/rkcommon_test_suite
-      artifact-in: build-centos7
+      artifact-in: build-rocky8
 
-  test-ubuntu1804:
-    needs: build-ubuntu1804
+  test-rocky8-icx:
+    needs: build-rocky8-icx
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ubuntu:18.04
+      image: rockylinux:8
       cmd: |
         ./build/rkcommon_test_suite
-      artifact-in: build-ubuntu1804
+      artifact-in: build-rocky8-icx
+
+  test-rocky9:
+    needs: build-rocky9
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: rockylinux:9
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-rocky9
 
   test-ubuntu2004:
     needs: build-ubuntu2004
@@ -109,11 +156,20 @@ jobs:
         ./build/rkcommon_test_suite
       artifact-in: build-ubuntu2204
 
+  test-ubuntu2404:
+    needs: build-ubuntu2404
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: ubuntu:24.04
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-ubuntu2404
+
   test-arch:
     needs: build-arch
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ospray/docker-images:arch
+      image: archlinux:latest
       cmd: |
         ./build/rkcommon_test_suite
       artifact-in: build-arch
@@ -122,10 +178,20 @@ jobs:
     needs: build-arch-clang
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
-      image: ospray/docker-images:arch
+      image: archlinux:latest
       cmd: |
         ./build/rkcommon_test_suite
       artifact-in: build-arch-clang
+
+#  EnkiTS generates heap-use-after-free, uncomment after EnkiTS removal
+#  test-arch-clang-sanitizer:
+#    needs: build-arch-clang-sanitizer
+#    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+#    with:
+#      image: archlinux:latest
+#      cmd: |
+#        ./build/rkcommon_test_suite
+#      artifact-in: build-arch-clang-sanitizer
 
   ## Static Analysis ##
 

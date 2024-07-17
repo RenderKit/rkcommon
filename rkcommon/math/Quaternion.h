@@ -72,7 +72,7 @@ namespace rkcommon {
     }
 
     template <typename T, typename U,
-        typename = traits::is_not_same_t<T, U>>
+        typename = traits::is_not_same_and_arithmetic_t<T, U>>
     inline auto operator*(const T &a, const QuaternionT<U> &b)
         -> QuaternionT<decltype(T() * U())>
     {
@@ -81,7 +81,9 @@ namespace rkcommon {
       return quaternion_t(scalar_t(a) * quaternion_t(b));
     }
 
-    template <typename T, typename U, typename = traits::is_not_same_t<T, U>>
+    template <typename T,
+        typename U,
+        typename = traits::is_not_same_and_arithmetic_t<T, U>>
     inline auto operator*(const QuaternionT<T> &a, const U &b)
         -> QuaternionT<decltype(T() * U())>
     {

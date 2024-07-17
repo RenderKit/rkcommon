@@ -137,5 +137,11 @@ namespace rkcommon {
     template <typename T>
     using is_arithmetic_t = enable_if_t<std::is_arithmetic<T>::value>;
 
+    // type 'T1' and 'T2' are not the same and arithmetic /////////////////////
+
+    template <typename T1, typename T2>
+    using is_not_same_and_arithmetic_t = enable_if_t<!std::is_same<T1, T2>::value
+        && std::is_arithmetic<T1>::value && std::is_arithmetic<T2>::value>;
+
   }  // namespace traits
 }  // namespace rkcommon

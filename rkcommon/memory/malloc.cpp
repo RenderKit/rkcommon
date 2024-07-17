@@ -9,6 +9,8 @@
 #else
 #ifdef _WIN32
 #include <malloc.h>
+#elif defined(__APPLE__) && (defined(__aarch64__) || defined(__arm64__))
+#include <stdlib.h>
 #else
 #include <xmmintrin.h>
 #endif
@@ -25,6 +27,9 @@ namespace rkcommon {
 #else
 #ifdef _WIN32
       return _aligned_malloc(size, align);
+#elif defined(__APPLE__) && (defined(__aarch64__) || defined(__arm64__))
+      void *ptr = nullptr;
+      return (posix_memalign(&ptr, align, size) == 0) ? ptr : nullptr;
 #else  // __UNIX__
       return _mm_malloc(size, align);
 #endif
@@ -37,7 +42,9 @@ namespace rkcommon {
       scalable_aligned_free(ptr);
 #else
 #ifdef _WIN32
-      return _aligned_free(ptr);
+      _aligned_free(ptr);
+#elif defined(__APPLE__) && (defined(__aarch64__) || defined(__arm64__))
+      free(ptr);
 #else  // __UNIX__
       _mm_free(ptr);
 #endif

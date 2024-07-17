@@ -129,8 +129,10 @@ inline void test_intersectRayBox()
   using V = vec_t<T, N>;
   using X = box_t<T, N>;
   range_t<T> r = intersectRayBox(V(0), normalize(V(1)), X(V(1), V(2)));
-  REQUIRE(abs(r.lower - length(V(1))) <= T(ulp));
-  REQUIRE(abs(r.upper - length(V(2))) <= 2 * T(ulp)); // rcp is multiplied by box.upper
+
+  // Tolerance 2x higher because of sse2neon
+  REQUIRE(abs(r.lower - length(V(1))) <= 2 * T(ulp));
+  REQUIRE(abs(r.upper - length(V(2))) <= 4 * T(ulp)); // rcp is multiplied by box.upper
 }
 
 TEST_CASE("box intersectRayBox function", "[box]")

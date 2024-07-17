@@ -11,6 +11,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: read-all
+
 jobs:
 
   ## Build Jobs ##
@@ -19,7 +21,7 @@ jobs:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/windows.yml@main
     with:
       cmd: |
-        gitlab\build.ps1 "Visual Studio 15 2017 Win64" "v141"
+        .github\scripts\build.ps1 "Visual Studio 15 2017 Win64"
       artifact-out: build-windows-msvc15
       artifact-path: build
 
@@ -27,8 +29,16 @@ jobs:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/windows.yml@main
     with:
       cmd: |
-        gitlab\build.ps1 "Visual Studio 16 2019" "v142"
+        .github\scripts\build.ps1 "Visual Studio 16 2019"
       artifact-out: build-windows-msvc16
+      artifact-path: build
+
+  build-windows-msvc17:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/windows.yml@main
+    with:
+      cmd: |
+        .github\scripts\build.ps1 "Visual Studio 17 2022"
+      artifact-out: build-windows-msvc17
       artifact-path: build
 
   ## Functional Test Jobs ##
@@ -38,7 +48,7 @@ jobs:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/windows.yml@main
     with:
       cmd: |
-        gitlab\run_tests.ps1
+        .github\scripts\run_tests.ps1
       artifact-in: build-windows-msvc15
 
   test-windows-msvc16:
@@ -46,5 +56,13 @@ jobs:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/windows.yml@main
     with:
       cmd: |
-        gitlab\run_tests.ps1
+        .github\scripts\run_tests.ps1
       artifact-in: build-windows-msvc16
+
+  test-windows-msvc17:
+    needs: build-windows-msvc17
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/windows.yml@main
+    with:
+      cmd: |
+        .github\scripts\run_tests.ps1
+      artifact-in: build-windows-msvc17
