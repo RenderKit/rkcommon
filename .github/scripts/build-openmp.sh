@@ -7,6 +7,6 @@ cd build
 
 cmake --version
 
-cmake -DRKCOMMON_TASKING_SYSTEM=OPENMP ..
+cmake -DRKCOMMON_TASKING_SYSTEM=OPENMP -DRKCOMMON_WARN_AS_ERRORS=ON ..
 
 cmake --build .

@@ -9,6 +9,7 @@ cmake --version
 cmake -L `
 -G $args[0] `
 -D RKCOMMON_TASKING_SYSTEM=INTERNAL `
+-D RKCOMMON_WARN_AS_ERRORS=ON `
 ..
 
 cmake --build . --config Release --target ALL_BUILD

@@ -45,6 +45,7 @@ rkcommon_create_tasking_target(FALSE)
 option(BUILD_SHARED_LIBS "Build rkcommon as a shared library" ON)
 option(RKCOMMON_ADDRSAN "Build rkcommon with dlclose disabled for addrsan" OFF)
 option(RKCOMMON_NO_SIMD "Build rkcommon not using SIMD instructions" OFF)
+option(RKCOMMON_WARN_AS_ERRORS "Treat warnings as errors" OFF)
 
 set(CMAKE_SKIP_INSTALL_RPATH OFF)
 if (APPLE)

@@ -59,7 +59,15 @@ if (RKCOMMON_NO_SIMD)
   target_compile_definitions(${PROJECT_NAME} PUBLIC -DRKCOMMON_NO_SIMD)
 endif()
 
-set_property(TARGET rkcommon PROPERTY POSITION_INDEPENDENT_CODE ON)
+if (RKCOMMON_WARN_AS_ERRORS)
+  if(MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /WX)
+  else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Werror)
+  endif()
+endif()
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 ## Install library + targets ##################################################
 
