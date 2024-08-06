@@ -7,6 +7,6 @@ cd build
 
 cmake --version
 
-cmake "$@" -DRKCOMMON_TASKING_SYSTEM=INTERNAL ..
+cmake "$@" -DRKCOMMON_TASKING_SYSTEM=INTERNAL -DRKCOMMON_WARN_AS_ERRORS=ON ..
 
 cmake --build .
