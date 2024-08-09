@@ -6,6 +6,14 @@
 #include "rkcommon/tasking/tasking_system_init.h"
 
 int main(int argc, char* argv[]) {
+
+  // Spawn workers threads
   rkcommon::tasking::initTaskingSystem();
-  return Catch::Session().run(argc, argv);
+
+  // Run all tests
+  auto result = Catch::Session().run(argc, argv);
+
+  // Terminate worker threads
+  rkcommon::tasking::shutdownTaskingSystem();
+  return result;
 }

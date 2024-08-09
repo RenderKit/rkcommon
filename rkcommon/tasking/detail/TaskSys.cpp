@@ -4,8 +4,6 @@
 #include "TaskSys.h"
 // ospray
 #include "../../platform.h"
-// stl
-#include <thread>
 
 namespace rkcommon {
   namespace tasking {
@@ -23,6 +21,11 @@ namespace rkcommon {
         if (nThreads < 1)
           nThreads = enki::GetNumHardwareThreads();
         g_ts->Initialize(nThreads);
+      }
+
+      void shutdownTaskSystemInternal()
+      {
+        g_ts.reset();
       }
 
       int numThreadsTaskSystemInternal()
