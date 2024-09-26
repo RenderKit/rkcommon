@@ -1,7 +1,7 @@
 ## Copyright 2022 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
-name: CI MacOS
+name: (Internal) CI MacOS
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
     with:
       runs-on: '[ "macOS", "build", "x86_64" ]'
       cmd: |
-        .github/scripts/build-openmp.sh
+        .github/scripts/build.sh
       artifact-out: build-macos
       artifact-path: build
 
@@ -31,7 +31,7 @@ jobs:
     with:
       runs-on: '[ "macOS", "build", "arm" ]'
       cmd: |
-        .github/scripts/build-openmp.sh
+        .github/scripts/build.sh
       artifact-out: build-macos-arm
       artifact-path: build
 

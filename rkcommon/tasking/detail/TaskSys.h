@@ -15,12 +15,11 @@ namespace rkcommon {
 
       using Task = enki::ITaskSet;
 
-      void RKCOMMON_INTERFACE initTaskSystemInternal(int numThreads = -1);
-
-      int RKCOMMON_INTERFACE numThreadsTaskSystemInternal();
+      void initTaskSystemInternal(int numThreads = -1);
+      void shutdownTaskSystemInternal();
+      int numThreadsTaskSystemInternal();
 
       void RKCOMMON_INTERFACE scheduleTaskInternal(Task *task);
-
       void RKCOMMON_INTERFACE waitInternal(Task *task);
 
       template <typename TASK_T>
@@ -48,29 +47,6 @@ namespace rkcommon {
         scheduleTaskInternal(&task);
         waitInternal(&task);
       }
-
-      template <typename TASK_T>
-      inline void schedule_internal(TASK_T &&fcn)
-      {
-        struct LocalTask : public Task
-        {
-          TASK_T t;
-
-          LocalTask(TASK_T &&fcn) : Task(1), t(std::forward<TASK_T>(fcn)) {}
-
-          ~LocalTask() override = default;
-
-          void ExecuteRange(enki::TaskSetPartition, uint32_t) override
-          {
-            t();
-            delete this;
-          }
-        };
-
-        auto *task = new LocalTask(std::forward<TASK_T>(fcn));
-        scheduleTaskInternal(task);
-      }
-
     }  // namespace detail
   }    // namespace tasking
 }  // namespace rkcommon

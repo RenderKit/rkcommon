@@ -28,9 +28,7 @@ namespace rkcommon {
 #elif defined(RKCOMMON_TASKING_OMP)
         std::thread thread(fcn);
         thread.detach();
-#elif defined(RKCOMMON_TASKING_INTERNAL)
-        detail::schedule_internal(std::move(fcn));
-#else// Debug --> synchronous!
+#else// Internal & Debug --> synchronous!
         fcn();
 #endif
       }

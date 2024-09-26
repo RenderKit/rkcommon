@@ -66,6 +66,15 @@ namespace rkcommon {
 #endif
       }
 
+      ~tasking_system_handle()
+      {
+#if defined(RKCOMMON_TASKING_TBB)
+        tbb_gc.reset();
+#elif defined(RKCOMMON_TASKING_INTERNAL)
+        detail::shutdownTaskSystemInternal();
+#endif
+      }
+
       int num_threads()
       {
 #if defined(RKCOMMON_TASKING_TBB)
@@ -96,6 +105,11 @@ namespace rkcommon {
       }
 
       g_tasking_handle = make_unique<tasking_system_handle>(numThreads);
+    }
+
+    void shutdownTaskingSystem()
+    {
+      g_tasking_handle.reset();
     }
 
     int numTaskingThreads()

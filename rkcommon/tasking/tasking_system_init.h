@@ -10,6 +10,7 @@ namespace rkcommon {
 
     void RKCOMMON_INTERFACE initTaskingSystem(int numThreads      = -1,
                                                bool flushDenormals = false);
+    void RKCOMMON_INTERFACE shutdownTaskingSystem();
 
     int RKCOMMON_INTERFACE numTaskingThreads();
 

@@ -51,6 +51,10 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_LIST_DIR}
 )
 
+if (RKCOMMON_TASKING_INTERNAL)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE -DENKITS_BUILD_DLL)
+endif()
+
 if (RKCOMMON_ADDRSAN)
   target_compile_definitions(${PROJECT_NAME} PUBLIC -DRKCOMMON_ADDRSAN)
 endif()
