@@ -438,10 +438,15 @@ namespace rkcommon {
     template <typename T>
     inline LinearSpace3<T> frame(const T &N)
     {
-      const T dx0 = cross(T(one, zero, zero), N);
-      const T dx1 = cross(T(zero, one, zero), N);
-      const T dx  = normalize(dot(dx0, dx0) > dot(dx1, dx1) ?  dx0 : dx1);
-      const T dy  = normalize(cross(N, dx));
+      //  Duff et al., "Building an Orthonormal Basis, Revisited", JCGT 2017
+      const typename T::Scalar sgn = N.z < (typename T::Scalar)zero
+          ? -(typename T::Scalar)one
+          : (typename T::Scalar)one;
+      const typename T::Scalar a = -(typename T::Scalar)one / (sgn + N.z);
+      const typename T::Scalar b = N.x * N.y * a;
+      const T dx =
+          T((typename T::Scalar)one + sgn * N.x * N.x * a, sgn * b, -sgn * N.x);
+      const T dy = T(b, sgn + N.y * N.y * a, -N.y);
       return LinearSpace3<T>(dx, dy, N);
     }
 
