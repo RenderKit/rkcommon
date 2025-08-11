@@ -49,8 +49,8 @@ TEST_CASE("rkmath rcp_safe function", "[rkmath]")
 template <typename T>
 inline void test_rsqrt()
 {
-  REQUIRE(CmpT<T>(rsqrt(T(1)), T(1)));
-  REQUIRE(CmpT<T>(rsqrt(T(4)), T(.5)));
+  REQUIRE(CmpT<T>(rkcommon::math::rsqrt(T(1)), T(1)));
+  REQUIRE(CmpT<T>(rkcommon::math::rsqrt(T(4)), T(.5)));
 }
 
 TEST_CASE("rkmath rsqrt function", "[rkmath]")
