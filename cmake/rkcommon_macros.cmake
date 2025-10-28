@@ -1,45 +1,6 @@
 ## Copyright 2009 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
-# use a backported version of find_dependency(), renamed as
-# find_dependency_39(), from CMake 3.9.0, which correctly supports passing
-# components to find_package(). this allows us to maintain our current minimum
-# CMake version of 3.1.
-macro(find_dependency_39 dep)
-  if (NOT ${dep}_FOUND)
-    set(cmake_fd_quiet_arg)
-    if(${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY)
-      set(cmake_fd_quiet_arg QUIET)
-    endif()
-    set(cmake_fd_required_arg)
-    if(${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED)
-      set(cmake_fd_required_arg REQUIRED)
-    endif()
-
-    get_property(cmake_fd_alreadyTransitive GLOBAL PROPERTY
-      _CMAKE_${dep}_TRANSITIVE_DEPENDENCY
-    )
-
-    find_package(${dep} ${ARGN}
-      ${cmake_fd_quiet_arg}
-      ${cmake_fd_required_arg}
-    )
-
-    if(NOT DEFINED cmake_fd_alreadyTransitive OR cmake_fd_alreadyTransitive)
-      set_property(GLOBAL PROPERTY _CMAKE_${dep}_TRANSITIVE_DEPENDENCY TRUE)
-    endif()
-
-    if (NOT ${dep}_FOUND)
-      set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE "${CMAKE_FIND_PACKAGE_NAME} could not be found because dependency ${dep} could not be found.")
-      set(${CMAKE_FIND_PACKAGE_NAME}_FOUND False)
-      return()
-    endif()
-    set(cmake_fd_required_arg)
-    set(cmake_fd_quiet_arg)
-    set(cmake_fd_exact_arg)
-  endif()
-endmacro()
-
 ## Macro for printing CMake variables ##
 macro(print var)
   message("${var} = ${${var}}")
@@ -210,7 +171,7 @@ macro(rkcommon_create_tasking_target FROM_INSTALL)
       # If not found try getting older TBB via module (FindTBB.cmake)
       unset(TBB_DIR CACHE)
       if (${FROM_INSTALL})
-        find_dependency_39(TBB 4.4 REQUIRED tbb tbbmalloc)
+        find_dependency(TBB 4.4 REQUIRED tbb tbbmalloc)
       else()
         find_package(TBB 4.4 REQUIRED tbb tbbmalloc)
       endif()
@@ -220,7 +181,7 @@ macro(rkcommon_create_tasking_target FROM_INSTALL)
       endif()
     endif()
   elseif(RKCOMMON_TASKING_OPENMP)
-    find_dependency_39(OpenMP)
+    find_dependency(OpenMP)
     if (OPENMP_FOUND)
       list(APPEND RKCOMMON_TASKING_LIBS OpenMP::OpenMP_CXX)
       set(RKCOMMON_TASKING_DEFINITIONS RKCOMMON_TASKING_OMP)
