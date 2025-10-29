@@ -187,7 +187,7 @@ template <typename T>
 inline void test_slerp()
 {
   typename T::Scalar two = 2;
-  REQUIRE(CmpT(slerp(.5f, T(1, 0, 0, 0), T(0, 1, 0, 0)), T(rsqrt(two), rsqrt(two), 0, 0)));
+  REQUIRE(CmpT(slerp(.5f, T(1, 0, 0, 0), T(0, 1, 0, 0)), T(rkcommon::math::rsqrt(two), rkcommon::math::rsqrt(two), 0, 0)));
 }
 
 TEST_CASE("Quaternion functions", "[quat]")

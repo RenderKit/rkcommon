@@ -3,11 +3,7 @@
 
 ## Global CMake options ##
 
-if (RKCOMMON_TASKING_SYSTEM STREQUAL "OpenMP")
-  cmake_minimum_required(VERSION 3.9) # NOTE(jda): rely on OpenMP targets
-else()
-  cmake_minimum_required(VERSION 3.5)
-endif()
+cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -18,7 +14,7 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 ## Establish project ##
 
-project(rkcommon VERSION 1.14.2 LANGUAGES CXX)
+project(rkcommon VERSION 1.15.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
