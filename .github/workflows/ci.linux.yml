@@ -30,7 +30,7 @@ jobs:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
       image: rockylinux:8
-      dpcpp-version: intel/2025.1
+      dpcpp-version: intel/2025.2
       cmd: |
         export CC=icx
         export CXX=icpx
