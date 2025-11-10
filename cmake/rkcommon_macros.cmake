@@ -142,6 +142,8 @@ macro(rkcommon_configure_tasking_system)
   endif()
 endmacro()
 
+include(CMakeFindDependencyMacro)
+
 macro(rkcommon_create_tasking_target FROM_INSTALL)
   set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
   set(THREADS_PREFER_PTHREAD_FLAG TRUE)
