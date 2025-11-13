@@ -27,10 +27,21 @@ using int8 = int8_t;
 // Constants
 // ------------------------------------------------------------------
 
+#ifdef ISPC
 #define inf floatbits(0x7F800000)
 #define pos_inf floatbits(0x7F800000)
 #define neg_inf floatbits(0xFF800000)
 #define nan floatbits(0x7FBFFFFF)
+#else
+constexpr float floatbits(unsigned int a)
+{
+  return sycl::bit_cast<float>(a);
+}
+constexpr float inf = floatbits(0x7F800000);
+constexpr float pos_inf = floatbits(0x7F800000);
+constexpr float neg_inf = floatbits(0xFF800000);
+constexpr float nan = floatbits(0x7FBFFFFF);
+#endif
 // smallest positive normal number 2^-126 ~ 1.17549435e-38
 #define flt_min 0x1.0p-126f
 
@@ -136,10 +147,6 @@ inline float isnan(const float a)
 inline float nextafter(const float a, const float b)
 {
   return sycl::nextafter(a, b);
-}
-inline float floatbits(unsigned int a)
-{
-  return sycl::bit_cast<float>(a);
 }
 inline unsigned int intbits(float a)
 {
