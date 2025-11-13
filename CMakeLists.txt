@@ -14,7 +14,7 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 ## Establish project ##
 
-project(rkcommon VERSION 1.15.1 LANGUAGES CXX)
+project(rkcommon VERSION 1.15.2 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
