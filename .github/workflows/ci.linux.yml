@@ -30,13 +30,21 @@ jobs:
     uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
     with:
       image: rockylinux:8
-      dpcpp-version: intel/2025.2
+      dpcpp-version: intel/2025.3
       cmd: |
-        export CC=icx
-        export CXX=icpx
         export LDFLAGS="-static-intel"
         .github/scripts/build.sh
       artifact-out: build-rocky8-icx
+      artifact-path: build
+
+  build-rocky8-dpcpp:
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: rockylinux:8
+      dpcpp-version: intel-llvm/v7.0.0
+      cmd: |
+        .github/scripts/build.sh
+      artifact-out: build-rocky8-dpcpp
       artifact-path: build
 
   build-rocky9:
@@ -128,6 +136,15 @@ jobs:
       cmd: |
         ./build/rkcommon_test_suite
       artifact-in: build-rocky8-icx
+
+  test-rocky8-dpcpp:
+    needs: build-rocky8-dpcpp
+    uses: intel-innersource/libraries.devops.renderkit.workflows/.github/workflows/docker.yml@main
+    with:
+      image: rockylinux:8
+      cmd: |
+        ./build/rkcommon_test_suite
+      artifact-in: build-rocky8-dpcpp
 
   test-rocky9:
     needs: build-rocky9
