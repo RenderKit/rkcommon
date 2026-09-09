@@ -1,6 +1,8 @@
 ## Copyright 2009 Intel Corporation
 ## SPDX-License-Identifier: Apache-2.0
 
+add_subdirectory(external/catch2)
+
 add_executable(rkcommon_test_suite
   ${RKCOMMON_RESOURCE}
 
@@ -61,7 +63,7 @@ add_executable(rkcommon_test_suite
   utility/test_TransactionalValue.cpp
 )
 
-target_link_libraries(rkcommon_test_suite PRIVATE rkcommon)
+target_link_libraries(rkcommon_test_suite PRIVATE rkcommon Catch2::Catch2)
 
 add_test(NAME ArgumentList          COMMAND rkcommon_test_suite "[ArgumentList]")
 add_test(NAME ArrayView             COMMAND rkcommon_test_suite "[ArrayView]")

@@ -53,6 +53,8 @@ endif()
 
 include(CTest)
 
+set(RKCOMMON_CATCH2_GIT_TAG v3.16.0)
+
 if (BUILD_TESTING)
   enable_testing()
 endif()
