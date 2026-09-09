@@ -30,8 +30,6 @@ add_library(${PROJECT_NAME}
   utility/PseudoURL.cpp
   utility/TimeStamp.cpp
 
-  xml/XML.cpp
-
   tracing/Tracing.cpp
 )
 
