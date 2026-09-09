@@ -5,8 +5,8 @@ used by various components of Intel® Rendering Toolkit (Render Kit).
 
 ### Requirements
 
-- CMake v3.10 or higher
-- C++11 compiler
+- CMake v3.10 or higher (v3.16 when compiling the tests)
+- C++11 compiler (C++14 when compiling the tests)
 - TBB 4.4.3 or higher (by default, other tasking system options available via
   the `RKCOMMON_TASKING_SYSTEM` CMake variable)
 

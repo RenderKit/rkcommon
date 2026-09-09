@@ -14,7 +14,7 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 ## Establish project ##
 
-project(rkcommon VERSION 1.15.3 LANGUAGES CXX)
+project(rkcommon VERSION 1.15.4 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
@@ -52,6 +52,8 @@ else()
 endif()
 
 include(CTest)
+
+set(RKCOMMON_CATCH2_GIT_TAG v3.16.0)
 
 if (BUILD_TESTING)
   enable_testing()

@@ -1,8 +1,7 @@
 // Copyright 2009 Intel Corporation
 // SPDX-License-Identifier: Apache-2.0
 
-#define CATCH_CONFIG_RUNNER
-#include "catch.hpp"
+#include <catch2/catch_session.hpp>
 #include "rkcommon/tasking/tasking_system_init.h"
 
 int main(int argc, char* argv[]) {
